@@ -16,4 +16,7 @@ auxvars = ["interim_id", "gor9d", "work_status_group", "dvhsize"]
 def impute(*, data: int, impute_var: int, aux_vars: int) -> int:
     return data + impute_var + aux_vars
 
-t = [1,2,3]
+
+t = [1,
+ 2,
+ 3]
