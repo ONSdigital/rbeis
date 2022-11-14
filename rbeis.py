@@ -30,7 +30,8 @@ def _assign_igroups(data, aux_vars):
        of values corresponding to the record's auxiliary variables
     2. Group by 'conc_aux' and extract group integers from the internal grouper
        object, creating a new column 'IGroup' containing these integers
-    3. Assign non-recipient records to IGroup -1
+    3. Subtract 1 from each IGroup value, giving -1 for all non-recipient
+       records and zero-indexing all others
     4. Remove column 'conc_aux'
     """
     data["conc_aux"] = data.apply(
@@ -38,7 +39,7 @@ def _assign_igroups(data, aux_vars):
         axis=1,
     )
     data["IGroup"] = data.groupby("conc_aux").grouper.group_info[0]
-    data["IGroup"] = np.where(data["impute"] == False, -1, data["IGroup"])
+    data["IGroup"] = data.apply(lambda r: r["IGroup"]-1,axis=1)
     del data["conc_aux"]
 
 
@@ -57,7 +58,7 @@ def _get_igroup_aux_var(data, aux_var):
     Return a list containing each IGroup's value of a given auxiliary variable.
     """
     out = []
-    for i in range(1, 1 + data["IGroup"].max()):
+    for i in range(1 + data["IGroup"].max()):
         out += (
             data[["IGroup", aux_var]]
             .drop_duplicates()
@@ -138,8 +139,8 @@ def _calc_distances(
         else [_df1, _df2, _df3][dist_func - 1]
     )
     igroup_aux_vars = []
-    vars_vals = zip(aux_vars, map(lambda v: _get_igroup_aux_var(data, v), aux_vars))
-    for i in range(0, data["IGroup"].max()):
+    vars_vals = list(zip(aux_vars, map(lambda v: _get_igroup_aux_var(data, v), aux_vars)))
+    for i in range(1 + data["IGroup"].max()):
         igroup_aux_vars.append({k: v[i] for k, v in vars_vals})
     data["dists_temp"] = data.apply(
         lambda r: list(
@@ -161,7 +162,7 @@ def _calc_distances(
     del data["dists_temp"]
 
 
-def _get_donors(data, min_quantile=None):
+def _calc_donors(data, min_quantile=None):
     """
     data (pd.DataFrame): The dataset undergoing imputation
      min_quantile (int): Instead of choosing the minimum distance, choose
@@ -178,17 +179,74 @@ def _get_donors(data, min_quantile=None):
        maximum required IGroup distances, giving a list of indices where this is
        the case.
     """
-    igroups_dists = np.array(data.query("not(impute)")["distances"].values.tolist()).T.tolist()
+    igroups_dists = np.array(
+        data.query("not(impute)")["distances"].values.tolist()
+    ).T.tolist()
     igroups_dists.sort()
     # This would be a lot nicer if we could have NumPy >= 1.15.0, which has
-    # np.quantile, but we're on 1.13.0
-    max_donor_dists = list(map((lambda l: l[int(np.ceil(len(l)/n))-1]) if min_quantile else min,igroups_dists)
-    data["donor"] = data.apply(lambda r: np.where(list(map(lambda p: p[0]<=p[1],zip(r["distances"],max_donor_dists))))[0],tolist() if not(r["impute"]) else [], axis=1)
-    # TODO: DO WE HAVE AN OFF-BY-ONE ERROR HERE?  IGROUP NUMBERS (from 1) OR LIST INDICES (from 0)?
+    # np.quantile, but we're on 1.13.3
+    max_donor_dists = list(
+        map(
+            (lambda l: l[int(np.ceil(len(l) / n)) - 1]) if min_quantile else min,
+            igroups_dists,
+        )
+    )
+    data["donor"] = data.apply(
+        lambda r: np.where(
+            list(map(lambda p: p[0] <= p[1], zip(r["distances"], max_donor_dists)))
+        )[0].tolist()
+        if not (r["impute"])
+        else [],
+        axis=1,
+    )
 
+def _get_igroup_sizes(data):
+    """
+    data (pd.DataFrame): The dataset undergoing imputation
 
-def _get_freq_dist(igroup):
-    pass
+    Return a list of integers representing the sizes of each IGroup.
+    """
+    return data.query("impute").groupby("IGroup").count()["impute"].values.tolist()
+
+def _get_donors(data, igroup):
+    """
+    data (pd.DataFrame): The dataset undergoing imputation
+           igroup (int): The IGroup whose donors are required
+
+    Return a list of indices corresponding to records in data that are donors to
+    the specified IGroup.
+    """
+    return list(map(lambda x: igroup in x, data["donor"].values.tolist()))
+
+def _get_donor_probs(data, imp_var, possible_vals, igroup):
+    """
+        data (pd.DataFrame): The dataset undergoing imputation
+              imp_var (str): The name of the variable to be imputed
+    possible_vals ('a list): A list of all possible values that imp_var can take
+               igroup (int): The IGroup whose donors are required
+
+    Return a list of the proportions of a given igroup taken up by each possible
+    value of the variable to be imputed.
+    """
+    pool = data[_get_donors(data,igroup)][imp_var].values.tolist()
+    return list(map(lambda v: Fraction(len([i for i in pool if i==v]),len(pool)),possible_vals))
+
+def _get_freq_dist(data, imp_var, possible_vals, igroup):
+    """
+        data (pd.DataFrame): The dataset undergoing imputation
+              imp_var (str): The name of the variable to be imputed
+    possible_vals ('a list): A list of all possible values that imp_var can take
+               igroup (int): The IGroup whose donors are required
+
+    Return a list of frequency distributions for each IGroup (that is, the
+    expected values for each possible value of imp_var given the number of
+    records to be imputed, according to the probability observed in the
+    dataset).
+    """
+    out = []
+    for i in range(1+data["IGroup"].max()):
+        out.append(_get_donor_probs(data,imp_var,possible_vals,i)) # FIXME: Getting a divide-by-zero error here with IGroup 50 in the test - need a special case for if a possible value doesn't appear, I guess
+    return out
 
 
 def _freq_to_exp(freq_dist):
@@ -196,10 +254,19 @@ def _freq_to_exp(freq_dist):
 
 
 def impute(
-    data, impute_var, aux_vars, weights, dist_func, min_quantile=None, overwrite=False, col_name=None
+    data,
+    imp_var,
+    possible_vals,
+    aux_vars,
+    weights,
+    dist_func,
+    min_quantile=None,
+    overwrite=False,
+    col_name=None,
 ):
     # data: dataframe
-    # impute_var: string
+    # imp_var: string
+    # possible_vals: 'a list
     # aux_vars: string list
     # weights: (string * float) dict
     # dist_func: numeric * numeric -> numeric function
@@ -236,3 +303,7 @@ def t2():
 
 def t3():
     _calc_distances(test_data, test_aux_vars, test_df, test_weights)
+
+
+def t4():
+    _calc_donors(test_data)
