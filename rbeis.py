@@ -39,7 +39,7 @@ def _assign_igroups(data, aux_vars):
         axis=1,
     )
     data["IGroup"] = data.groupby("conc_aux").grouper.group_info[0]
-    data["IGroup"] = data.apply(lambda r: r["IGroup"]-1,axis=1)
+    data["IGroup"] = data.apply(lambda r: r["IGroup"] - 1, axis=1)
     del data["conc_aux"]
 
 
@@ -139,7 +139,9 @@ def _calc_distances(
         else [_df1, _df2, _df3][dist_func - 1]
     )
     igroup_aux_vars = []
-    vars_vals = list(zip(aux_vars, map(lambda v: _get_igroup_aux_var(data, v), aux_vars)))
+    vars_vals = list(
+        zip(aux_vars, map(lambda v: _get_igroup_aux_var(data, v), aux_vars))
+    )
     for i in range(1 + data["IGroup"].max()):
         igroup_aux_vars.append({k: v[i] for k, v in vars_vals})
     data["dists_temp"] = data.apply(
@@ -200,13 +202,6 @@ def _calc_donors(data, min_quantile=None):
         axis=1,
     )
 
-def _get_igroup_sizes(data):
-    """
-    data (pd.DataFrame): The dataset undergoing imputation
-
-    Return a list of integers representing the sizes of each IGroup.
-    """
-    return data.query("impute").groupby("IGroup").count()["impute"].values.tolist()
 
 def _get_donors(data, igroup):
     """
@@ -218,18 +213,6 @@ def _get_donors(data, igroup):
     """
     return list(map(lambda x: igroup in x, data["donor"].values.tolist()))
 
-def _get_donor_probs(data, imp_var, possible_vals, igroup):
-    """
-        data (pd.DataFrame): The dataset undergoing imputation
-              imp_var (str): The name of the variable to be imputed
-    possible_vals ('a list): A list of all possible values that imp_var can take
-               igroup (int): The IGroup whose donors are required
-
-    Return a list of the proportions of a given igroup taken up by each possible
-    value of the variable to be imputed.
-    """
-    pool = data[_get_donors(data,igroup)][imp_var].values.tolist()
-    return list(map(lambda v: Fraction(len([i for i in pool if i==v]),len(pool)),possible_vals))
 
 def _get_freq_dist(data, imp_var, possible_vals, igroup):
     """
@@ -238,19 +221,29 @@ def _get_freq_dist(data, imp_var, possible_vals, igroup):
     possible_vals ('a list): A list of all possible values that imp_var can take
                igroup (int): The IGroup whose donors are required
 
-    Return a list of frequency distributions for each IGroup (that is, the
-    expected values for each possible value of imp_var given the number of
-    records to be imputed, according to the probability observed in the
-    dataset).
+    For a given IGroup, return a frequency distribution for each possible value
+    of the variable to be imputed.  This takes the form of a list of the
+    proportions of a given igroup taken up by each possible value.
     """
-    out = []
-    for i in range(1+data["IGroup"].max()):
-        out.append(_get_donor_probs(data,imp_var,possible_vals,i)) # FIXME: Getting a divide-by-zero error here with IGroup 50 in the test - need a special case for if a possible value doesn't appear, I guess
-    return out
+    pool = data[_get_donors(data, igroup)][imp_var].values.tolist()
+    return list(
+        map(lambda n: 0 if n==0 else Fraction(n,len(pool)),
+        map(
+            lambda v: len([i for i in pool if i == v]),
+            possible_vals,
+        ))
+    )
 
+def _freq_to_exp(freq_dist,igroup):
+    """
+    freq_dist (Fraction list): The frequency distribution to convert
+                 igroup (int): The IGroup corresponding to freq_dist
 
-def _freq_to_exp(freq_dist):
-    pass
+    Convert a frequency distribution to the expected numbers of occurrences for
+    a given IGroup.
+    """
+    igroup_size = len(data.query("IGroup=="+str(igroup)).values.tolist())
+    return list(map(lambda f: f*igroup_size,freq_dist))
 
 
 def impute(
