@@ -227,24 +227,70 @@ def _get_freq_dist(data, imp_var, possible_vals, igroup):
     """
     pool = data[_get_donors(data, igroup)][imp_var].values.tolist()
     return list(
-        map(lambda n: 0 if n==0 else Fraction(n,len(pool)),
         map(
-            lambda v: len([i for i in pool if i == v]),
-            possible_vals,
-        ))
+            lambda n: 0 if n == 0 else Fraction(n, len(pool)),
+            map(
+                lambda v: len([i for i in pool if i == v]),
+                possible_vals,
+            ),
+        )
     )
 
-def _freq_to_exp(freq_dist,igroup):
+
+def _freq_to_exp(data, freq_dist, igroup):
     """
+          data (pd.DataFrame): The dataset undergoing imputation
     freq_dist (Fraction list): The frequency distribution to convert
                  igroup (int): The IGroup corresponding to freq_dist
 
     Convert a frequency distribution to the expected numbers of occurrences for
     a given IGroup.
     """
-    igroup_size = len(data.query("IGroup=="+str(igroup)).values.tolist())
-    return list(map(lambda f: f*igroup_size,freq_dist))
+    igroup_size = len(data.query("IGroup==" + str(igroup)).values.tolist())
+    return list(map(lambda f: f * igroup_size, freq_dist))
 
+def _impute_igroup(data, exp_dist, possible_vals, igroup):
+    """
+         data (pd.DataFrame): The dataset undergoing imputation
+    exp_dist (Fraction list): The expected values derived from the frequency
+                              distribution using _freq_to_exp
+     possible_vals ('a list): A list of all possible values that imp_var can take
+                igroup (int): The IGroup whose values are to be imputed
+
+    Return a set of imputed values for the given IGroup:
+    1. For each of the possible values that the variable to be imputed can take,
+       insert a number of values equal to the integer part of the expected value
+       and subtract the integer part from the expected value
+    2. Convert the fractional parts of the expected values back into
+       probabilities
+    3. Using these probabilities, draw a value at random, remove that value from
+       the set of possible values to be imputed, and adjust the remaining
+       probabilities accordingly
+    4. Repeat step 3 until there are no more values still to impute
+    5. Randomise the order of the list of imputed values, then return it
+    """
+    out = []
+    igroup_size = len(data.query("IGroup==" + str(igroup)).values.tolist())
+    for i in range(len(exp_dist)):
+        if exp_dist[i] >= 1:
+            out += [possible_vals[i]]*int(exp_dist[i])
+            exp_dist[i] -= int(exp_dist[i])
+    remaining = igroup_size - len(out)
+    exp_dist = list(map(lambda e: Fraction(e,sum(exp_dist)),exp_dist))
+    assert sum(exp_dist)==1
+    possible_vals = [possible_vals[i] for i in range(len(exp_dist)) if exp_dist[i]!=0]
+    exp_dist = [e for e in exp_dist if e!=0]
+    for i in range(remaining):
+        selected_val = choice(possible_vals,p=exp_dist)
+        del(exp_dist[possible_vals.index(selected_val)])
+        exp_dist = list(map(lambda e: Fraction(e,sum(exp_dist)),exp_dist))
+        assert sum(exp_dist)==1
+        possible_vals = [v for v in possible_vals if v!=selected_val]
+        out.append(selected_val)
+    # TODO: check that number of imputed values for each possible value is
+    #       either int(exp) or int(exp)+1
+    shuffle(out)
+    return out
 
 def impute(
     data,
@@ -253,9 +299,11 @@ def impute(
     aux_vars,
     weights,
     dist_func,
+    custom_df_map=None,
     min_quantile=None,
     overwrite=False,
     col_name=None,
+    in_place=True
 ):
     # data: dataframe
     # imp_var: string
@@ -263,9 +311,11 @@ def impute(
     # aux_vars: string list
     # weights: (string * float) dict
     # dist_func: numeric * numeric -> numeric function
+    # custom_df_map: ('a * 'a) * numeric dict
     # min_quantile: int
     # overwrite: bool
     # col_name: string
+    # in_place: bool
     # - (check that weights keys correspond to aux_vars)
     # - add 'impute' column
     # - assign igroups
@@ -274,8 +324,15 @@ def impute(
     # - get igroup freq dists
     # - convert to rbeis donor pools
     # - assign imputed variables
+    # - tidy up columns
     # - return dataset
-    pass
+    _add_impute_col(test_data, test_imp_var)
+    _assign_igroups(test_data, test_aux_vars)
+    _calc_distances(test_data, test_aux_vars, test_df, test_weights)
+    _calc_donors(test_data)
+    # TODO: tidy this up and return the dataframe properly (or modify in place)
+    # TODO: include optional keyword arguments
+    # return _impute_igroup(test_data,_freq_to_exp(test_data,_get_freq_dist(test_data,"white",[0,1],i),i),[0,1],i)
 
 
 # Test setup: same dataset as in the notebook example
@@ -300,3 +357,9 @@ def t3():
 
 def t4():
     _calc_donors(test_data)
+
+def t4a():
+    t1();t2();t3();t4();return test_data
+
+def t5(i):
+    return _impute_igroup(test_data,_freq_to_exp(test_data,_get_freq_dist(test_data,"white",[0,1],i),i),[0,1],i)
