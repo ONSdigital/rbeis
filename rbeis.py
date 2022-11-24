@@ -74,7 +74,7 @@ def _get_igroup_aux_var(data, aux_var):
     return out
 
 
-def _build_custom_df(dist_func, mappings):
+def _build_custom_df(dist_func, mappings, threshold=None):
     """
     _build_custom_df(dist_func, mappings)
 
@@ -84,9 +84,12 @@ def _build_custom_df(dist_func, mappings):
     mappings (('a * 'a) * numeric dict): A dictionary with pairs of values to be
                                          overridden as its keys, and the desired
                                          distances as the corresponding values
+                    threshold (numeric): [Optional] A threshold value for the
+                                         distance function, if required
 
     Return a two-argument function that corresponds to distance functions 1, 2
-    or 3, but with certain pairs of values overridden.
+    or 3, but with certain pairs of values overridden.  This function assumes
+    that df(x,y)==df(y,x), where df is the distance function.
     """
     assert dist_func >= 4 and dist_func <= 6
     if dist_func == 4:
@@ -97,10 +100,23 @@ def _build_custom_df(dist_func, mappings):
         df = _df3
     else:
         raise Exception("You may only choose 4, 5 or 6 for a custom distance function.")
-    if dist_func==4:
-        return lambda x, y: mappings[(x, y)] if (x, y) in mappings.keys() else df(x, y)
+    if dist_func == 4:
+        return (
+            lambda x, y: mappings[(x, y)]
+            if (x, y) in mappings.keys()
+            else mappings[(y, x)]
+            if (y, x) in mappings.keys()
+            else df(x, y)
+        )
     else:
-        return lambda x, y, m: mappings[(x, y)] if (x, y) in mappings.keys() else df(x, y, m)
+        assert threshold
+        return (
+            lambda x, y: mappings[(x, y)]
+            if (x, y) in mappings.keys()
+            else mappings[(y, x)]
+            if (y, x) in mappings.keys()
+            else df(x, y, threshold)
+        )
 
 
 def _calc_distances(
@@ -140,7 +156,7 @@ def _calc_distances(
     # Check that the distance function selected is one of the standard six
     assert dist_func >= 1 and dist_func <= 6
     # If required, check that there is a threshold
-    if dist_func in [2,3,5,6]:
+    if dist_func in [2, 3, 5, 6]:
         assert threshold
     # If DF4, DF5 or DF6 required, check that map is provided
     if dist_func >= 4:
@@ -149,7 +165,7 @@ def _calc_distances(
     assert all(map(lambda v: v in aux_vars, weights.keys()))
     # Calculate the distances
     dist_func = (
-        _build_custom_df(dist_func, custom_df_map)
+        _build_custom_df(dist_func, custom_df_map, threshold=threshold)
         if dist_func >= 4
         else [_df1, _df2, _df3][dist_func - 1]
     )
@@ -206,7 +222,7 @@ def _calc_donors(data, min_quantile=None):
     # np.quantile, but we're on 1.13.3
     max_donor_dists = list(
         map(
-            (lambda l: l[int(np.ceil(len(l) / n)) - 1]) if min_quantile else min,
+            (lambda l: l[int(np.ceil(len(l) / min_quantile)) - 1]) if min_quantile else min,
             igroups_dists,
         )
     )
@@ -382,7 +398,7 @@ def impute(
                                               modify the original DataFrame in
                                               place.  If False, return a new
                                               (deep) copy of the DataFrame
-                                              having undergone imputation. 
+                                              having undergone imputation.
                    keep_intermediates (bool): [Optional, default False] If True,
                                               retain the intermediate columns
                                               created by this implementation of
@@ -439,10 +455,11 @@ def impute(
         axis=1,
     )
     assert all(map(lambda l: l == [], imputed_vals))
-    del data["_impute"]
-    del data["_IGroup"]
-    del data["_distances"]
-    del data["_donor"]
+    if not(keep_intermediates):
+        del data["_impute"]
+        del data["_IGroup"]
+        del data["_distances"]
+        del data["_donor"]
 
 
 # Test setup: same dataset as in the notebook example
@@ -484,3 +501,6 @@ def t5(i):
         [0, 1],
         i,
     )
+
+def t6():
+    impute(test_data,"dvsex",[1,2],["interim_id","uac","hh_id_fake"],{"interim_id":1,"uac":2,"hh_id_fake":3},6,threshold=1,custom_df_map={(1,1):2},min_quantile=4,keep_intermediates=True)
