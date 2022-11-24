@@ -169,6 +169,8 @@ def _calc_distances(
         if dist_func >= 4
         else [_df1, _df2, _df3][dist_func - 1]
     )
+    # TODO: Check if dist_func is compatible with each auxvar dtype
+    #       (e.g. DF3 doesn't like strings)
     igroup_aux_vars = []
     vars_vals = list(
         zip(aux_vars, map(lambda v: _get_igroup_aux_var(data, v), aux_vars))
@@ -222,7 +224,9 @@ def _calc_donors(data, min_quantile=None):
     # np.quantile, but we're on 1.13.3
     max_donor_dists = list(
         map(
-            (lambda l: l[int(np.ceil(len(l) / min_quantile)) - 1]) if min_quantile else min,
+            (lambda l: l[int(np.ceil(len(l) / min_quantile)) - 1])
+            if min_quantile
+            else min,
             igroups_dists,
         )
     )
@@ -455,7 +459,7 @@ def impute(
         axis=1,
     )
     assert all(map(lambda l: l == [], imputed_vals))
-    if not(keep_intermediates):
+    if not (keep_intermediates):
         del data["_impute"]
         del data["_IGroup"]
         del data["_distances"]
@@ -502,5 +506,17 @@ def t5(i):
         i,
     )
 
+
 def t6():
-    impute(test_data,"dvsex",[1,2],["interim_id","uac","hh_id_fake"],{"interim_id":1,"uac":2,"hh_id_fake":3},6,threshold=1,custom_df_map={(1,1):2},min_quantile=4,keep_intermediates=True)
+    impute(
+        test_data,
+        "dvsex",
+        [1, 2],
+        ["interim_id", "uac", "hh_id_fake"],
+        {"interim_id": 1, "uac": 2, "hh_id_fake": 3},
+        6,
+        threshold=1,
+        custom_df_map={(1, 1): 2},
+        min_quantile=4,
+        keep_intermediates=True,
+    )
