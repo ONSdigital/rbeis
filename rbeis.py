@@ -16,7 +16,7 @@ def _add_impute_col(data, imp_var):
     Prepare the DataFrame by adding a boolean column 'impute' indicating whether
     or not a record is to be imputed.
     """
-    data["impute"] = np.isnan(data[imp_var])
+    data["_impute"] = np.isnan(data[imp_var])
 
 
 def _assign_igroups(data, aux_vars):
@@ -26,21 +26,21 @@ def _assign_igroups(data, aux_vars):
 
     Add a column 'IGroup' containing integers representing the IGroup each
     recipient record is assigned to:
-    1. Add a column 'conc_aux' containing the string representation of the list
+    1. Add a column '_conc_aux' containing the string representation of the list
        of values corresponding to the record's auxiliary variables
-    2. Group by 'conc_aux' and extract group integers from the internal grouper
-       object, creating a new column 'IGroup' containing these integers
+    2. Group by '_conc_aux' and extract group integers from the internal grouper
+       object, creating a new column '_IGroup' containing these integers
     3. Subtract 1 from each IGroup value, giving -1 for all non-recipient
        records and zero-indexing all others
-    4. Remove column 'conc_aux'
+    4. Remove column '_conc_aux'
     """
-    data["conc_aux"] = data.apply(
-        lambda r: str(list(map(lambda v: r[v], aux_vars))) if r["impute"] else "",
+    data["_conc_aux"] = data.apply(
+        lambda r: str(list(map(lambda v: r[v], aux_vars))) if r["_impute"] else "",
         axis=1,
     )
-    data["IGroup"] = data.groupby("conc_aux").grouper.group_info[0]
-    data["IGroup"] = data.apply(lambda r: r["IGroup"] - 1, axis=1)
-    del data["conc_aux"]
+    data["_IGroup"] = data.groupby("_conc_aux").grouper.group_info[0]
+    data["_IGroup"] = data.apply(lambda r: r["_IGroup"] - 1, axis=1)
+    del data["_conc_aux"]
 
 
 # Distance functions
@@ -58,11 +58,11 @@ def _get_igroup_aux_var(data, aux_var):
     Return a list containing each IGroup's value of a given auxiliary variable.
     """
     out = []
-    for i in range(1 + data["IGroup"].max()):
+    for i in range(1 + data["_IGroup"].max()):
         out += (
-            data[["IGroup", aux_var]]
+            data[["_IGroup", aux_var]]
             .drop_duplicates()
-            .query("IGroup == " + str(i))[aux_var]
+            .query("_IGroup == " + str(i))[aux_var]
             .values.tolist()
         )
     return out
@@ -111,16 +111,16 @@ def _calc_distances(
                                               overriding the underlying standard
                                               distance function
 
-    Add a column 'distances' containing lists of calculated distances of each
+    Add a column '_distances' containing lists of calculated distances of each
     record's auxiliary variables from those of its IGroup:
     1. Create a list of dictionaries containing the values of each IGroup's
        auxiliary variables
-    2. Add a column 'dists_temp' containing, for each potential donor record, a
+    2. Add a column '_dists_temp' containing, for each potential donor record, a
        list of dictionaries of calculated distances for each auxiliary variable
-    3. Add a column 'distances' containing, for each potential donor record, a
+    3. Add a column '_distances' containing, for each potential donor record, a
        list of calculated distances from its IGroup's auxiliary variables,
        taking into account the specified weights
-    4. Remove column 'dists_temp'
+    4. Remove column '_dists_temp'
     """
     # Check that the distance function selected is one of the standard six
     assert dist_func >= 1 and dist_func <= 6
@@ -142,26 +142,26 @@ def _calc_distances(
     vars_vals = list(
         zip(aux_vars, map(lambda v: _get_igroup_aux_var(data, v), aux_vars))
     )
-    for i in range(1 + data["IGroup"].max()):
+    for i in range(1 + data["_IGroup"].max()):
         igroup_aux_vars.append({k: v[i] for k, v in vars_vals})
-    data["dists_temp"] = data.apply(
+    data["_dists_temp"] = data.apply(
         lambda r: list(
             map(
                 lambda x: {k: weights[k] * dist_func(x[k], r[k]) for k in aux_vars},
                 igroup_aux_vars,
             )
         )
-        if not (r["impute"])
+        if not (r["_impute"])
         else [],
         axis=1,
     )
-    data["distances"] = data.apply(
+    data["_distances"] = data.apply(
         lambda r: list(
-            map(lambda d: reduce(add, list(d.values()), 0), r["dists_temp"])
+            map(lambda d: reduce(add, list(d.values()), 0), r["_dists_temp"])
         ),
         axis=1,
     )
-    del data["dists_temp"]
+    del data["_dists_temp"]
 
 
 def _calc_donors(data, min_quantile=None):
@@ -182,7 +182,7 @@ def _calc_donors(data, min_quantile=None):
        the case.
     """
     igroups_dists = np.array(
-        data.query("not(impute)")["distances"].values.tolist()
+        data.query("not(_impute)")["_distances"].values.tolist()
     ).T.tolist()
     igroups_dists.sort()
     # This would be a lot nicer if we could have NumPy >= 1.15.0, which has
@@ -193,11 +193,11 @@ def _calc_donors(data, min_quantile=None):
             igroups_dists,
         )
     )
-    data["donor"] = data.apply(
+    data["_donor"] = data.apply(
         lambda r: np.where(
-            list(map(lambda p: p[0] <= p[1], zip(r["distances"], max_donor_dists)))
+            list(map(lambda p: p[0] <= p[1], zip(r["_distances"], max_donor_dists)))
         )[0].tolist()
-        if not (r["impute"])
+        if not (r["_impute"])
         else [],
         axis=1,
     )
@@ -211,7 +211,7 @@ def _get_donors(data, igroup):
     Return a list of indices corresponding to records in data that are donors to
     the specified IGroup.
     """
-    return list(map(lambda x: igroup in x, data["donor"].values.tolist()))
+    return list(map(lambda x: igroup in x, data["_donor"].values.tolist()))
 
 
 def _get_freq_dist(data, imp_var, possible_vals, igroup):
@@ -246,8 +246,9 @@ def _freq_to_exp(data, freq_dist, igroup):
     Convert a frequency distribution to the expected numbers of occurrences for
     a given IGroup.
     """
-    igroup_size = len(data.query("IGroup==" + str(igroup)).values.tolist())
+    igroup_size = len(data.query("_IGroup==" + str(igroup)).values.tolist())
     return list(map(lambda f: f * igroup_size, freq_dist))
+
 
 def _impute_igroup(data, exp_dist, possible_vals, igroup):
     """
@@ -270,27 +271,31 @@ def _impute_igroup(data, exp_dist, possible_vals, igroup):
     5. Randomise the order of the list of imputed values, then return it
     """
     out = []
-    igroup_size = len(data.query("IGroup==" + str(igroup)).values.tolist())
+    if all(map(lambda e:e==0,exp_dist)):
+        return out
+    igroup_size = len(data.query("_IGroup==" + str(igroup)).values.tolist())
     for i in range(len(exp_dist)):
         if exp_dist[i] >= 1:
-            out += [possible_vals[i]]*int(exp_dist[i])
+            out += [possible_vals[i]] * int(exp_dist[i])
             exp_dist[i] -= int(exp_dist[i])
     remaining = igroup_size - len(out)
-    exp_dist = list(map(lambda e: Fraction(e,sum(exp_dist)),exp_dist))
-    assert sum(exp_dist)==1
-    possible_vals = [possible_vals[i] for i in range(len(exp_dist)) if exp_dist[i]!=0]
-    exp_dist = [e for e in exp_dist if e!=0]
-    for i in range(remaining):
-        selected_val = choice(possible_vals,p=exp_dist)
-        del(exp_dist[possible_vals.index(selected_val)])
-        exp_dist = list(map(lambda e: Fraction(e,sum(exp_dist)),exp_dist))
-        assert sum(exp_dist)==1
-        possible_vals = [v for v in possible_vals if v!=selected_val]
-        out.append(selected_val)
-    # TODO: check that number of imputed values for each possible value is
-    #       either int(exp) or int(exp)+1
+    if remaining != 0:
+        exp_dist = list(map(lambda e: Fraction(e, sum(exp_dist)), exp_dist))
+        assert sum(exp_dist) == 1
+        possible_vals = [possible_vals[i] for i in range(len(exp_dist)) if exp_dist[i] != 0]
+        exp_dist = [e for e in exp_dist if e != 0]
+        for i in range(remaining):
+            selected_val = choice(possible_vals, p=exp_dist)
+            del exp_dist[possible_vals.index(selected_val)]
+            exp_dist = list(map(lambda e: Fraction(e, sum(exp_dist)), exp_dist))
+            assert sum(exp_dist) == 1
+            possible_vals = [v for v in possible_vals if v != selected_val]
+            out.append(selected_val)
+        # TODO: check that number of imputed values for each possible value is
+        #       either int(exp) or int(exp)+1
     shuffle(out)
     return out
+
 
 def impute(
     data,
@@ -299,11 +304,13 @@ def impute(
     aux_vars,
     weights,
     dist_func,
+    threshold=None,
     custom_df_map=None,
     min_quantile=None,
     overwrite=False,
     col_name=None,
-    in_place=True
+    in_place=True,
+    keep_intermediates=False
 ):
     # data: dataframe
     # imp_var: string
@@ -311,6 +318,7 @@ def impute(
     # aux_vars: string list
     # weights: (string * float) dict
     # dist_func: numeric * numeric -> numeric function
+    # threshold: numeric
     # custom_df_map: ('a * 'a) * numeric dict
     # min_quantile: int
     # overwrite: bool
@@ -326,13 +334,21 @@ def impute(
     # - assign imputed variables
     # - tidy up columns
     # - return dataset
-    _add_impute_col(test_data, test_imp_var)
-    _assign_igroups(test_data, test_aux_vars)
-    _calc_distances(test_data, test_aux_vars, test_df, test_weights)
-    _calc_donors(test_data)
+    _add_impute_col(data, imp_var)
+    _assign_igroups(data, aux_vars)
+    _calc_distances(data, aux_vars, dist_func, weights, threshold=threshold, custom_df_map=custom_df_map)
+    _calc_donors(data, min_quantile=min_quantile)
     # TODO: tidy this up and return the dataframe properly (or modify in place)
     # TODO: include optional keyword arguments
-    # return _impute_igroup(test_data,_freq_to_exp(test_data,_get_freq_dist(test_data,"white",[0,1],i),i),[0,1],i)
+    imputed_vals = list(map(lambda i:_impute_igroup(data,_freq_to_exp(data,_get_freq_dist(data,imp_var,possible_vals,i),i),possible_vals,i),range(1 + data["_IGroup"].max())))
+    data[imp_var+"_imputed"]=data.apply(
+lambda r: (imputed_vals[r["_IGroup"]].pop(0) if imputed_vals[r["_IGroup"]]!=[] else r[imp_var]) if r["_impute"] else r[imp_var]
+,axis=1)
+    assert all(map(lambda l: l==[],imputed_vals))
+    del(data["_impute"])
+    del(data["_IGroup"])
+    del(data["_distances"])
+    del(data["_donor"])
 
 
 # Test setup: same dataset as in the notebook example
@@ -358,8 +374,19 @@ def t3():
 def t4():
     _calc_donors(test_data)
 
+
 def t4a():
-    t1();t2();t3();t4();return test_data
+    t1()
+    t2()
+    t3()
+    t4()
+    return test_data
+
 
 def t5(i):
-    return _impute_igroup(test_data,_freq_to_exp(test_data,_get_freq_dist(test_data,"white",[0,1],i),i),[0,1],i)
+    return _impute_igroup(
+        test_data,
+        _freq_to_exp(test_data, _get_freq_dist(test_data, "white", [0, 1], i), i),
+        [0, 1],
+        i,
+    )
