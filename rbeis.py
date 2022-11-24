@@ -10,6 +10,8 @@ from copy import deepcopy
 
 def _add_impute_col(data, imp_var):
     """
+    _add_impute_col(data, imp_var)
+
     data (pd.DataFrame): The dataset undergoing imputation
           imp_var (str): The name of the variable to be imputed
 
@@ -21,6 +23,8 @@ def _add_impute_col(data, imp_var):
 
 def _assign_igroups(data, aux_vars):
     """
+    _assign_igroups(data, aux_vars)
+
     data (pd.DataFrame): The dataset undergoing imputation
     aux_vars (str list): The names of the chosen auxiliary variables
 
@@ -52,6 +56,8 @@ _df3 = lambda x, y, m: 1 if abs(x - y) > m else abs(x - y) / (m + 1)
 
 def _get_igroup_aux_var(data, aux_var):
     """
+    _get_igroup_aux_var(data, aux_var)
+
     data (pd.DataFrame): The dataset undergoing imputation
           aux_var (str): The desired auxiliary variable
 
@@ -70,6 +76,8 @@ def _get_igroup_aux_var(data, aux_var):
 
 def _build_custom_df(dist_func, mappings):
     """
+    _build_custom_df(dist_func, mappings)
+
                         dist_func (int): Which of the six standard distance
                                          functions to use (in this case, only 4,
                                          5 or 6 are permissible)
@@ -89,13 +97,19 @@ def _build_custom_df(dist_func, mappings):
         df = _df3
     else:
         raise Exception("You may only choose 4, 5 or 6 for a custom distance function.")
-    return lambda x, y: mappings[(x, y)] if (x, y) in mappings.keys() else df(x, y)
+    if dist_func==4:
+        return lambda x, y: mappings[(x, y)] if (x, y) in mappings.keys() else df(x, y)
+    else:
+        return lambda x, y, m: mappings[(x, y)] if (x, y) in mappings.keys() else df(x, y, m)
 
 
 def _calc_distances(
     data, aux_vars, dist_func, weights, threshold=None, custom_df_map=None
 ):
     """
+    _calc_distances(data, aux_vars, dist_func, weights, threshold=None,
+                    custom_df_map=None)
+
                          data (pd.DataFrame): The dataset undergoing imputation
                          aux_vars (str list): The names of the chosen auxiliary
                                               variables
@@ -107,9 +121,10 @@ def _calc_distances(
                          threshold (numeric): [Optional] A threshold value for
                                               the distance function, if required
     custom_df_map (('a * 'a) * numeric dict): [Optional] A dictionary mapping
-                                              pairs of values to distances,
-                                              overriding the underlying standard
-                                              distance function
+                                              pairs (2-tuples) of values to
+                                              distances, overriding the
+                                              underlying standard distance
+                                              function
 
     Add a column '_distances' containing lists of calculated distances of each
     record's auxiliary variables from those of its IGroup:
@@ -125,7 +140,7 @@ def _calc_distances(
     # Check that the distance function selected is one of the standard six
     assert dist_func >= 1 and dist_func <= 6
     # If required, check that there is a threshold
-    if dist_func == 3:
+    if dist_func in [2,3,5,6]:
         assert threshold
     # If DF4, DF5 or DF6 required, check that map is provided
     if dist_func >= 4:
@@ -166,11 +181,13 @@ def _calc_distances(
 
 def _calc_donors(data, min_quantile=None):
     """
+    _calc_donors(data, min_quantile=None)
+
     data (pd.DataFrame): The dataset undergoing imputation
-     min_quantile (int): Instead of choosing the minimum distance, choose
-                         records in the lowest n-quantile, where min_quantile
-                         specifies n (e.g. if min_quantile is 10, then accept
-                         records in the bottom decile).
+     min_quantile (int): [Optional] Instead of choosing the minimum distance,
+                         choose records in the lowest n-quantile, where
+                         min_quantile specifies n (e.g. if min_quantile is 10,
+                         then accept records in the bottom decile).
 
     Add a column 'donor' containing a list of IGroup numbers to which each
     record is a donors.
@@ -205,6 +222,8 @@ def _calc_donors(data, min_quantile=None):
 
 def _get_donors(data, igroup):
     """
+    _get_donors(data, igroup)
+
     data (pd.DataFrame): The dataset undergoing imputation
            igroup (int): The IGroup whose donors are required
 
@@ -216,6 +235,8 @@ def _get_donors(data, igroup):
 
 def _get_freq_dist(data, imp_var, possible_vals, igroup):
     """
+    _get_freq_dist(data, imp_var, possible_vals, igroup)
+
         data (pd.DataFrame): The dataset undergoing imputation
               imp_var (str): The name of the variable to be imputed
     possible_vals ('a list): A list of all possible values that imp_var can take
@@ -239,6 +260,8 @@ def _get_freq_dist(data, imp_var, possible_vals, igroup):
 
 def _freq_to_exp(data, freq_dist, igroup):
     """
+    _freq_to_exp(data, freq_dist, igroup)
+
           data (pd.DataFrame): The dataset undergoing imputation
     freq_dist (Fraction list): The frequency distribution to convert
                  igroup (int): The IGroup corresponding to freq_dist
@@ -252,6 +275,8 @@ def _freq_to_exp(data, freq_dist, igroup):
 
 def _impute_igroup(data, exp_dist, possible_vals, igroup):
     """
+    _impute_igroup(data, exp_dist, possible_vals, igroup)
+
          data (pd.DataFrame): The dataset undergoing imputation
     exp_dist (Fraction list): The expected values derived from the frequency
                               distribution using _freq_to_exp
@@ -271,7 +296,7 @@ def _impute_igroup(data, exp_dist, possible_vals, igroup):
     5. Randomise the order of the list of imputed values, then return it
     """
     out = []
-    if all(map(lambda e:e==0,exp_dist)):
+    if all(map(lambda e: e == 0, exp_dist)):
         return out
     igroup_size = len(data.query("_IGroup==" + str(igroup)).values.tolist())
     for i in range(len(exp_dist)):
@@ -282,7 +307,9 @@ def _impute_igroup(data, exp_dist, possible_vals, igroup):
     if remaining != 0:
         exp_dist = list(map(lambda e: Fraction(e, sum(exp_dist)), exp_dist))
         assert sum(exp_dist) == 1
-        possible_vals = [possible_vals[i] for i in range(len(exp_dist)) if exp_dist[i] != 0]
+        possible_vals = [
+            possible_vals[i] for i in range(len(exp_dist)) if exp_dist[i] != 0
+        ]
         exp_dist = [e for e in exp_dist if e != 0]
         for i in range(remaining):
             selected_val = choice(possible_vals, p=exp_dist)
@@ -310,45 +337,112 @@ def impute(
     overwrite=False,
     col_name=None,
     in_place=True,
-    keep_intermediates=False
+    keep_intermediates=False,
 ):
-    # data: dataframe
-    # imp_var: string
-    # possible_vals: 'a list
-    # aux_vars: string list
-    # weights: (string * float) dict
-    # dist_func: numeric * numeric -> numeric function
-    # threshold: numeric
-    # custom_df_map: ('a * 'a) * numeric dict
-    # min_quantile: int
-    # overwrite: bool
-    # col_name: string
-    # in_place: bool
-    # - (check that weights keys correspond to aux_vars)
-    # - add 'impute' column
-    # - assign igroups
-    # - calculate distances
-    # - get donors
-    # - get igroup freq dists
-    # - convert to rbeis donor pools
-    # - assign imputed variables
-    # - tidy up columns
-    # - return dataset
+    """
+    impute(data, imp_var, possible_vals, aux_vars, weights, dist_func,
+           threshold=None, custom_df_map=None, min_quantile=None,
+           overwrite=False, col_name=None, in_place=True,
+           keep_intermediates=False)
+
+                         data (pd.DataFrame): The dataset undergoing imputation
+                               imp_var (str): The name of the variable to be
+                                              imputed
+                     possible_vals ('a list): A list of all possible values that
+                                              imp_var can take
+                         aux_vars (str list): The names of the chosen auxiliary
+                                              variables
+                weights (str * numeric dict): Dictionary with auxiliary variable
+                                              names as keys and chosen weights
+                                              as values
+                             dist_func (int): Which of the six standard distance
+                                              functions to use
+                         threshold (numeric): [Optional] A threshold value for
+                                              the distance function, if required
+    custom_df_map (('a * 'a) * numeric dict): [Optional] A dictionary mapping
+                                              pairs (2-tuples) of values to
+                                              distances, overriding the
+                                              underlying standard distance
+                                              function
+                          min_quantile (int): [Optional] Instead of choosing the
+                                              minimum distance, choose records
+                                              in the lowest n-quantile, where
+                                              min_quantile specifies n (e.g. if
+                                              min_quantile is 10, then accept
+                                              records in the bottom decile).
+                            overwrite (bool): [Optional, default False] True if
+                                              the column to undergo imputation
+                                              should be overwritten with the
+                                              results, False if imputed values
+                                              are to go into a new column.
+                              col_name (str): [Optional] If overwrite is False,
+                                              the name of the new column in
+                                              which to write the imputed values
+                             in_place (bool): [Optional, default True] If True,
+                                              modify the original DataFrame in
+                                              place.  If False, return a new
+                                              (deep) copy of the DataFrame
+                                              having undergone imputation. 
+                   keep_intermediates (bool): [Optional, default False] If True,
+                                              retain the intermediate columns
+                                              created by this implementation of
+                                              RBEIS in the process of
+                                              imputation.  If False,
+                                              remove them from the output.
+
+    Impute missing values for a given variable using the Rogers & Berriman
+    Editing and Imputation System (RBEIS).  A high-level overview of the
+    approach is given here (for more detail, see the documentation for each of
+    the intermediate functions in this library):
+    1. Identify values to be imputed
+    2. Assign imputation groups ("IGroups") based on a given set of auxiliary
+       variables
+    3. Calculate how similar the auxiliary variables of each IGroup are to those
+       of the potential donor records
+    4. Assign the most similar records to the donor pools of the corresponding
+       IGroups
+    5. Impute values for each IGroup
+    6. Insert imputed values into the original DataFrame
+    """
     _add_impute_col(data, imp_var)
     _assign_igroups(data, aux_vars)
-    _calc_distances(data, aux_vars, dist_func, weights, threshold=threshold, custom_df_map=custom_df_map)
+    _calc_distances(
+        data,
+        aux_vars,
+        dist_func,
+        weights,
+        threshold=threshold,
+        custom_df_map=custom_df_map,
+    )
     _calc_donors(data, min_quantile=min_quantile)
     # TODO: tidy this up and return the dataframe properly (or modify in place)
     # TODO: include optional keyword arguments
-    imputed_vals = list(map(lambda i:_impute_igroup(data,_freq_to_exp(data,_get_freq_dist(data,imp_var,possible_vals,i),i),possible_vals,i),range(1 + data["_IGroup"].max())))
-    data[imp_var+"_imputed"]=data.apply(
-lambda r: (imputed_vals[r["_IGroup"]].pop(0) if imputed_vals[r["_IGroup"]]!=[] else r[imp_var]) if r["_impute"] else r[imp_var]
-,axis=1)
-    assert all(map(lambda l: l==[],imputed_vals))
-    del(data["_impute"])
-    del(data["_IGroup"])
-    del(data["_distances"])
-    del(data["_donor"])
+    imputed_vals = list(
+        map(
+            lambda i: _impute_igroup(
+                data,
+                _freq_to_exp(data, _get_freq_dist(data, imp_var, possible_vals, i), i),
+                possible_vals,
+                i,
+            ),
+            range(1 + data["_IGroup"].max()),
+        )
+    )
+    data[imp_var + "_imputed"] = data.apply(
+        lambda r: (
+            imputed_vals[r["_IGroup"]].pop(0)
+            if imputed_vals[r["_IGroup"]] != []
+            else r[imp_var]
+        )
+        if r["_impute"]
+        else r[imp_var],
+        axis=1,
+    )
+    assert all(map(lambda l: l == [], imputed_vals))
+    del data["_impute"]
+    del data["_IGroup"]
+    del data["_distances"]
+    del data["_donor"]
 
 
 # Test setup: same dataset as in the notebook example
