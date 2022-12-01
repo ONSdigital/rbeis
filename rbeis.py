@@ -467,7 +467,7 @@ def impute(
 
 
 # Test setup: same dataset as in the notebook example
-test_data = pd.read_csv("../understanding/data.csv")
+test_data = pd.read_csv("../rbeis-understanding/data.csv")
 test_imp_var = "white"
 test_aux_vars = ["interim_id", "gor9d", "work_status_group", "dvhsize"]
 test_df = 1
