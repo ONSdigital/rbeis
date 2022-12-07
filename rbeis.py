@@ -219,7 +219,8 @@ def _calc_donors(data, min_quantile=None):
     igroups_dists = np.array(
         data.query("not(_impute)")["_distances"].values.tolist()
     ).T.tolist()
-    igroups_dists.sort()
+    for i in igroups_dists:
+        i.sort()
     # This would be a lot nicer if we could have NumPy >= 1.15.0, which has
     # np.quantile, but we're on 1.13.3
     max_donor_dists = list(
@@ -467,7 +468,7 @@ def impute(
 
 
 # Test setup: same dataset as in the notebook example
-test_data = pd.read_csv("../rbeis-understanding/data.csv")
+test_data = pd.read_csv("/home/cdsw/rbeis-understanding/data.csv")
 test_imp_var = "white"
 test_aux_vars = ["interim_id", "gor9d", "work_status_group", "dvhsize"]
 test_df = 1
