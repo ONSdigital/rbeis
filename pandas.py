@@ -103,11 +103,7 @@ def _build_custom_df(dist_func, mappings, threshold=None):
     else:
         raise Exception("You may only choose 4, 5 or 6 for a custom distance function.")
     if dist_func == 4:
-        return (
-            lambda x, y: mappings[(x, y)]
-            if (x, y) in mappings.keys()
-            else df(x, y)
-        )
+        return lambda x, y: mappings[(x, y)] if (x, y) in mappings.keys() else df(x, y)
     else:
         assert threshold
         return (
