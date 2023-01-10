@@ -51,7 +51,7 @@ def _assign_igroups(data, aux_vars):
 # Where x is the IGroup's value, y is the current record's value, and m is a threshold value
 _df1 = lambda x, y: int(x != y)
 _df2 = lambda x, y, m: int(abs(x - y) > m)
-_df3 = lambda x, y, m: 1 if abs(x - y) > m else abs(x - y) / (m + 1)
+_df3 = lambda x, y, m: 1 if abs(x - y) > m else abs(x - y) / (m + 1.0)
 
 
 def _get_igroup_aux_var(data, aux_var):
