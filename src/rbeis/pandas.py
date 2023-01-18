@@ -44,7 +44,8 @@ def _assign_igroups(data, aux_vars):
     4. Remove column '_conc_aux'
     """
     data["_conc_aux"] = data.apply(
-        lambda r: str(list(map(lambda v: r[v], aux_vars))) if r["_impute"] else "",
+        lambda r: str(list(map(lambda v: r[v], aux_vars)))
+        if r["_impute"] else "",
         axis=1,
     )
     data["_IGroup"] = data.groupby("_conc_aux").grouper.group_info[0]
@@ -70,12 +71,10 @@ def _get_igroup_aux_var(data, aux_var):
     """
     out = []
     for i in range(1 + data["_IGroup"].max()):
-        out += (
-            data[["_IGroup", aux_var]]
-            .drop_duplicates()
-            .query("_IGroup == " + str(i))[aux_var]
-            .values.tolist()
-        )
+        out += (data[[
+            "_IGroup", aux_var
+        ]].drop_duplicates().query("_IGroup == " +
+                                   str(i))[aux_var].values.tolist())
     return out
 
 
@@ -106,21 +105,23 @@ def _build_custom_df(dist_func, mappings, threshold=None):
     elif dist_func == 6:
         df = _df3
     else:
-        raise Exception("You may only choose 4, 5 or 6 for a custom distance function.")
+        raise Exception(
+            "You may only choose 4, 5 or 6 for a custom distance function.")
     if dist_func == 4:
-        return lambda x, y: mappings[(x, y)] if (x, y) in mappings.keys() else df(x, y)
+        return lambda x, y: mappings[
+            (x, y)] if (x, y) in mappings.keys() else df(x, y)
     else:
         assert threshold
-        return (
-            lambda x, y: mappings[(x, y)]
-            if (x, y) in mappings.keys()
-            else df(x, y, threshold)
-        )
+        return (lambda x, y: mappings[(x, y)]
+                if (x, y) in mappings.keys() else df(x, y, threshold))
 
 
-def _calc_distances(
-    data, aux_vars, dist_func, weights, threshold=None, custom_df_map=None
-):
+def _calc_distances(data,
+                    aux_vars,
+                    dist_func,
+                    weights,
+                    threshold=None,
+                    custom_df_map=None):
     """
     _calc_distances(data, aux_vars, dist_func, weights, threshold=None,
                     custom_df_map=None)
@@ -154,34 +155,29 @@ def _calc_distances(
     4. Remove column '_dists_temp'
     """
     # Calculate the distances
-    dist_func = (
-        _build_custom_df(dist_func, custom_df_map, threshold=threshold)
-        if dist_func >= 4
-        else [_df1, _df2, _df3][dist_func - 1]
-    )
+    dist_func = (_build_custom_df(
+        dist_func, custom_df_map, threshold=threshold)
+                 if dist_func >= 4 else [_df1, _df2, _df3][dist_func - 1])
     # TODO: Check if dist_func is compatible with each auxvar dtype
     #       (e.g. DF3 doesn't like strings)
     igroup_aux_vars = []
     vars_vals = list(
-        zip(aux_vars, map(lambda v: _get_igroup_aux_var(data, v), aux_vars))
-    )
+        zip(aux_vars, map(lambda v: _get_igroup_aux_var(data, v), aux_vars)))
     for i in range(1 + data["_IGroup"].max()):
         igroup_aux_vars.append({k: v[i] for k, v in vars_vals})
     data["_dists_temp"] = data.apply(
         lambda r: list(
             map(
-                lambda x: {k: weights[k] * dist_func(x[k], r[k]) for k in aux_vars},
+                lambda x:
+                {k: weights[k] * dist_func(x[k], r[k])
+                 for k in aux_vars},
                 igroup_aux_vars,
-            )
-        )
-        if not (r["_impute"])
-        else [],
+            )) if not (r["_impute"]) else [],
         axis=1,
     )
     data["_distances"] = data.apply(
         lambda r: list(
-            map(lambda d: reduce(add, list(d.values()), 0), r["_dists_temp"])
-        ),
+            map(lambda d: reduce(add, list(d.values()), 0), r["_dists_temp"])),
         axis=1,
     )
     del data["_dists_temp"]
@@ -207,8 +203,7 @@ def _calc_donors(data, min_quantile=None):
        the case.
     """
     igroups_dists = np.array(
-        data.query("not(_impute)")["_distances"].values.tolist()
-    ).T.tolist()
+        data.query("not(_impute)")["_distances"].values.tolist()).T.tolist()
     for i in igroups_dists:
         i.sort()
     # This would be a lot nicer if we could have NumPy >= 1.15.0, which has
@@ -216,17 +211,15 @@ def _calc_donors(data, min_quantile=None):
     max_donor_dists = list(
         map(
             (lambda l: l[int(np.ceil(len(l) / min_quantile)) - 1])
-            if min_quantile
-            else min,
+            if min_quantile else min,
             igroups_dists,
-        )
-    )
+        ))
     data["_donor"] = data.apply(
         lambda r: np.where(
-            list(map(lambda p: p[0] <= p[1], zip(r["_distances"], max_donor_dists)))
-        )[0].tolist()
-        if not (r["_impute"])
-        else [],
+            list(
+                map(lambda p: p[0] <= p[1],
+                    zip(r["_distances"], max_donor_dists))))[0].tolist()
+        if not (r["_impute"]) else [],
         axis=1,
     )
 
@@ -265,8 +258,7 @@ def _get_freq_dist(data, imp_var, possible_vals, igroup):
                 lambda v: len([i for i in pool if i == v]),
                 possible_vals,
             ),
-        )
-    )
+        ))
 
 
 def _freq_to_exp(data, freq_dist, igroup):
@@ -325,7 +317,8 @@ def _impute_igroup(data, exp_dist, possible_vals, igroup):
         for i in range(remaining):
             selected_val = choice(possible_vals, p=exp_dist)
             del exp_dist[possible_vals.index(selected_val)]
-            exp_dist = list(map(lambda e: Fraction(e, sum(exp_dist)), exp_dist))
+            exp_dist = list(map(lambda e: Fraction(e, sum(exp_dist)),
+                                exp_dist))
             assert sum(exp_dist) == 1
             possible_vals = [v for v in possible_vals if v != selected_val]
             out.append(selected_val)
@@ -437,38 +430,41 @@ def impute(
             "Weights must be a dictionary whose keys are strings containing variable names"
         )
     if not (all(map(lambda x: isinstance(x, Number), weights.values()))):
-        raise TypeError("Weights must be a dictionary whose values are numeric")
+        raise TypeError(
+            "Weights must be a dictionary whose values are numeric")
     try:
         assert all(map(lambda v: v in weights.keys(), aux_vars))
     except AssertionError:
         raise RBEISInputException(
-            "You have not specified a weight for every auxiliary variable"
-        )
+            "You have not specified a weight for every auxiliary variable")
     if not (isinstance(dist_func, int)):
         raise TypeError(
             "Distance functions are indicated by an integer from 1 to 6 inclusive"
         )
     if dist_func < 1 or dist_func > 6:
         raise RBEISInputException(
-            "The distance function must be an integer from 1 to 6 inclusive"
-        )
+            "The distance function must be an integer from 1 to 6 inclusive")
     if dist_func in [2, 3, 5, 6]:
         try:
             assert threshold
             if not (isinstance(threshold, Number)):
-                raise TypeError("Distance function thresholds must be a numeric type")
+                raise TypeError(
+                    "Distance function thresholds must be a numeric type")
         except AssertionError:
             raise RBEISInputException(
-                "The chosen distance function requires a threshold value"
-            )
+                "The chosen distance function requires a threshold value")
     if dist_func >= 4:
         try:
             assert custom_df_map
-            if not (all(map(lambda x: isinstance(x, tuple), custom_df_map.keys()))):
+            if not (all(
+                    map(lambda x: isinstance(x, tuple),
+                        custom_df_map.keys()))):
                 raise TypeError(
                     "Distance function overrides must be expressed in a dictionary whose keys are tuples representing pairs of values"
                 )
-            if not (all(map(lambda x: isinstance(x, Number), custom_df_map.values()))):
+            if not (all(
+                    map(lambda x: isinstance(x, Number),
+                        custom_df_map.values()))):
                 raise TypeError(
                     "Distance function overrides must be expressed in a dictionary whose values are numeric"
                 )
@@ -493,7 +489,7 @@ def impute(
     try:
         assert col_name
         if not (isinstance(col_name, str)):
-            raise TypeError("A new column name must be a string")
+            raise TypeError("col_name must be a string")
     except AssertionError:
         pass
     try:
@@ -527,21 +523,17 @@ def impute(
         map(
             lambda i: _impute_igroup(
                 data,
-                _freq_to_exp(data, _get_freq_dist(data, imp_var, possible_vals, i), i),
+                _freq_to_exp(
+                    data, _get_freq_dist(data, imp_var, possible_vals, i), i),
                 possible_vals,
                 i,
             ),
             range(1 + data["_IGroup"].max()),
-        )
-    )
+        ))
     data[imp_var + "_imputed"] = data.apply(
-        lambda r: (
-            imputed_vals[r["_IGroup"]].pop(0)
-            if imputed_vals[r["_IGroup"]] != []
-            else r[imp_var]
-        )
-        if r["_impute"]
-        else r[imp_var],
+        lambda r: (imputed_vals[r["_IGroup"]].pop(0)
+                   if imputed_vals[r["_IGroup"]] != [] else r[imp_var])
+        if r["_impute"] else r[imp_var],
         axis=1,
     )
     assert all(map(lambda l: l == [], imputed_vals))
