@@ -8,8 +8,10 @@ from random import shuffle
 from copy import deepcopy
 from numbers import Number
 
+
 class RBEISException(Exception):
     pass
+
 
 def _add_impute_col(data, imp_var):
     """
@@ -332,6 +334,7 @@ def _impute_igroup(data, exp_dist, possible_vals, igroup):
     shuffle(out)
     return out
 
+
 def impute(
     data,
     imp_var,
@@ -415,73 +418,93 @@ def impute(
     """
 
     # Input checks
-    if not(isinstance(data,pd.DataFrame)):
+    if not (isinstance(data, pd.DataFrame)):
         raise TypeError("Dataset must be a Pandas DataFrame")
-    if not(isinstance(imp_var,str)):
+    if not (isinstance(imp_var, str)):
         raise TypeError("Imputation variable name must be a string")
-    if not(isinstance(possible_vals,list)):
+    if not (isinstance(possible_vals, list)):
         raise TypeError("Possible values must be contained in a list")
-    if not(isinstance(aux_vars,list)):
+    if not (isinstance(aux_vars, list)):
         raise TypeError("Auxiliary variable names must be a list of strings")
-    if not(all(map(lambda(x): isinstance(x,str),aux_vars))):
+    if not (all(map(lambda x: isinstance(x, str), aux_vars))):
         raise TypeError("Auxiliary variable names must be a list of strings")
-    if not(isinstance(weights,dict)):
-        raise TypeError("Weights must be a dictionary whose keys are strings containing variable names and whose values are numeric")
-    if not(all(map(lambda(x): isinstance(x,str),weights.keys()))):
-        raise TypeError("Weights must be a dictionary whose keys are strings containing variable names")
-    if not(all(map(lambda(x): isinstance(x,Number),weights.values()))):
+    if not (isinstance(weights, dict)):
+        raise TypeError(
+            "Weights must be a dictionary whose keys are strings containing variable names and whose values are numeric"
+        )
+    if not (all(map(lambda x: isinstance(x, str), weights.keys()))):
+        raise TypeError(
+            "Weights must be a dictionary whose keys are strings containing variable names"
+        )
+    if not (all(map(lambda x: isinstance(x, Number), weights.values()))):
         raise TypeError("Weights must be a dictionary whose values are numeric")
     try:
         assert all(map(lambda v: v in weights.keys(), aux_vars))
     except AssertionError:
-        raise RBEISException("You have not specified a weight for every auxiliary variable")
-    if not(isinstance(dist_func,int)):
-        raise TypeError("Distance functions are indicated by an integer from 1 to 6 inclusive")
+        raise RBEISException(
+            "You have not specified a weight for every auxiliary variable"
+        )
+    if not (isinstance(dist_func, int)):
+        raise TypeError(
+            "Distance functions are indicated by an integer from 1 to 6 inclusive"
+        )
     if dist_func < 1 or dist_func > 6:
-        raise RBEISException("The distance function must be an integer from 1 to 6 inclusive")
+        raise RBEISException(
+            "The distance function must be an integer from 1 to 6 inclusive"
+        )
     if dist_func in [2, 3, 5, 6]:
         try:
             assert threshold
-            if not(isinstance(threshold,Number)):
+            if not (isinstance(threshold, Number)):
                 raise TypeError("Distance function thresholds must be a numeric type")
         except AssertionError:
-            raise RBEISException("The chosen distance function requires a threshold value")
+            raise RBEISException(
+                "The chosen distance function requires a threshold value"
+            )
     if dist_func >= 4:
         try:
             assert custom_df_map
-            if not(all(map(lambda(x): isinstance(x,tuple),custom_df_map.keys()))):
-                raise TypeError("Distance function overrides must be expressed in a dictionary whose keys are tuples representing pairs of values")
-            if not(all(map(lambda(x): isinstance(x,Number),custom_df_map.values()))):
-                raise TypeError("Distance function overrides must be expressed in a dictionary whose values are numeric")
+            if not (all(map(lambda x: isinstance(x, tuple), custom_df_map.keys()))):
+                raise TypeError(
+                    "Distance function overrides must be expressed in a dictionary whose keys are tuples representing pairs of values"
+                )
+            if not (all(map(lambda x: isinstance(x, Number), custom_df_map.values()))):
+                raise TypeError(
+                    "Distance function overrides must be expressed in a dictionary whose values are numeric"
+                )
         except AssertionError:
-            raise RBEISException("You have chosen a distance funtion with overrides, but have not provided them")
+            raise RBEISException(
+                "You have chosen a distance funtion with overrides, but have not provided them"
+            )
     try:
         assert min_quantile
-        if not(isinstance(min_quantile,int)):
-            raise TypeError("The required quantile partition must be specified with an integer")
+        if not (isinstance(min_quantile, int)):
+            raise TypeError(
+                "The required quantile partition must be specified with an integer"
+            )
     except AssertionError:
         pass
     try:
         assert overwrite
-        if not(isinstance(overwrite,bool)):
+        if not (isinstance(overwrite, bool)):
             raise TypeError("overwrite must be either True or False")
     except AssertionError:
         pass
     try:
         assert col_name
-        if not(isinstance(col_name,str)):
+        if not (isinstance(col_name, str)):
             raise TypeError("A new column name must be a string")
     except AssertionError:
         pass
     try:
         assert in_place
-        if not(isinstance(in_place,bool)):
+        if not (isinstance(in_place, bool)):
             raise TypeError("in_place must be either True or False")
     except AssertionError:
         pass
     try:
         assert keep_intermediates
-        if not(isinstance(keep_intermediates,bool)):
+        if not (isinstance(keep_intermediates, bool)):
             raise TypeError("keep_intermediates must be either True or False")
     except AssertionError:
         pass
