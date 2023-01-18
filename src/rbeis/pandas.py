@@ -9,7 +9,7 @@ from copy import deepcopy
 from numbers import Number
 
 
-class RBEISException(Exception):
+class RBEISInputException(Exception):
     pass
 
 
@@ -441,7 +441,7 @@ def impute(
     try:
         assert all(map(lambda v: v in weights.keys(), aux_vars))
     except AssertionError:
-        raise RBEISException(
+        raise RBEISInputException(
             "You have not specified a weight for every auxiliary variable"
         )
     if not (isinstance(dist_func, int)):
@@ -449,7 +449,7 @@ def impute(
             "Distance functions are indicated by an integer from 1 to 6 inclusive"
         )
     if dist_func < 1 or dist_func > 6:
-        raise RBEISException(
+        raise RBEISInputException(
             "The distance function must be an integer from 1 to 6 inclusive"
         )
     if dist_func in [2, 3, 5, 6]:
@@ -458,7 +458,7 @@ def impute(
             if not (isinstance(threshold, Number)):
                 raise TypeError("Distance function thresholds must be a numeric type")
         except AssertionError:
-            raise RBEISException(
+            raise RBEISInputException(
                 "The chosen distance function requires a threshold value"
             )
     if dist_func >= 4:
@@ -473,7 +473,7 @@ def impute(
                     "Distance function overrides must be expressed in a dictionary whose values are numeric"
                 )
         except AssertionError:
-            raise RBEISException(
+            raise RBEISInputException(
                 "You have chosen a distance funtion with overrides, but have not provided them"
             )
     try:
