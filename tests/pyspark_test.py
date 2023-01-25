@@ -1,10 +1,13 @@
 from unittest import TestCase
 from pyspark.sql import SparkSession
+from time import sleep
 
 # Procedures to run before unit tests, if necessary
 def setUpModule():
     # Initialise small Spark session
     print("> Initialising Spark session...")
+    sleep(10)
+    global spark
     spark = (
         SparkSession.builder.appName("rbeis-test-session")
         .config("spark.executor.memory", "1g")
