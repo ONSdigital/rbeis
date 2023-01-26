@@ -55,7 +55,7 @@ def _assign_igroups(data, aux_vars):
 
 # Distance functions
 # Where x is the IGroup's value, y is the current record's value, and m is a threshold value
-_df1 = lambda x, y: int(x != y)
+_df1 = lambda x, y, m: int(x != y)
 _df2 = lambda x, y, m: int(abs(x - y) > m)
 _df3 = lambda x, y, m: 1 if abs(x - y) > m else abs(x - y) / (m + 1.0)
 
@@ -94,8 +94,8 @@ def _build_custom_df(dist_func, mappings, threshold=None):
                                          distance function, if required
 
     Return a two-argument function that corresponds to distance functions 1, 2
-    or 3, but with certain pairs of values overridden.  This function assumes
-    that df(x,y)==df(y,x), where df is the distance function.
+    or 3, but with certain pairs of values overridden.  This function does not
+    assume that distance(x,y)==distance(y,x).
     """
     assert dist_func >= 4 and dist_func <= 6
     if dist_func == 4:
@@ -107,13 +107,9 @@ def _build_custom_df(dist_func, mappings, threshold=None):
     else:
         raise Exception(
             "You may only choose 4, 5 or 6 for a custom distance function.")
-    if dist_func == 4:
-        return lambda x, y: mappings[
-            (x, y)] if (x, y) in mappings.keys() else df(x, y)
-    else:
+    if dist_func != 4:
         assert threshold
-        return (lambda x, y: mappings[(x, y)]
-                if (x, y) in mappings.keys() else df(x, y, threshold))
+    return lambda x, y, m: mappings[(x, y)] if (x, y) in mappings.keys() else df(x, y, m)
 
 
 def _calc_distances(data,
@@ -169,7 +165,7 @@ def _calc_distances(data,
         lambda r: list(
             map(
                 lambda x:
-                {k: weights[k] * dist_func(x[k], r[k])
+                {k: weights[k] * dist_func(x[k], r[k], threshold)
                  for k in aux_vars},
                 igroup_aux_vars,
             )) if not (r["_impute"]) else [],
@@ -194,7 +190,7 @@ def _calc_donors(data, min_quantile=None):
                          then accept records in the bottom decile).
 
     Add a column 'donor' containing a list of IGroup numbers to which each
-    record is a donors.
+    record is a donor.
     1. Calculate the distances less than or equal to which a record may be
        accepted as a donor to each respective IGroup.
     2. Zip each record's distances to the list of distances calculated in step
