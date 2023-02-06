@@ -2,6 +2,15 @@ from unittest import TestCase
 from pyspark.sql import SparkSession
 from time import sleep
 
+import numpy as np
+import pandas as pd
+import sys
+
+sys.path.insert(0, "../src/rbeis")
+sys.path.insert(0, "src/rbeis")
+
+# TODO: uncomment when rbeis_pyspark.py is up and running
+# from rbeis_pyspark import impute, _df1, _df2, _df3, _build_custom_df
 
 # Procedures to run before unit tests, if necessary
 def setUpModule():

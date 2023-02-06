@@ -7,7 +7,7 @@ import sys
 sys.path.insert(0, "../src/rbeis")
 sys.path.insert(0, "src/rbeis")
 
-from rbeis import impute, _df1, _df2, _df3, _build_custom_df
+from rbeis_pandas import impute, _df1, _df2, _df3, _build_custom_df
 
 
 # Procedures to run before unit tests, if necessary
