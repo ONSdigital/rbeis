@@ -109,7 +109,8 @@ def _build_custom_df(dist_func, mappings, threshold=None):
             "You may only choose 4, 5 or 6 for a custom distance function.")
     if dist_func != 4:
         assert threshold
-    return lambda x, y, m: mappings[(x, y)] if (x, y) in mappings.keys() else df(x, y, m)
+    return (lambda x, y, m: mappings[(x, y)]
+            if (x, y) in mappings.keys() else df(x, y, m))
 
 
 def _calc_distances(data,
@@ -164,9 +165,10 @@ def _calc_distances(data,
     data["_dists_temp"] = data.apply(
         lambda r: list(
             map(
-                lambda x:
-                {k: weights[k] * dist_func(x[k], r[k], threshold)
-                 for k in aux_vars},
+                lambda x: {
+                    k: weights[k] * dist_func(x[k], r[k], threshold)
+                    for k in aux_vars
+                },
                 igroup_aux_vars,
             )) if not (r["_impute"]) else [],
         axis=1,
