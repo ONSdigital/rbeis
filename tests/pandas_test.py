@@ -13,575 +13,647 @@ from rbeis_pandas import impute, _df1, _df2, _df3, _build_custom_df
 # Procedures to run before unit tests, if necessary
 def setUpModule():
 
-    # --- Setup dummy dataframe for testing input parameters ---
-    dummy_data = {
-        "age": [30, 20, 30, 40, None],
-        "interim_id": [21, 19, 18, 67, 20],
-        "work_status_group": [2, 3, 1, 1, 3],
-    }
+    # --- Setup simple dummy dataframe for testing input parameters ---
+    dummy_data = {"dummy_impute_var": [30,20,30,40,None],
+        "dummy_aux_var1": [21, 19, 18, 67, 20],
+        "dummy_aux_var2": [2,3,1,1,3],
+        "dummy_aux_var_missing": [4,3,6,None,6]}
     dummy_dataframe = pd.DataFrame(dummy_data)
     pass
+
+
+# ====================================================================================
+# --------------- TESTING TEMPLATE ---------------------------
+# ====================================================================================
+# --- Test type validation on all input parameters ---
+# --- Test constrainst on input parameters:
+# ---     impute variable and auxiliary variables are in the dataframe ---
+# ---     auxiliry variables have no missing values  ---
+# ---     weights and distance functions are within range  ---
+# ---     threshold and custom_df_map are specified for, and only for, appropriate distance functions  ---
+# --- Test each function does what it is expected to do ---
+# --- Test if output dataframe is as expected, both new columns and data content ---
+
+# TEST DATA
+# Data is loaded for each function test as the order tests are carried out in cannot be controlled 
+
+# ====================================================================================
+
+
+# CHANGES IN TO BE MADE RBEIS WHICH WILL IMPACT TESTING
+# 1. Distance function, threshold and custom_df_map to be set for each auxiliary variable
+#    Will need to rewrite impute statements throughout TestImpute class
+#    Will need to check that ONLY df1 or df4 can be specified for any categorical aux vars
+# 2. May allow impuataion of non-numeric variable if this can be done in python
+#    If this cannot be done, then add check that impute variable is numeric 
+# 3. The min-quantile functionality will be changed back to ratio as in SAS
+#    Tests will need to br addedd to check ratio functionality
+#    Currently, type validation is carried out on min_quantile and parameter is set to None throughout
+# 4. Overwrite parameter functionality may be implemented and will need to be tested
+# 5. In-place parameter functionality may be implemented and will need to be tested
+# 6. Still to be decided how to check if user specified appropriate range for possible_vals 
+#    Test will need to be implemented when this is established
 
 
 # --------------------------------------------------------------------------------------
 # TESTS: IMPUTE MAIN METHOD
 # --------------------------------------------------------------------------------------
 
-
 class TestImpute(TestCase):
-
-    # --- TYPE VALIDATION TESTS ---
-
+    
+    # --------------------------------
+    # --- TYPE VALIDATION TESTS    ---
+    # --------------------------------
+        
     # --- Test type validation on the input dataframe  ---
     def test_type_validation_data(self):
         with self.assertRaises(TypeError):
             impute(
-                data=["Not_a_Dataframe"],
-                imp_var="age",
-                possible_vals=list(range(1, 101)),
-                aux_vars=["interim_id", "work_status_group"],
-                weights={
-                    "interim_id": 2,
-                    "work_status_group": 3
-                },
-                dist_func=1,
-                threshold=None,
-                custom_df_map=None,
-                min_quantile=None,
-                overwrite=False,
-                col_name=None,
-                in_place=True,
-                keep_intermediates=True,
-            )
-
+              data=["Not_a_Dataframe"], 
+              imp_var="dummy_impute_var", 
+              possible_vals=list(range(1,101)), 
+              aux_vars=["dummy_aux_var1", "dummy_aux_var2"], 
+              weights={"dummy_aux_var1": 2, "dummy_aux_var2": 3}, 
+              dist_func=1,
+              threshold=None, 
+              custom_df_map=None, 
+              min_quantile=None,
+              overwrite=False, 
+              col_name=None, 
+              in_place=True,
+              keep_intermediates=True)
+          
     # --- Test type validation on the impute variable  ---
-    def test_type_validation_imp_var(self):
+    def test_type_validation_imp_var(self):  
         with self.assertRaises(TypeError):
             impute(
-                data=dummy_dataframe,
-                imp_var=["Not", "A", "String"],
-                possible_vals=list(range(1, 101)),
-                aux_vars=["interim_id", "work_status_group"],
-                weights={
-                    "interim_id": 2,
-                    "work_status_group": 3
-                },
-                dist_func=1,
-                threshold=None,
-                custom_df_map=None,
-                min_quantile=None,
-                overwrite=False,
-                col_name=None,
-                in_place=True,
-                keep_intermediates=True,
-            )
-
+              data=dummy_dataframe, 
+              imp_var=["Not","A","String"], 
+              possible_vals=list(range(1,101)), 
+              aux_vars=["dummy_aux_var1", "dummy_aux_var2"], 
+              weights={"dummy_aux_var1": 2, "dummy_aux_var2": 3}, 
+              dist_func=1,
+              threshold=None, 
+              custom_df_map=None, 
+              min_quantile=None,
+              overwrite=False, 
+              col_name=None, 
+              in_place=True,
+              keep_intermediates=True)
+               
     # --- Test type validation on possible values for impute variable  ---
-    def test_type_validation_possible_vals(self):
+    def test_type_validation_possible_vals(self):         
         with self.assertRaises(TypeError):
             impute(
-                data=dummy_dataframe,
-                imp_var="age",
-                possible_vals="Not_a_List",
-                aux_vars=["interim_id", "work_status_group"],
-                weights={
-                    "interim_id": 2,
-                    "work_status_group": 3
-                },
-                dist_func=1,
-                threshold=None,
-                custom_df_map=None,
-                min_quantile=None,
-                overwrite=False,
-                col_name=None,
-                in_place=True,
-                keep_intermediates=True,
-            )
-
+              data=dummy_dataframe, 
+              imp_var="dummy_impute_var", 
+              possible_vals="Not_a_List", 
+              aux_vars=["dummy_aux_var1", "dummy_aux_var2"], 
+              weights={"dummy_aux_var1": 2, "dummy_aux_var2": 3}, 
+              dist_func=1,
+              threshold=None, 
+              custom_df_map=None, 
+              min_quantile=None,
+              overwrite=False, 
+              col_name=None, 
+              in_place=True,
+              keep_intermediates=True)
+          
     # --- Test type validation on auxiliary variables  ---
-    def test_type_validation_aux_vars(self):
+    def test_type_validation_aux_vars(self): 
         with self.assertRaises(TypeError):
             impute(
-                data=dummy_dataframe,
-                imp_var="age",
-                possible_vals=list(range(1, 101)),
-                aux_vars=[["Not", "A", "String"], "work_status_group"],
-                weights={
-                    "interim_id": 2,
-                    "work_status_group": 3
-                },
-                dist_func=1,
-                threshold=None,
-                custom_df_map=None,
-                min_quantile=None,
-                overwrite=False,
-                col_name=None,
-                in_place=True,
-                keep_intermediates=True,
-            )
-
+              data=dummy_dataframe, 
+              imp_var="dummy_impute_var", 
+              possible_vals=list(range(1,101)), 
+              aux_vars=[["Not","A","String"], "dummy_aux_var2"], 
+              weights={"dummy_aux_var1": 2, "dummy_aux_var2": 3}, 
+              dist_func=1,
+              threshold=None, 
+              custom_df_map=None, 
+              min_quantile=None,
+              overwrite=False, 
+              col_name=None, 
+              in_place=True,
+              keep_intermediates=True)
+          
     # --- Test type validation on weights  ---
-    def test_type_validation_weights(self):
+    def test_type_validation_weights(self):         
         with self.assertRaises(TypeError):
             impute(
-                data=dummy_dataframe,
-                imp_var="age",
-                possible_vals=list(range(1, 101)),
-                aux_vars=["interim_id", "work_status_group"],
-                weights="Not_a_Dictionary",
-                dist_func=1,
-                threshold=None,
-                custom_df_map=None,
-                min_quantile=None,
-                overwrite=False,
-                col_name=None,
-                in_place=True,
-                keep_intermediates=True,
-            )
-
+              data=dummy_dataframe, 
+              imp_var="dummy_impute_var", 
+              possible_vals=list(range(1,101)), 
+              aux_vars=["dummy_aux_var1", "dummy_aux_var2"], 
+              weights="Not_a_Dictionary", 
+              dist_func=1,
+              threshold=None, 
+              custom_df_map=None, 
+              min_quantile=None,
+              overwrite=False, 
+              col_name=None, 
+              in_place=True,
+              keep_intermediates=True)
+          
     # --- Test type validation on distance function  ---
-    def test_type_validation_dist_func(self):
+    def test_type_validation_dist_func(self):        
         with self.assertRaises(TypeError):
             impute(
-                data=dummy_dataframe,
-                imp_var="age",
-                possible_vals=list(range(1, 101)),
-                aux_vars=["interim_id", "work_status_group"],
-                weights={
-                    "interim_id": 2,
-                    "work_status_group": 3
-                },
-                dist_func="Not_a_Number",
-                threshold=None,
-                custom_df_map=None,
-                min_quantile=None,
-                overwrite=False,
-                col_name=None,
-                in_place=True,
-                keep_intermediates=True,
-            )
-
+              data=dummy_dataframe, 
+              imp_var="dummy_impute_var", 
+              possible_vals=list(range(1,101)), 
+              aux_vars=["dummy_aux_var1", "dummy_aux_var2"], 
+              weights={"dummy_aux_var1": 2, "dummy_aux_var2": 3}, 
+              dist_func="Not_a_Number",
+              threshold=None, 
+              custom_df_map=None, 
+              min_quantile=None,
+              overwrite=False, 
+              col_name=None, 
+              in_place=True,
+              keep_intermediates=True)
+          
     # --- Test type validation on threshhold  ---
-    def test_type_validation_threshold(self):
+    def test_type_validation_threshold(self): 
         with self.assertRaises(TypeError):
             impute(
-                data=dummy_dataframe,
-                imp_var="age",
-                possible_vals=list(range(1, 101)),
-                aux_vars=["interim_id", "work_status_group"],
-                weights={
-                    "interim_id": 2,
-                    "work_status_group": 3
-                },
-                dist_func=2,
-                threshold="Not_a_Number",
-                custom_df_map=None,
-                min_quantile=None,
-                overwrite=False,
-                col_name=None,
-                in_place=True,
-                keep_intermediates=True,
-            )
-
+              data=dummy_dataframe, 
+              imp_var="dummy_impute_var", 
+              possible_vals=list(range(1,101)), 
+              aux_vars=["dummy_aux_var1", "dummy_aux_var2"], 
+              weights={"dummy_aux_var1": 2, "dummy_aux_var2": 3}, 
+              dist_func=2,
+              threshold="Not_a_Number", 
+              custom_df_map=None, 
+              min_quantile=None,
+              overwrite=False, 
+              col_name=None, 
+              in_place=True,
+              keep_intermediates=True)
+          
     # --- Test type validation on custom_df_map  ---
-    def test_type_validation_custom_df_map(self):
+    def test_type_validation_custom_df_map(self): 
         with self.assertRaises(TypeError):
             impute(
-                data=dummy_dataframe,
-                imp_var="age",
-                possible_vals=list(range(1, 101)),
-                aux_vars=["interim_id", "work_status_group"],
-                weights={
-                    "interim_id": 2,
-                    "work_status_group": 3
-                },
-                dist_func=4,
-                threshold=None,
-                custom_df_map="Not_a_Dictionary",
-                min_quantile=None,
-                overwrite=False,
-                col_name=None,
-                in_place=True,
-                keep_intermediates=True,
-            )
-
+              data=dummy_dataframe, 
+              imp_var="dummy_impute_var", 
+              possible_vals=list(range(1,101)), 
+              aux_vars=["dummy_aux_var1", "dummy_aux_var2"], 
+              weights={"dummy_aux_var1": 2, "dummy_aux_var2": 3}, 
+              dist_func=4,
+              threshold=None, 
+              custom_df_map="Not_a_Dictionary", 
+              min_quantile=None,
+              overwrite=False, 
+              col_name=None, 
+              in_place=True,
+              keep_intermediates=True)
+          
     # --- Test type validation on min_quantile  ---
-    def test_type_validation_min_quantile(self):
+    def test_type_validation_min_quantile(self):       
         with self.assertRaises(TypeError):
             impute(
-                data=dummy_dataframe,
-                imp_var="age",
-                possible_vals=list(range(1, 101)),
-                aux_vars=["interim_id", "work_status_group"],
-                weights={
-                    "interim_id": 2,
-                    "work_status_group": 3
-                },
-                dist_func=1,
-                threshold=None,
-                custom_df_map=None,
-                min_quantile="Not_a_number",
-                overwrite=False,
-                col_name=None,
-                in_place=True,
-                keep_intermediates=True,
-            )
-
+              data=dummy_dataframe, 
+              imp_var="dummy_impute_var", 
+              possible_vals=list(range(1,101)), 
+              aux_vars=["dummy_aux_var1", "dummy_aux_var2"], 
+              weights={"dummy_aux_var1": 2, "dummy_aux_var2": 3}, 
+              dist_func=1,
+              threshold=None, 
+              custom_df_map=None, 
+              min_quantile="Not_a_number",
+              overwrite=False, 
+              col_name=None, 
+              in_place=True,
+              keep_intermediates=True)   
+          
     # --- Test type validation on overwrite  ---
-    def test_type_validation_overwrite(self):
+    def test_type_validation_overwrite(self):        
         with self.assertRaises(TypeError):
             impute(
-                data=dummy_dataframe,
-                imp_var="age",
-                possible_vals=list(range(1, 101)),
-                aux_vars=["interim_id", "work_status_group"],
-                weights={
-                    "interim_id": 2,
-                    "work_status_group": 3
-                },
-                dist_func=1,
-                threshold=None,
-                custom_df_map=None,
-                min_quantile=None,
-                overwrite="Not_a_Boolean",
-                col_name=None,
-                in_place=True,
-                keep_intermediates=True,
-            )
-
+              data=dummy_dataframe, 
+              imp_var="dummy_impute_var", 
+              possible_vals=list(range(1,101)), 
+              aux_vars=["dummy_aux_var1", "dummy_aux_var2"], 
+              weights={"dummy_aux_var1": 2, "dummy_aux_var2": 3}, 
+              dist_func=1,
+              threshold=None, 
+              custom_df_map=None, 
+              min_quantile=None,
+              overwrite="Not_a_Boolean", 
+              col_name=None, 
+              in_place=True,
+              keep_intermediates=True)   
+          
     # --- Test type validation on col_name  ---
-    def test_type_validation_col_name(self):
+    def test_type_validation_col_name(self):  
         with self.assertRaises(TypeError):
             impute(
-                data=dummy_dataframe,
-                imp_var="age",
-                possible_vals=list(range(1, 101)),
-                aux_vars=["interim_id", "work_status_group"],
-                weights={
-                    "interim_id": 2,
-                    "work_status_group": 3
-                },
-                dist_func=1,
-                threshold=None,
-                custom_df_map=None,
-                min_quantile=None,
-                overwrite=False,
-                col_name=["Not", "A", "String"],
-                in_place=True,
-                keep_intermediates=True,
-            )
-
+              data=dummy_dataframe, 
+              imp_var="dummy_impute_var", 
+              possible_vals=list(range(1,101)), 
+              aux_vars=["dummy_aux_var1", "dummy_aux_var2"], 
+              weights={"dummy_aux_var1": 2, "dummy_aux_var2": 3}, 
+              dist_func=1,
+              threshold=None, 
+              custom_df_map=None, 
+              min_quantile=None,
+              overwrite=False, 
+              col_name=["Not","A","String"], 
+              in_place=True,
+              keep_intermediates=True) 
+          
     # --- Test type validation on in_place  ---
-    def test_type_validation_in_place(self):
+    def test_type_validation_in_place(self): 
         with self.assertRaises(TypeError):
             impute(
-                data=dummy_dataframe,
-                imp_var="age",
-                possible_vals=list(range(1, 101)),
-                aux_vars=["interim_id", "work_status_group"],
-                weights={
-                    "interim_id": 2,
-                    "work_status_group": 3
-                },
-                dist_func=1,
-                threshold=None,
-                custom_df_map=None,
-                min_quantile=None,
-                overwrite=False,
-                col_name=None,
-                in_place="Not_a_Boolean",
-                keep_intermediates=True,
-            )
-
+              data=dummy_dataframe, 
+              imp_var="dummy_impute_var", 
+              possible_vals=list(range(1,101)), 
+              aux_vars=["dummy_aux_var1", "dummy_aux_var2"], 
+              weights={"dummy_aux_var1": 2, "dummy_aux_var2": 3}, 
+              dist_func=1,
+              threshold=None, 
+              custom_df_map=None, 
+              min_quantile=None,
+              overwrite=False, 
+              col_name=None, 
+              in_place="Not_a_Boolean",
+              keep_intermediates=True) 
+          
     # --- Test type validation on keep_intermediates  ---
-    def test_type_validation_keep_intermediates(self):
+    def test_type_validation_keep_intermediates(self):  
         with self.assertRaises(TypeError):
             impute(
-                data=dummy_dataframe,
-                imp_var="age",
-                possible_vals=list(range(1, 101)),
-                aux_vars=["interim_id", "work_status_group"],
-                weights={
-                    "interim_id": 2,
-                    "work_status_group": 3
-                },
-                dist_func=1,
-                threshold=None,
-                custom_df_map=None,
-                min_quantile=None,
-                overwrite=False,
-                col_name=None,
-                in_place=True,
-                keep_intermediates="Not_a_Boolean",
-            )
-
+              data=dummy_dataframe, 
+              imp_var="dummy_impute_var", 
+              possible_vals=list(range(1,101)), 
+              aux_vars=["dummy_aux_var1", "dummy_aux_var2"], 
+              weights={"dummy_aux_var1": 2, "dummy_aux_var2": 3}, 
+              dist_func=1,
+              threshold=None, 
+              custom_df_map=None, 
+              min_quantile=None,
+              overwrite=False, 
+              col_name=None, 
+              in_place=True,
+              keep_intermediates="Not_a_Boolean") 
+          
+            
+    # -----------------------------------
     # --- CHECK INPUT VARIABLES TESTS ---
+    # -----------------------------------
 
     # --- Test exception when impute variable is not in the dataframe  ---
     def test_imp_var_in_df(self):
         with self.assertRaises(Exception):
             impute(
-                data=dummy_dataframe,
-                imp_var="not_a_variable",
-                possible_vals=list(range(1, 101)),
-                aux_vars=["interim_id", "work_status_group"],
-                weights={
-                    "interim_id": 2,
-                    "work_status_group": 3
-                },
-                dist_func=1,
-                threshold=None,
-                custom_df_map=None,
-                min_quantile=None,
-                overwrite=False,
-                col_name=None,
-                in_place=True,
-                keep_intermediates=True,
-            )
-
-    # --- Test exception when possible_vals do not match range of impute variable  ---
-    # def test_pos_vals_match_range(self):
+              data=dummy_dataframe, 
+              imp_var="not_a_variable", 
+              possible_vals=list(range(1,101)), 
+              aux_vars=["dummy_aux_var1", "dummy_aux_var2"], 
+              weights={"dummy_aux_var1": 2, "dummy_aux_var2": 3}, 
+              dist_func=1,
+              threshold=None, 
+              custom_df_map=None, 
+              min_quantile=None,
+              overwrite=False, 
+              col_name=None, 
+              in_place=True,
+              keep_intermediates=True)
+          
+    # --- Test exception when possible_vals do not match range of impute variable  ---    
+    #def test_pos_vals_match_range(self):
     #    with self.assertRaises(Exception):
     #        impute(
-    #          data=dummy_dataframe,
-    #          imp_var="age",
-    #          possible_vals=list(range(100,120)),
-    #          aux_vars=["interim_id", "work_status_group"],
-    #          weights={"interim_id": 2, "work_status_group": 3},
+    #          data=dummy_dataframe, 
+    #          imp_var="dummy_impute_var", 
+    #          possible_vals=list(range(100,120)), 
+    #          aux_vars=["dummy_aux_var1", "dummy_aux_var2"], 
+    #          weights={"dummy_aux_var1": 2, "dummy_aux_var2": 3}, 
     #          dist_func=1,
-    #          threshold=None,
-    #          custom_df_map=None,
+    #          threshold=None, 
+    #          custom_df_map=None, 
     #          min_quantile=None,
-    #          overwrite=False,
-    #          col_name=None,
+    #          overwrite=False, 
+    #          col_name=None, 
     #          in_place=True,
     #          keep_intermediates=True)
-
+       
     # --- Test exception when auxiliary variable is not a variable in the dataframe
-    def test_aux_vars_in_df(self):
+    def test_aux_vars_in_df(self):       
         with self.assertRaises(Exception):
             impute(
-                data=dummy_dataframe,
-                imp_var="age",
-                possible_vals=list(range(1, 101)),
-                aux_vars=["interim_id", "not_a_variable"],
-                weights={
-                    "interim_id": 2,
-                    "work_status_group": 3
-                },
-                dist_func=1,
-                threshold=None,
-                custom_df_map=None,
-                min_quantile=None,
-                overwrite=False,
-                col_name=None,
-                in_place=True,
-                keep_intermediates=True,
-            )
+              data=dummy_dataframe, 
+              imp_var="dummy_impute_var", 
+              possible_vals=list(range(1,101)), 
+              aux_vars=["dummy_aux_var1", "not_a_variable"], 
+              weights={"dummy_aux_var1": 2, "dummy_aux_var2": 3}, 
+              dist_func=1,
+              threshold=None, 
+              custom_df_map=None, 
+              min_quantile=None,
+              overwrite=False, 
+              col_name=None, 
+              in_place=True,
+              keep_intermediates=True)
 
-    # --- Test exception when weights dictionary keys do not match auxiliary variables
-    def test_weights_keys_match_aux_vars(self):
+    # --- Test exception when auxiliary variable has missing values
+    def test_aux_vars_no_missing_vals(self):  
         with self.assertRaises(Exception):
             impute(
-                data=dummy_dataframe,
-                imp_var="age",
-                possible_vals=list(range(1, 101)),
-                aux_vars=["interim_id", "work_status_group"],
-                weights={
-                    "not_a_variable": 2,
-                    "work_status_group": 3
-                },
-                dist_func=1,
-                threshold=None,
-                custom_df_map=None,
-                min_quantile=None,
-                overwrite=False,
-                col_name=None,
-                in_place=True,
-                keep_intermediates=True,
-            )
+              data=dummy_dataframe, 
+              imp_var="dummy_impute_var", 
+              possible_vals=list(range(1,101)), 
+              aux_vars=["dummy_aux_var1", "dummy_aux_var_missing"], 
+              weights={"dummy_aux_var1": 2, "dummy_aux_var_missing": 3}, 
+              dist_func=1,
+              threshold=None, 
+              custom_df_map=None, 
+              min_quantile=None,
+              overwrite=False, 
+              col_name=None, 
+              in_place=True,
+              keep_intermediates=True)
+          
+    # --- Test exception when weights dictionary keys do not match auxiliary variables
+    def test_weights_keys_match_aux_vars(self):  
+        with self.assertRaises(Exception):
+            impute(
+              data=dummy_dataframe, 
+              imp_var="dummy_impute_var", 
+              possible_vals=list(range(1,101)), 
+              aux_vars=["dummy_aux_var1", "dummy_aux_var2"], 
+              weights={"not_a_variable": 2, "dummy_aux_var2": 3}, 
+              dist_func=1,
+              threshold=None, 
+              custom_df_map=None, 
+              min_quantile=None,
+              overwrite=False, 
+              col_name=None, 
+              in_place=True,
+              keep_intermediates=True)
+            
+    # --- Test exception when weights are not positive values
+    def test_weights_are_positive(self):  
+        with self.assertRaises(Exception):
+            impute(
+              data=dummy_dataframe, 
+              imp_var="dummy_impute_var", 
+              possible_vals=list(range(1,101)), 
+              aux_vars=["dummy_aux_var1", "dummy_aux_var2"], 
+              weights={"dummy_aux_var1": 2, "dummy_aux_var2": -1}, 
+              dist_func=1,
+              threshold=None, 
+              custom_df_map=None, 
+              min_quantile=None,
+              overwrite=False, 
+              col_name=None, 
+              in_place=True,
+              keep_intermediates=True)
 
     # --- Test exception when dist_func is not an int between 1 and 6
-    def test_dist_func_1_to_6(self):
+    def test_dist_func_1_to_6(self):  
         with self.assertRaises(Exception):
             impute(
-                data=dummy_dataframe,
-                imp_var="age",
-                possible_vals=list(range(1, 101)),
-                aux_vars=["interim_id", "work_status_group"],
-                weights={
-                    "interim_id": 2,
-                    "work_status_group": 3
-                },
-                dist_func=7,
-                threshold=None,
-                custom_df_map=None,
-                min_quantile=None,
-                overwrite=False,
-                col_name=None,
-                in_place=True,
-                keep_intermediates=True,
-            )
-
-    # --- Test exception when threshold not specified for distance function 2
-    def test_threshold_for_df2(self):
+              data=dummy_dataframe, 
+              imp_var="dummy_impute_var", 
+              possible_vals=list(range(1,101)), 
+              aux_vars=["dummy_aux_var1", "dummy_aux_var2"], 
+              weights={"dummy_aux_var1": 2, "dummy_aux_var2": 3}, 
+              dist_func=7,
+              threshold=None, 
+              custom_df_map=None, 
+              min_quantile=None,
+              overwrite=False, 
+              col_name=None, 
+              in_place=True,
+              keep_intermediates=True)
+            
+    # --- Test exception when threshold IS specified for distance function 1
+    def test_threshold_for_df1(self): 
         with self.assertRaises(Exception):
             impute(
-                data=dummy_dataframe,
-                imp_var="age",
-                possible_vals=list(range(1, 101)),
-                aux_vars=["interim_id", "work_status_group"],
-                weights={
-                    "interim_id": 2,
-                    "work_status_group": 3
-                },
-                dist_func=2,
-                threshold=None,
-                custom_df_map=None,
-                min_quantile=None,
-                overwrite=False,
-                col_name=None,
-                in_place=True,
-                keep_intermediates=True,
-            )
+              data=dummy_dataframe, 
+              imp_var="dummy_impute_var", 
+              possible_vals=list(range(1,101)), 
+              aux_vars=["dummy_aux_var1", "dummy_aux_var2"], 
+              weights={"dummy_aux_var1": 2, "dummy_aux_var2": 3}, 
+              dist_func=1,
+              threshold=3, 
+              custom_df_map=None, 
+              min_quantile=None,
+              overwrite=False, 
+              col_name=None, 
+              in_place=True,
+              keep_intermediates=True)
 
-        # --- Test exception when threshold not specified for distance function 3
-
-    def test_threshold_for_df3(self):
+    # --- Test exception when threshold NOT specified for distance function 2
+    def test_threshold_for_df2(self): 
         with self.assertRaises(Exception):
             impute(
-                data=dummy_dataframe,
-                imp_var="age",
-                possible_vals=list(range(1, 101)),
-                aux_vars=["interim_id", "work_status_group"],
-                weights={
-                    "interim_id": 2,
-                    "work_status_group": 3
-                },
-                dist_func=3,
-                threshold=None,
-                custom_df_map=None,
-                min_quantile=None,
-                overwrite=False,
-                col_name=None,
-                in_place=True,
-                keep_intermediates=True,
-            )
-
-        # --- Test exception when threshold not specified for distance function 5
-
-    def test_threshold_for_df5(self):
+              data=dummy_dataframe, 
+              imp_var="dummy_impute_var", 
+              possible_vals=list(range(1,101)), 
+              aux_vars=["dummy_aux_var1", "dummy_aux_var2"], 
+              weights={"dummy_aux_var1": 2, "dummy_aux_var2": 3}, 
+              dist_func=2,
+              threshold=None, 
+              custom_df_map=None, 
+              min_quantile=None,
+              overwrite=False, 
+              col_name=None, 
+              in_place=True,
+              keep_intermediates=True)
+          
+    # --- Test exception when threshold NOT specified for distance function 3
+    def test_threshold_for_df3(self):         
         with self.assertRaises(Exception):
             impute(
-                data=dummy_dataframe,
-                imp_var="age",
-                possible_vals=list(range(1, 101)),
-                aux_vars=["interim_id", "work_status_group"],
-                weights={
-                    "interim_id": 2,
-                    "work_status_group": 3
-                },
-                dist_func=5,
-                threshold=None,
-                custom_df_map={(1, 1): 2},
-                min_quantile=None,
-                overwrite=False,
-                col_name=None,
-                in_place=True,
-                keep_intermediates=True,
-            )
-
-    # --- Test exception when threshold not specified for distance function 6
-    def test_threshold_for_df6(self):
+              data=dummy_dataframe, 
+              imp_var="dummy_impute_var", 
+              possible_vals=list(range(1,101)), 
+              aux_vars=["dummy_aux_var1", "dummy_aux_var2"], 
+              weights={"dummy_aux_var1": 2, "dummy_aux_var2": 3}, 
+              dist_func=3,
+              threshold=None, 
+              custom_df_map=None, 
+              min_quantile=None,
+              overwrite=False, 
+              col_name=None, 
+              in_place=True,
+              keep_intermediates=True)
+            
+    # --- Test exception when threshold IS specified for distance function 4
+    def test_threshold_for_df4(self): 
         with self.assertRaises(Exception):
             impute(
-                data=dummy_dataframe,
-                imp_var="age",
-                possible_vals=list(range(1, 101)),
-                aux_vars=["interim_id", "work_status_group"],
-                weights={
-                    "interim_id": 2,
-                    "work_status_group": 3
-                },
-                dist_func=6,
-                threshold=None,
-                custom_df_map={(1, 1): 2},
-                min_quantile=None,
-                overwrite=False,
-                col_name=None,
-                in_place=True,
-                keep_intermediates=True,
-            )
-
-    # --- Test exception when custom_df_map not specified for distance function 4
-    def test_custom_map_for_df4(self):
+              data=dummy_dataframe, 
+              imp_var="dummy_impute_var", 
+              possible_vals=list(range(1,101)), 
+              aux_vars=["dummy_aux_var1", "dummy_aux_var2"], 
+              weights={"dummy_aux_var1": 2, "dummy_aux_var2": 3}, 
+              dist_func=4,
+              threshold=3, 
+              custom_df_map={(1, 1): 2}, 
+              min_quantile=None,
+              overwrite=False, 
+              col_name=None, 
+              in_place=True,
+              keep_intermediates=True)            
+          
+    # --- Test exception when threshold NOT specified for distance function 5
+    def test_threshold_for_df5(self): 
         with self.assertRaises(Exception):
             impute(
-                data=dummy_dataframe,
-                imp_var="age",
-                possible_vals=list(range(1, 101)),
-                aux_vars=["interim_id", "work_status_group"],
-                weights={
-                    "interim_id": 2,
-                    "work_status_group": 3
-                },
-                dist_func=4,
-                threshold=1,
-                custom_df_map=None,
-                min_quantile=None,
-                overwrite=False,
-                col_name=None,
-                in_place=True,
-                keep_intermediates=True,
-            )
-
-    # --- Test exception when custom_df_map not specified for distance function 5
-    def test_custom_map_for_df5(self):
+              data=dummy_dataframe, 
+              imp_var="dummy_impute_var", 
+              possible_vals=list(range(1,101)), 
+              aux_vars=["dummy_aux_var1", "dummy_aux_var2"], 
+              weights={"dummy_aux_var1": 2, "dummy_aux_var2": 3}, 
+              dist_func=5,
+              threshold=None, 
+              custom_df_map={(1, 1): 2}, 
+              min_quantile=None,
+              overwrite=False, 
+              col_name=None, 
+              in_place=True,
+              keep_intermediates=True)
+          
+    # --- Test exception when threshold NOT specified for distance function 6
+    def test_threshold_for_df6(self): 
         with self.assertRaises(Exception):
             impute(
-                data=dummy_dataframe,
-                imp_var="age",
-                possible_vals=list(range(1, 101)),
-                aux_vars=["interim_id", "work_status_group"],
-                weights={
-                    "interim_id": 2,
-                    "work_status_group": 3
-                },
-                dist_func=5,
-                threshold=1,
-                custom_df_map=None,
-                min_quantile=None,
-                overwrite=False,
-                col_name=None,
-                in_place=True,
-                keep_intermediates=True,
-            )
+              data=dummy_dataframe, 
+              imp_var="dummy_impute_var", 
+              possible_vals=list(range(1,101)), 
+              aux_vars=["dummy_aux_var1", "dummy_aux_var2"], 
+              weights={"dummy_aux_var1": 2, "dummy_aux_var2": 3}, 
+              dist_func=6,
+              threshold=None, 
+              custom_df_map={(1, 1): 2}, 
+              min_quantile=None,
+              overwrite=False, 
+              col_name=None, 
+              in_place=True,
+              keep_intermediates=True)
 
-    # --- Test exception when custom_df_map not specified for distance function 6
-    def test_custom_map_for_df6(self):
+    # --- Test exception when custom_df_map IS specified for distance function 1
+    def test_custom_map_for_df1(self): 
         with self.assertRaises(Exception):
             impute(
-                data=dummy_dataframe,
-                imp_var="age",
-                possible_vals=list(range(1, 101)),
-                aux_vars=["interim_id", "work_status_group"],
-                weights={
-                    "interim_id": 2,
-                    "work_status_group": 3
-                },
-                dist_func=6,
-                threshold=1,
-                custom_df_map=None,
-                min_quantile=None,
-                overwrite=False,
-                col_name=None,
-                in_place=True,
-                keep_intermediates=True,
-            )
+              data=dummy_dataframe, 
+              imp_var="dummy_impute_var", 
+              possible_vals=list(range(1,101)), 
+              aux_vars=["dummy_aux_var1", "dummy_aux_var2"], 
+              weights={"dummy_aux_var1": 2, "dummy_aux_var2": 3}, 
+              dist_func=1,
+              threshold=None, 
+              custom_df_map={(1, 1): 2}, 
+              min_quantile=None,
+              overwrite=False, 
+              col_name=None, 
+              in_place=True,
+              keep_intermediates=True)
+          
+    # --- Test exception when custom_df_map IS specified for distance function 2
+    def test_custom_map_for_df2(self):  
+        with self.assertRaises(Exception):
+            impute(
+              data=dummy_dataframe, 
+              imp_var="dummy_impute_var", 
+              possible_vals=list(range(1,101)), 
+              aux_vars=["dummy_aux_var1", "dummy_aux_var2"], 
+              weights={"dummy_aux_var1": 2, "dummy_aux_var2": 3}, 
+              dist_func=2,
+              threshold=1, 
+              custom_df_map={(1, 1): 2}, 
+              min_quantile=None,
+              overwrite=False, 
+              col_name=None, 
+              in_place=True,
+              keep_intermediates=True)
+          
+    # --- Test exception when custom_df_map IS specified for distance function 3
+    def test_custom_map_for_df3(self): 
+        with self.assertRaises(Exception):
+            impute(
+              data=dummy_dataframe, 
+              imp_var="dummy_impute_var", 
+              possible_vals=list(range(1,101)), 
+              aux_vars=["dummy_aux_var1", "dummy_aux_var2"], 
+              weights={"dummy_aux_var1": 2, "dummy_aux_var2": 3}, 
+              dist_func=3,
+              threshold=1, 
+              custom_df_map={(1, 1): 2}, 
+              min_quantile=None,
+              overwrite=False, 
+              col_name=None, 
+              in_place=True,
+              keep_intermediates=True)
+          
+    # --- Test exception when custom_df_map NOT specified for distance function 4
+    def test_custom_map_for_df4(self): 
+        with self.assertRaises(Exception):
+            impute(
+              data=dummy_dataframe, 
+              imp_var="dummy_impute_var", 
+              possible_vals=list(range(1,101)), 
+              aux_vars=["dummy_aux_var1", "dummy_aux_var2"], 
+              weights={"dummy_aux_var1": 2, "dummy_aux_var2": 3}, 
+              dist_func=4,
+              threshold=1, 
+              custom_df_map=None, 
+              min_quantile=None,
+              overwrite=False, 
+              col_name=None, 
+              in_place=True,
+              keep_intermediates=True)
+          
+    # --- Test exception when custom_df_map NOT specified for distance function 5
+    def test_custom_map_for_df5(self):  
+        with self.assertRaises(Exception):
+            impute(
+              data=dummy_dataframe, 
+              imp_var="dummy_impute_var", 
+              possible_vals=list(range(1,101)), 
+              aux_vars=["dummy_aux_var1", "dummy_aux_var2"], 
+              weights={"dummy_aux_var1": 2, "dummy_aux_var2": 3}, 
+              dist_func=5,
+              threshold=1, 
+              custom_df_map=None, 
+              min_quantile=None,
+              overwrite=False, 
+              col_name=None, 
+              in_place=True,
+              keep_intermediates=True)
+          
+    # --- Test exception when custom_df_map NOT specified for distance function 6
+    def test_custom_map_for_df6(self): 
+        with self.assertRaises(Exception):
+            impute(
+              data=dummy_dataframe, 
+              imp_var="dummy_impute_var", 
+              possible_vals=list(range(1,101)), 
+              aux_vars=["dummy_aux_var1", "dummy_aux_var2"], 
+              weights={"dummy_aux_var1": 2, "dummy_aux_var2": 3}, 
+              dist_func=6,
+              threshold=1, 
+              custom_df_map=None, 
+              min_quantile=None,
+              overwrite=False, 
+              col_name=None, 
+              in_place=True,
+              keep_intermediates=True)
+           
 
 
 # --------------------------------------------------------------------------------------
 # TESTS: DISTANCE FUNCTIONS - _df1, _df2, _df3, _build_custom_df
+#
+# It is assumed that missing values cannot be passed to the distance functions 
+# as imputation will be prevented when the impute function is called
+# if any of the auxiliary values contain missing values
 # --------------------------------------------------------------------------------------
 
 
