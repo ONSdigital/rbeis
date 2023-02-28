@@ -7,18 +7,25 @@ import sys
 sys.path.insert(0, "../src/rbeis")
 sys.path.insert(0, "src/rbeis")
 
-from rbeis_pandas import impute, _df1, _df2, _df3, _build_custom_df
+from rbeis_pandas import impute, _df1, _df2, _df3, _build_custom_df, _add_impute_col
 
 
 # Procedures to run before unit tests, if necessary
 def setUpModule():
 
-    # --- Setup simple dummy dataframe for testing input parameters ---
+    # --- Set up simple dummy dataframe for testing input parameters for impute function  ---
     dummy_data = {"dummy_impute_var": [30,20,30,40,None],
         "dummy_aux_var1": [21, 19, 18, 67, 20],
         "dummy_aux_var2": [2,3,1,1,3],
         "dummy_aux_var_missing": [4,3,6,None,6]}
     dummy_dataframe = pd.DataFrame(dummy_data)
+
+   # --- Set up variables for importing test data ---
+    test_data_filepath = "artists_unique_galcount_spaceavg_missing.csv"
+    test_impute_var = "whitney_count"
+    test_aux_var1 = "moma_count"
+    test_aux_var2 = "space_ratio_per_page_avg"
+    
     pass
 
 
@@ -649,7 +656,7 @@ class TestImpute(TestCase):
 
 
 # --------------------------------------------------------------------------------------
-# TESTS: DISTANCE FUNCTIONS - _df1, _df2, _df3, _build_custom_df
+# TESTS: DISTANCE FUNCTIONS: _df1, _df2, _df3, _build_custom_df
 #
 # It is assumed that missing values cannot be passed to the distance functions 
 # as imputation will be prevented when the impute function is called
@@ -712,6 +719,23 @@ class TestDistanceFunctions(TestCase):
         self.assertEqual(df6(1, 3, 3), 0.5)
         self.assertEqual(df6(7, 6, 3), 0.25)
         self.assertEqual(df6(7, 2, 3), 1)
+
+
+# --------------------------------------------------------------------------------------
+# TESTS: Function: _add_impute_col
+# --------------------------------------------------------------------------------------
+ 
+# --- Test impute column values are assigned correctly ---   
+class TestAddImputeCol(TestCase):
+      
+    def test_assign_impute(self): 
+        test_data = pd.read_csv(test_data_filepath) 
+        _add_impute_col(test_data,test_impute_var)
+             
+        # Check that correct Boolean values are assigned for _impute column
+        self.assertTrue(test_data['_impute'].equals(np.isnan(test_data[test_impute_var]))) 
+
+
 
 
 # Procedures to run after unit tests, if necessary
