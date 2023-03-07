@@ -14,7 +14,7 @@ sys.path.insert(0, "src/rbeis")
 #
 #
 ## Procedures to run before unit tests, if necessary
-#def setUpModule():
+# def setUpModule():
 #    # Initialise small Spark session
 #    print("> Initialising Spark session...")
 #    sleep(10)
@@ -40,7 +40,7 @@ class TestExample(TestCase):
 
 
 ## Procedures to run after unit tests, if necessary
-#def tearDownModule():
+# def tearDownModule():
 #    pass
 #    # Stop Spark session
 #    print("> Terminating Spark session...")

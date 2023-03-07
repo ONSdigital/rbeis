@@ -55,9 +55,59 @@ def _assign_igroups(data, aux_vars):
 
 # Distance functions
 # Where x is the IGroup's value, y is the current record's value, and m is a threshold value
-_df1 = lambda x, y, m: int(x != y)
-_df2 = lambda x, y, m: int(abs(x - y) > m)
-_df3 = lambda x, y, m: 1 if abs(x - y) > m else abs(x - y) / (m + 1.0)
+def _df1(x,y,m=None):
+    """
+    _df1(x, y, m)
+
+    x ('a): A data point for comparison
+    y ('a): A data point for comparison
+    m ('a): A redundant argument that is not used, and is included solely for
+            compatibility with the pattern used by _df2 and _df3
+
+    Distance Function 1: return 1 if x and y are not equal, otherwise 0.  This
+    function (and it's derivative, DF4) can be used with any data types that
+    are comparable using =.
+    """
+    return int(x != y)
+
+def _df2(x,y,m):
+    """
+    _df2(x, y, m)
+
+    x (numeric): A data point for comparison
+    y (numeric): A data point for comparison
+    m (numeric): A threshold value
+
+    Distance Function 2: return 1 if the difference between x and y is greater
+    than the threshold m, otherwise 0.  This function (and its derivative, DF5)
+    may only be used with numeric data.
+    """
+    if not(isinstance(x,Number) or isinstance(y,Number)):
+        raise TypeError("You have tried to call distance function 2, 3, 5 or 6, but your data is not numeric")
+    elif not(isinstance(m,Number)):
+        raise TypeError("You have provided a non-numeric threshold value to distance function 2, 3, 5 or 6")
+    else:
+        return int(abs(x - y) > m)
+
+def _df3(x,y,m):
+    """
+    _df3(x, y, m)
+
+    x (numeric): A data point for comparison
+    y (numeric): A data point for comparison
+    m (numeric): A threshold value
+
+    Distance Function 3: return 1 if the difference between x and y is greater
+    than the threshold m, otherwise return the difference between x and y,
+    divided by m + 1.  This function (and its derivative, DF6) may only be used
+    with numeric data.
+    """
+    if not(isinstance(x,Number) or isinstance(y,Number)):
+        raise TypeError("You have tried to call distance function 2, 3, 5 or 6, but your data is not numeric")
+    elif not(isinstance(m,Number)):
+        raise TypeError("You have provided a non-numeric threshold value to distance function 2, 3, 5 or 6")
+    else:
+        return 1 if abs(x - y) > m else abs(x - y) / (m + 1.0)
 
 
 def _get_igroup_aux_var(data, aux_var):
