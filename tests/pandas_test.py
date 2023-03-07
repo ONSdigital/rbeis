@@ -7,7 +7,8 @@ import sys
 sys.path.insert(0, "../src/rbeis")
 sys.path.insert(0, "src/rbeis")
 
-from rbeis_pandas import impute, _df1, _df2, _df3, _build_custom_df, _add_impute_col
+from rbeis_pandas import (impute, _df1, _df2, _df3, _build_custom_df, 
+			_add_impute_col, _assign_igroups, _get_igroup_aux_var)
 
 
 # Procedures to run before unit tests, if necessary
@@ -25,6 +26,7 @@ def setUpModule():
     # --- Set up variables for importing test data ---
     test_data_filepath = "artists_unique_galcount_spaceavg_missing.csv"
     test_impute_var = "whitney_count"
+    test_pos_vals = list(range(0,41))
     test_aux_var1 = "moma_count"
     test_aux_var2 = "space_ratio_per_page_avg"
 
@@ -841,9 +843,11 @@ class TestDistanceFunctions(TestCase):
         self.assertEqual(df6(7, 2, 3), 1)
 
 
-# --------------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # TESTS: Function: _add_impute_col
-# --------------------------------------------------------------------------------------
+# This function adds a boolean column 'impute' indicating whether record  
+# will be imputed.
+# -----------------------------------------------------------------------------
 
 
 # --- Test impute column values are assigned correctly ---
@@ -856,6 +860,88 @@ class TestAddImputeCol(TestCase):
         # Check that correct Boolean values are assigned for _impute column
         self.assertTrue(test_data["_impute"].equals(
             np.isnan(test_data[test_impute_var])))
+
+
+# -----------------------------------------------------------------------------
+# TESTS: Function: _assign_igroups
+# This function adds a column 'IGroup' containing integers representing  
+# the IGroup each recipient record is assigned to. 
+# -----------------------------------------------------------------------------
+   
+# --- Test Igroup column values are assigned correctly ---   
+class TestAssignIgroups(TestCase):
+  
+    def test_assign_igroups(self): 
+        test_data = pd.read_csv(test_data_filepath)  
+        _add_impute_col(test_data,test_impute_var)
+        _assign_igroups(test_data,[test_aux_var1, test_aux_var2])
+        
+        # Check Igroup is set to -1 for non-recipient records
+        donors = test_data[test_data['_impute'] == False]
+        for row_index in range(donors.shape[0]):
+            self.assertTrue(donors['_IGroup'].values[row_index] == -1)  
+                   
+        # Check Igroup isassigned for recipiants 
+        recipiants = test_data[test_data['_impute'] == True]
+        for row_index in range(recipiants.shape[0]):        
+            self.assertTrue(recipiants['_IGroup'].values[row_index] > -1)
+          
+        # Calculate how many recipiants in each IGroup
+        recipiant_freq = recipiants.groupby(by="_IGroup")["_IGroup"].count()
+    
+        # Check records assigned to same IGroup have same valueas for 
+        # auxiliary variables
+        multiple_recipiant_igroups = recipiant_freq[recipiant_freq > 1].index
+        for igroup_number in multiple_recipiant_igroups:
+            igroup_data = test_data[test_data['_IGroup'] == igroup_number]
+            self.assertTrue(len(igroup_data[test_aux_var1].unique()) == 1)
+            self.assertTrue(len(igroup_data[test_aux_var2].unique()) == 1)    
+         
+        # Check single recipiant IGroups all have different combination of 
+        # auxiliary variables
+        single_recipiant_list = recipiant_freq[recipiant_freq == 1].index
+        single_recipiant_data = test_data.copy()
+        single_recipiant_data = single_recipiant_data[
+            single_recipiant_data['_IGroup'].isin(single_recipiant_list)]
+        
+        single_recipiant_data['combine_aux_vars'] = single_recipiant_data[
+            test_aux_var1].astype(str) + ' ' + single_recipiant_data[
+            test_aux_var2].astype(str)   
+            
+        single_recipiant_freq = single_recipiant_data.groupby(
+            by='combine_aux_vars')['combine_aux_vars'].count()
+        
+        self.assertTrue(
+            len(single_recipiant_freq[single_recipiant_freq > 1].index) == 0) 
+
+
+# -----------------------------------------------------------------------------
+# TESTS: Function: _get_igroup_aux_var
+# This function returns a list containing each IGroup's value of a given 
+# auxiliary variable.       
+# -----------------------------------------------------------------------------
+
+# --- Test list of auxiliary variables values for each iGroup is correct ---   
+class TestGetIGroupAuxVar(TestCase):
+
+  def test_get_igroup_aux_var(self): 
+        test_data = pd.read_csv(test_data_filepath)   
+        _add_impute_col(test_data,test_impute_var)
+        _assign_igroups(test_data,[test_aux_var1, test_aux_var2])   
+        
+        # Get list of auxiliary variable values for each iGroup
+        aux_var1_list = _get_igroup_aux_var(test_data,test_aux_var1)
+        aux_var2_list = _get_igroup_aux_var(test_data,test_aux_var2)       
+        
+        # Check records assigned to each iGroup match auxiliary values in list
+        for igroup_number in range(1+test_data["_IGroup"].max()):
+            for row_index in range(test_data.shape[0]):
+                if test_data['_IGroup'].values[row_index] == igroup_number:
+                    self.assertTrue(test_data[test_aux_var1].values[row_index] 
+                        == aux_var1_list[igroup_number])
+                    self.assertTrue(test_data[test_aux_var2].values[row_index] 
+                        == aux_var2_list[igroup_number])
+
 
 
 # Procedures to run after unit tests, if necessary
