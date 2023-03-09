@@ -12,3 +12,19 @@ dynamic = ["version", "description"]
 
 [project.urls]
 Home = "https://www.ons.gov.uk"
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-cov",
+]
+# doc = [
+#     "sphinx",
+#     "myst-parser",
+# ]
+
+[tool.pytest.ini_options]
+addopts = "--cov"
+
+[tool.coverage.run]
+source = ["rbeis"]
