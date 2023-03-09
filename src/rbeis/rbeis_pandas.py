@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from functools import reduce
+from functools import partial, reduce
 from operator import add
 from fractions import Fraction
 from numpy.random import choice
@@ -12,32 +12,31 @@ from numbers import Number
 class RBEISInputException(Exception):
     pass
 
-class RBEISDistanceFunction():
-    f = 1
+
+class RBEISDistanceFunction:
     # Standard distance functions
     # Where x is the IGroup's value, y is the current record's value, and m is a threshold value
-    def _df1(x, y):
+    def _df1(self, x, y):
         """
         _df1(x, y)
-    
+
         x ('a): A data point for comparison
         y ('a): A data point for comparison
-    
+
         Distance Function 1: return 1 if x and y are not equal, otherwise 0.  This
         function (and it's derivative, DF4) can be used with any data types that
         are comparable using =.
         """
         return int(x != y)
-    
-    
-    def _df2(x, y, m):
+
+    def _df2(self, x, y, m=None):
         """
         _df2(x, y, m)
-    
+
         x (numeric): A data point for comparison
         y (numeric): A data point for comparison
         m (numeric): A threshold value
-    
+
         Distance Function 2: return 1 if the difference between x and y is greater
         than the threshold m, otherwise 0.  This function (and its derivative, DF5)
         may only be used with numeric data.
@@ -52,16 +51,15 @@ class RBEISDistanceFunction():
             )
         else:
             return int(abs(x - y) > m)
-    
-    
-    def _df3(x, y, m):
+
+    def _df3(self, x, y, m=None):
         """
         _df3(x, y, m)
-    
+
         x (numeric): A data point for comparison
         y (numeric): A data point for comparison
         m (numeric): A threshold value
-    
+
         Distance Function 3: return 1 if the difference between x and y is greater
         than the threshold m, otherwise return the difference between x and y,
         divided by m + 1.  This function (and its derivative, DF6) may only be used
@@ -76,60 +74,39 @@ class RBEISDistanceFunction():
                 "You have provided a non-numeric threshold value to distance function 2, 3, 5 or 6"
             )
         else:
-            return 1 if abs(x - y) > m else abs(x - y) / (m + 1.0)
-    def _build_custom_df(self, dist_func, mappings, threshold=None):
-        """
-        _build_custom_df(dist_func, mappings)
-    
-                            dist_func (int): Which of the six standard distance
-                                             functions to use (in this case, only 4,
-                                             5 or 6 are permissible)
-        mappings (('a * 'a) * numeric dict): A dictionary with pairs of values to be
-                                             overridden as its keys, and the desired
-                                             distances as the corresponding values.
-                                             Note that (x,y) -> z does not imply
-                                             that (y,z) -> z.
-                        threshold (numeric): [Optional] A threshold value for the
-                                             distance function, if required
-    
-        Return a two-argument function that corresponds to distance functions 1, 2
-        or 3, but with certain pairs of values overridden.  This function does not
-        assume that distance(x,y)==distance(y,x).
-        """
-        assert dist_func >= 4 and dist_func <= 6
-        if dist_func == 4:
-            df = self._df1
-        elif dist_func == 5:
-            df = self._df2
-        elif dist_func == 6:
-            df = self._df3
-        else:
-            raise Exception(
-                "You may only choose 4, 5 or 6 for a custom distance function.")
-        if dist_func != 4:
-            assert threshold
-        return (lambda x, y, m: mappings[(x, y)]
-                if (x, y) in mappings.keys() else df(x, y, m))
-    _dfs = [_df1,
-            _df2,
-            _df3,
-            None,
-            None,
-            None]
-    def __init__(self,df,custom_map=None,threshold=None):
+            return 1.0 if abs(x - y) > m else abs(x - y) / (m + 1.0)
+
+    f = _df1
+
+    def __init__(self, df, custom_map=None, threshold=None):
         # TODO: move type checking stuff from impute to here
-        assert df>=1 and df<=6
-        if df!=1 and df!=4:
-            assert threshold # TODO: nicer exception
-        if df>=4:
-            assert custom_map # TODO: nicer exception
-            if df>=5:
-                self._dfs[df-1] = self._build_custom_df(df,custom_map,threshold)
-            else:
-                self._dfs[df-1] = self._build_custom_df(df,custom_map)
-        self.f = df
-    def __call__(self,x,y):
-        return self._dfs[self.f-1](x,y)
+        assert df >= 1 and df <= 6
+        # TODO: print warning if map or threshold provided for functions that won't use them
+        if df != 1 and df != 4:
+            assert threshold  # TODO: nicer exception
+        if df >= 4:
+            assert custom_map  # TODO: nicer exception
+        if df == 1:
+            self.f = self._df1
+        elif df == 2:
+            self.f = partial(self._df2, m=threshold)
+        elif df == 3:
+            self.f = partial(self._df3, m=threshold)
+        elif df == 4:
+            self.f = (lambda x, y: custom_map[(x, y)]
+                      if (x, y) in custom_map.keys() else self._df1(x, y))
+        elif df == 5:
+            self.f = (
+                lambda x, y: custom_map[(x, y)]
+                if (x, y) in custom_map.keys() else self._df2(x, y, threshold))
+        elif df == 6:
+            self.f = (
+                lambda x, y: float(custom_map[(x, y)])
+                if (x, y) in custom_map.keys() else self._df3(x, y, threshold))
+
+    def __call__(self, x, y):
+        return self.f(x, y)
+
 
 def _add_impute_col(data, imp_var):
     """
@@ -171,7 +148,6 @@ def _assign_igroups(data, aux_vars):
     del data["_conc_aux"]
 
 
-
 def _get_igroup_aux_var(data, aux_var):
     """
     _get_igroup_aux_var(data, aux_var)
@@ -188,7 +164,6 @@ def _get_igroup_aux_var(data, aux_var):
         ]].drop_duplicates().query("_IGroup == " +
                                    str(i))[aux_var].values.tolist())
     return out
-
 
 
 def _calc_distances(data,
