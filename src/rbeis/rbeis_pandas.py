@@ -488,10 +488,21 @@ def impute(
     except AssertionError:
         raise RBEISInputException(
             "You have not specified a weight for every auxiliary variable")
-    if not (isinstance(dist_func, int)):
-        raise TypeError(
-            "Distance functions are indicated by an integer from 1 to 6 inclusive"
+    if not (isinstance(dist_func, RBEISDistanceFunction)):
+        raise TypeError( # TODO: Can probably remove aux_vars as an argument as the keys cover it, and then just include a line aux_vars = dist_func.keys() somewhere before the actual imputation begins
+            "Distance functions must be given by a dictionary whose keys are strings corresponding to auxiliary variables and whose values are RBEISDistanceFunction objects."
         )
+    if dist_func.keys() != aux_vars: # TODO: remove if aux_vars is replaced with just the DF dict's keys
+        raise RBEISInputException("Auxiliary variables must match the keys in the distance function dictionary") # TODO: Clearer error message
+    if not all(map(lambda x:isinstance(x,str),dist_func.keys())):
+        raise TypeError(
+            "Distance functions must be given by a dictionary whose keys are strings corresponding to auxiliary variables and whose values are RBEISDistanceFunction objects."
+        )
+    if not all(map(lambda x:isinstance(x,RBEISDistanceFunction),dist_func.values())):
+        raise TypeError(
+            "Distance functions must be given by a dictionary whose keys are strings corresponding to auxiliary variables and whose values are RBEISDistanceFunction objects."
+        )
+    # TODO: move all of the below type checking for dist_func to inside RBEISDistanceFunction
     if dist_func < 1 or dist_func > 6:
         raise RBEISInputException(
             "The distance function must be an integer from 1 to 6 inclusive")
@@ -557,6 +568,7 @@ def impute(
         pass
 
     # Imputation
+    # aux_vars = dist_func.keys() # TODO: Decide if we want this and uncomment/delete
     _add_impute_col(data, imp_var)
     _assign_igroups(data, aux_vars)
     _calc_distances(
