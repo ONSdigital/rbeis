@@ -14,10 +14,10 @@ dynamic = ["version", "description"]
 Home = "https://www.ons.gov.uk"
 
 [project.optional-dependencies]
-test = [
-    "pytest",
-    "pytest-cov",
-]
+#test = [ # FIXME
+#    "pytest",
+#    "pytest-cov",
+#]
 # doc = [
 #     "sphinx",
 #     "myst-parser",
@@ -25,6 +25,9 @@ test = [
 
 [tool.pytest.ini_options]
 addopts = "--cov"
+testpaths = [
+    "tests",
+]
 
 [tool.coverage.run]
 source = ["rbeis"]
