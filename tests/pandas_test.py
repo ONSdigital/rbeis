@@ -215,7 +215,7 @@ class TestImpute(TestCase):
                     "dummy_aux_var1": 2,
                     "dummy_aux_var2": 3
                 },
-                dist_func=RBEISDistanceFunction(2,threshold="Not_a_Number"),
+                dist_func=RBEISDistanceFunction(2, threshold="Not_a_Number"),
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
@@ -235,7 +235,9 @@ class TestImpute(TestCase):
                     "dummy_aux_var1": 2,
                     "dummy_aux_var2": 3
                 },
-                dist_func=RBEISDistanceFunction(4,threshold=None,custom_map="Not_a_Dictionary"),
+                dist_func=RBEISDistanceFunction(4,
+                                                threshold=None,
+                                                custom_map="Not_a_Dictionary"),
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
@@ -495,7 +497,7 @@ class TestImpute(TestCase):
                     "dummy_aux_var1": 2,
                     "dummy_aux_var2": 3
                 },
-                dist_func=RBEISDistanceFunction(1,threshold=3),
+                dist_func=RBEISDistanceFunction(1, threshold=3),
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
@@ -555,7 +557,9 @@ class TestImpute(TestCase):
                     "dummy_aux_var1": 2,
                     "dummy_aux_var2": 3
                 },
-                dist_func=RBEISDistanceFunction(4,threshold=3,custom_map={(1, 1): 2}),
+                dist_func=RBEISDistanceFunction(4,
+                                                threshold=3,
+                                                custom_map={(1, 1): 2}),
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
@@ -575,7 +579,7 @@ class TestImpute(TestCase):
                     "dummy_aux_var1": 2,
                     "dummy_aux_var2": 3
                 },
-                dist_func=RBEISDistanceFunction(5,custom_map={(1, 1): 2}),
+                dist_func=RBEISDistanceFunction(5, custom_map={(1, 1): 2}),
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
@@ -595,7 +599,7 @@ class TestImpute(TestCase):
                     "dummy_aux_var1": 2,
                     "dummy_aux_var2": 3
                 },
-                dist_func=RBEISDistanceFunction(6,custom_df_map={(1, 1): 2}),
+                dist_func=RBEISDistanceFunction(6, custom_df_map={(1, 1): 2}),
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
@@ -615,7 +619,7 @@ class TestImpute(TestCase):
                     "dummy_aux_var1": 2,
                     "dummy_aux_var2": 3
                 },
-                dist_func=RBEISDistanceFunction(1,custom_map={(1, 1): 2}),
+                dist_func=RBEISDistanceFunction(1, custom_map={(1, 1): 2}),
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
@@ -635,7 +639,9 @@ class TestImpute(TestCase):
                     "dummy_aux_var1": 2,
                     "dummy_aux_var2": 3
                 },
-                dist_func=RBEISDistanceFunction(2,threshold=1,custom_map={(1, 1): 2}),
+                dist_func=RBEISDistanceFunction(2,
+                                                threshold=1,
+                                                custom_map={(1, 1): 2}),
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
@@ -655,7 +661,9 @@ class TestImpute(TestCase):
                     "dummy_aux_var1": 2,
                     "dummy_aux_var2": 3
                 },
-                dist_func=RBEISDistanceFunction(3,threshold=1,custom_df_map={(1, 1): 2}),
+                dist_func=RBEISDistanceFunction(3,
+                                                threshold=1,
+                                                custom_df_map={(1, 1): 2}),
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
@@ -675,7 +683,7 @@ class TestImpute(TestCase):
                     "dummy_aux_var1": 2,
                     "dummy_aux_var2": 3
                 },
-                dist_func=RBEISDistanceFunction(4,threshold=1),
+                dist_func=RBEISDistanceFunction(4, threshold=1),
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
@@ -695,7 +703,7 @@ class TestImpute(TestCase):
                     "dummy_aux_var1": 2,
                     "dummy_aux_var2": 3
                 },
-                dist_func=RBEISDistanceFunction(5,threshold=1),
+                dist_func=RBEISDistanceFunction(5, threshold=1),
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
@@ -715,7 +723,7 @@ class TestImpute(TestCase):
                     "dummy_aux_var1": 2,
                     "dummy_aux_var2": 3
                 },
-                dist_func=RBEISDistanceFunction(6,threshold=1),
+                dist_func=RBEISDistanceFunction(6, threshold=1),
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
@@ -943,7 +951,7 @@ class TestCalcDistances(TestCase):
         _calc_distances(
             data=test_data,
             aux_vars=[test_aux_var1, test_aux_var2],
-            dist_func=RBEISDistanceFunction(2,threshold=0.1),
+            dist_func=RBEISDistanceFunction(2, threshold=0.1),
             weights={
                 test_aux_var1: 2,
                 test_aux_var2: 3
@@ -972,7 +980,7 @@ class TestCalcDistances(TestCase):
         _calc_distances(
             data=test_data,
             aux_vars=[test_aux_var1, test_aux_var2],
-            dist_func=RBEISDistanceFunction(3,threshold=0.1),
+            dist_func=RBEISDistanceFunction(3, threshold=0.1),
             weights={
                 test_aux_var1: 2,
                 test_aux_var2: 3
@@ -1006,10 +1014,10 @@ class TestCalcDistances(TestCase):
             data=test_data,
             aux_vars=[test_aux_var1, test_aux_var_catagorical],
             dist_func=RBEISDistanceFunction(4,
-            custom_map={
-                (0, 1): 0.5,
-                ("American", "British"): 0.5
-            }),
+                                            custom_map={
+                                                (0, 1): 0.5,
+                                                ("American", "British"): 0.5
+                                            }),
             weights={
                 test_aux_var1: 2,
                 test_aux_var_catagorical: 3
@@ -1046,8 +1054,8 @@ class TestCalcDistances(TestCase):
             data=test_data,
             aux_vars=[test_aux_var1, test_aux_var2],
             dist_func=RBEISDistanceFunction(5,
-            threshold=0.1,
-            custom_df_map={(0, 1): 0.5}),
+                                            threshold=0.1,
+                                            custom_df_map={(0, 1): 0.5}),
             weights={
                 test_aux_var1: 2,
                 test_aux_var2: 3
@@ -1077,8 +1085,8 @@ class TestCalcDistances(TestCase):
             data=test_data,
             aux_vars=[test_aux_var1, test_aux_var2],
             dist_func=RBEISDistanceFunction(6,
-            threshold=0.1,
-            custom_df_map={(0, 1): 0.5}),
+                                            threshold=0.1,
+                                            custom_df_map={(0, 1): 0.5}),
             weights={
                 test_aux_var1: 2,
                 test_aux_var2: 3
@@ -1176,8 +1184,8 @@ class TestGetDonors(TestCase):
             data=test_data,
             aux_vars=[test_aux_var1, test_aux_var2],
             dist_func=RBEISDistanceFunction(6,
-            threshold=2,
-            custom_map=test_custom_df_map),
+                                            threshold=2,
+                                            custom_map=test_custom_df_map),
             weights={
                 test_aux_var1: 3,
                 test_aux_var2: 4
@@ -1218,8 +1226,8 @@ class TestGetFrequencyDistribution(TestCase):
             data=test_data,
             aux_vars=[test_aux_var1, test_aux_var2],
             dist_func=RBEISDistanceFunction(5,
-            threshold=3,
-            custom_map=test_custom_df_map),
+                                            threshold=3,
+                                            custom_map=test_custom_df_map),
             weights={
                 test_aux_var1: 2,
                 test_aux_var2: 3
@@ -1261,8 +1269,8 @@ class TestFrequencyToExpected(TestCase):
             data=test_data,
             aux_vars=[test_aux_var1, test_aux_var2],
             dist_func=RBEISDistanceFunction(6,
-            threshold=2,
-            custom_map=test_custom_df_map),
+                                            threshold=2,
+                                            custom_map=test_custom_df_map),
             weights={
                 test_aux_var1: 2,
                 test_aux_var2: 3
@@ -1312,8 +1320,8 @@ class TestImputeIGroup(TestCase):
             data=test_data,
             aux_vars=[test_aux_var1, test_aux_var2],
             dist_func=RBEISDistanceFunction(5,
-            threshold=3,
-            custom_map=test_custom_df_map),
+                                            threshold=3,
+                                            custom_map=test_custom_df_map),
             weights={
                 test_aux_var1: 2,
                 test_aux_var2: 3

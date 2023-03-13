@@ -489,16 +489,21 @@ def impute(
         raise RBEISInputException(
             "You have not specified a weight for every auxiliary variable")
     if not (isinstance(dist_func, RBEISDistanceFunction)):
-        raise TypeError( # TODO: Can probably remove aux_vars as an argument as the keys cover it, and then just include a line aux_vars = dist_func.keys() somewhere before the actual imputation begins
+        raise TypeError(  # TODO: Can probably remove aux_vars as an argument as the keys cover it, and then just include a line aux_vars = dist_func.keys() somewhere before the actual imputation begins
             "Distance functions must be given by a dictionary whose keys are strings corresponding to auxiliary variables and whose values are RBEISDistanceFunction objects."
         )
-    if dist_func.keys() != aux_vars: # TODO: remove if aux_vars is replaced with just the DF dict's keys
-        raise RBEISInputException("Auxiliary variables must match the keys in the distance function dictionary") # TODO: Clearer error message
-    if not all(map(lambda x:isinstance(x,str),dist_func.keys())):
+    if (dist_func.keys() != aux_vars
+        ):  # TODO: remove if aux_vars is replaced with just the DF dict's keys
+        raise RBEISInputException(
+            "Auxiliary variables must match the keys in the distance function dictionary"
+        )  # TODO: Clearer error message
+    if not all(map(lambda x: isinstance(x, str), dist_func.keys())):
         raise TypeError(
             "Distance functions must be given by a dictionary whose keys are strings corresponding to auxiliary variables and whose values are RBEISDistanceFunction objects."
         )
-    if not all(map(lambda x:isinstance(x,RBEISDistanceFunction),dist_func.values())):
+    if not all(
+            map(lambda x: isinstance(x, RBEISDistanceFunction),
+                dist_func.values())):
         raise TypeError(
             "Distance functions must be given by a dictionary whose keys are strings corresponding to auxiliary variables and whose values are RBEISDistanceFunction objects."
         )
