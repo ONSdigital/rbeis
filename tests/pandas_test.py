@@ -21,9 +21,7 @@ from rbeis.pandas import (
     _impute_igroup,
 )
 
-
-# Procedures to run before unit tests, if necessary
-def setUpModule():
+class RBEISTestCase(TestCase):
 
     # --- Set up simple dummy dataframe for testing input parameters for impute function  ---
     dummy_data = {
@@ -35,13 +33,13 @@ def setUpModule():
     dummy_dataframe = pd.DataFrame(dummy_data)
 
     # --- Set up variables for importing test data ---
-    test_data_filepath = "artists_unique_galcount_spaceavg_missing.csv"
+    test_data_filepath = "tests/artists_unique_galcount_spaceavg_missing.csv"
     test_impute_var = "whitney_count"
     test_pos_vals = list(range(0, 41))
     test_aux_var1 = "moma_count"
     test_aux_var2 = "space_ratio_per_page_avg"
-    test_aux_var_catagorical = "artist_nationality_other"
-    test_custom_df_map = {(0, 1): 0.5}
+    test_aux_var_categorial = "artist_nationality_other"
+    test_custom_map = {(0, 1): 0.5}
 
     # Set up data for testing distances calulations
     # For IGroup 0, moma_count = 0,
@@ -49,9 +47,7 @@ def setUpModule():
     # & artist_nationality_other = "American"
     igroup0_aux_var1 = 0
     igroup0_aux_var2 = 0.197291
-    igroup0_aux_catagorical = "American"
-
-    pass
+    igroup0_aux_categorical = "American"
 
 
 # --------------------------------------------------------------------------------------
@@ -80,7 +76,7 @@ def setUpModule():
 # --------------------------------------------------------------------------------------
 
 
-class TestImpute(TestCase):
+class TestImpute(RBEISTestCase):
 
     # --------------------------------
     # --- TYPE VALIDATION TESTS    ---
@@ -110,7 +106,7 @@ class TestImpute(TestCase):
     def test_type_validation_imp_var(self):
         with self.assertRaises(TypeError):
             impute(
-                data=dummy_dataframe,
+                data=self.dummy_dataframe,
                 imp_var=["Not", "A", "String"],
                 possible_vals=list(range(1, 101)),
                 aux_vars=["dummy_aux_var1", "dummy_aux_var2"],
@@ -130,7 +126,7 @@ class TestImpute(TestCase):
     def test_type_validation_possible_vals(self):
         with self.assertRaises(TypeError):
             impute(
-                data=dummy_dataframe,
+                data=self.dummy_dataframe,
                 imp_var="dummy_impute_var",
                 possible_vals="Not_a_List",
                 aux_vars=["dummy_aux_var1", "dummy_aux_var2"],
@@ -150,7 +146,7 @@ class TestImpute(TestCase):
     def test_type_validation_aux_vars(self):
         with self.assertRaises(TypeError):
             impute(
-                data=dummy_dataframe,
+                data=self.dummy_dataframe,
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars=[["Not", "A", "String"], "dummy_aux_var2"],
@@ -170,7 +166,7 @@ class TestImpute(TestCase):
     def test_type_validation_weights(self):
         with self.assertRaises(TypeError):
             impute(
-                data=dummy_dataframe,
+                data=self.dummy_dataframe,
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars=["dummy_aux_var1", "dummy_aux_var2"],
@@ -187,7 +183,7 @@ class TestImpute(TestCase):
     def test_type_validation_dist_func(self):
         with self.assertRaises(TypeError):
             impute(
-                data=dummy_dataframe,
+                data=self.dummy_dataframe,
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars=["dummy_aux_var1", "dummy_aux_var2"],
@@ -207,7 +203,7 @@ class TestImpute(TestCase):
     def test_type_validation_threshold(self):
         with self.assertRaises(TypeError):
             impute(
-                data=dummy_dataframe,
+                data=self.dummy_dataframe,
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars=["dummy_aux_var1", "dummy_aux_var2"],
@@ -227,7 +223,7 @@ class TestImpute(TestCase):
     def test_type_validation_custom_df_map(self):
         with self.assertRaises(TypeError):
             impute(
-                data=dummy_dataframe,
+                data=self.dummy_dataframe,
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars=["dummy_aux_var1", "dummy_aux_var2"],
@@ -249,7 +245,7 @@ class TestImpute(TestCase):
     def test_type_validation_min_quantile(self):
         with self.assertRaises(TypeError):
             impute(
-                data=dummy_dataframe,
+                data=self.dummy_dataframe,
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars=["dummy_aux_var1", "dummy_aux_var2"],
@@ -269,7 +265,7 @@ class TestImpute(TestCase):
     def test_type_validation_overwrite(self):
         with self.assertRaises(TypeError):
             impute(
-                data=dummy_dataframe,
+                data=self.dummy_dataframe,
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars=["dummy_aux_var1", "dummy_aux_var2"],
@@ -289,7 +285,7 @@ class TestImpute(TestCase):
     def test_type_validation_col_name(self):
         with self.assertRaises(TypeError):
             impute(
-                data=dummy_dataframe,
+                data=self.dummy_dataframe,
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars=["dummy_aux_var1", "dummy_aux_var2"],
@@ -309,7 +305,7 @@ class TestImpute(TestCase):
     def test_type_validation_in_place(self):
         with self.assertRaises(TypeError):
             impute(
-                data=dummy_dataframe,
+                data=self.dummy_dataframe,
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars=["dummy_aux_var1", "dummy_aux_var2"],
@@ -329,7 +325,7 @@ class TestImpute(TestCase):
     def test_type_validation_keep_intermediates(self):
         with self.assertRaises(TypeError):
             impute(
-                data=dummy_dataframe,
+                data=self.dummy_dataframe,
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars=["dummy_aux_var1", "dummy_aux_var2"],
@@ -353,7 +349,7 @@ class TestImpute(TestCase):
     def test_imp_var_in_df(self):
         with self.assertRaises(Exception):
             impute(
-                data=dummy_dataframe,
+                data=self.dummy_dataframe,
                 imp_var="not_a_variable",
                 possible_vals=list(range(1, 101)),
                 aux_vars=["dummy_aux_var1", "dummy_aux_var2"],
@@ -370,10 +366,10 @@ class TestImpute(TestCase):
             )
 
     # --- Test exception when possible_vals do not match range of impute variable  ---
-    # def test_pos_vals_match_range(self):
+    # def self.test_pos_vals_match_range(self):
     #    with self.assertRaises(Exception):
     #        impute(
-    #          data=dummy_dataframe,
+    #          data=self.dummy_dataframe,
     #          imp_var="dummy_impute_var",
     #          possible_vals=list(range(100,120)),
     #          aux_vars=["dummy_aux_var1", "dummy_aux_var2"],
@@ -389,7 +385,7 @@ class TestImpute(TestCase):
     def test_aux_vars_in_df(self):
         with self.assertRaises(Exception):
             impute(
-                data=dummy_dataframe,
+                data=self.dummy_dataframe,
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars=["dummy_aux_var1", "not_a_variable"],
@@ -409,7 +405,7 @@ class TestImpute(TestCase):
     def test_aux_vars_no_missing_vals(self):
         with self.assertRaises(Exception):
             impute(
-                data=dummy_dataframe,
+                data=self.dummy_dataframe,
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars=["dummy_aux_var1", "dummy_aux_var_missing"],
@@ -429,7 +425,7 @@ class TestImpute(TestCase):
     def test_weights_keys_match_aux_vars(self):
         with self.assertRaises(Exception):
             impute(
-                data=dummy_dataframe,
+                data=self.dummy_dataframe,
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars=["dummy_aux_var1", "dummy_aux_var2"],
@@ -449,7 +445,7 @@ class TestImpute(TestCase):
     def test_weights_are_positive(self):
         with self.assertRaises(Exception):
             impute(
-                data=dummy_dataframe,
+                data=self.dummy_dataframe,
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars=["dummy_aux_var1", "dummy_aux_var2"],
@@ -469,7 +465,7 @@ class TestImpute(TestCase):
     def test_dist_func_1_to_6(self):
         with self.assertRaises(Exception):
             impute(
-                data=dummy_dataframe,
+                data=self.dummy_dataframe,
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars=["dummy_aux_var1", "dummy_aux_var2"],
@@ -489,7 +485,7 @@ class TestImpute(TestCase):
     def test_threshold_for_df1(self):
         with self.assertRaises(Exception):
             impute(
-                data=dummy_dataframe,
+                data=self.dummy_dataframe,
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars=["dummy_aux_var1", "dummy_aux_var2"],
@@ -509,7 +505,7 @@ class TestImpute(TestCase):
     def test_threshold_for_df2(self):
         with self.assertRaises(Exception):
             impute(
-                data=dummy_dataframe,
+                data=self.dummy_dataframe,
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars=["dummy_aux_var1", "dummy_aux_var2"],
@@ -529,7 +525,7 @@ class TestImpute(TestCase):
     def test_threshold_for_df3(self):
         with self.assertRaises(Exception):
             impute(
-                data=dummy_dataframe,
+                data=self.dummy_dataframe,
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars=["dummy_aux_var1", "dummy_aux_var2"],
@@ -549,7 +545,7 @@ class TestImpute(TestCase):
     def test_threshold_for_df4(self):
         with self.assertRaises(Exception):
             impute(
-                data=dummy_dataframe,
+                data=self.dummy_dataframe,
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars=["dummy_aux_var1", "dummy_aux_var2"],
@@ -571,7 +567,7 @@ class TestImpute(TestCase):
     def test_threshold_for_df5(self):
         with self.assertRaises(Exception):
             impute(
-                data=dummy_dataframe,
+                data=self.dummy_dataframe,
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars=["dummy_aux_var1", "dummy_aux_var2"],
@@ -591,7 +587,7 @@ class TestImpute(TestCase):
     def test_threshold_for_df6(self):
         with self.assertRaises(Exception):
             impute(
-                data=dummy_dataframe,
+                data=self.dummy_dataframe,
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars=["dummy_aux_var1", "dummy_aux_var2"],
@@ -611,7 +607,7 @@ class TestImpute(TestCase):
     def test_custom_map_for_df1(self):
         with self.assertRaises(Exception):
             impute(
-                data=dummy_dataframe,
+                data=self.dummy_dataframe,
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars=["dummy_aux_var1", "dummy_aux_var2"],
@@ -631,7 +627,7 @@ class TestImpute(TestCase):
     def test_custom_map_for_df2(self):
         with self.assertRaises(Exception):
             impute(
-                data=dummy_dataframe,
+                data=self.dummy_dataframe,
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars=["dummy_aux_var1", "dummy_aux_var2"],
@@ -653,7 +649,7 @@ class TestImpute(TestCase):
     def test_custom_map_for_df3(self):
         with self.assertRaises(Exception):
             impute(
-                data=dummy_dataframe,
+                data=self.dummy_dataframe,
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars=["dummy_aux_var1", "dummy_aux_var2"],
@@ -675,7 +671,7 @@ class TestImpute(TestCase):
     def test_custom_map_for_df4(self):
         with self.assertRaises(Exception):
             impute(
-                data=dummy_dataframe,
+                data=self.dummy_dataframe,
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars=["dummy_aux_var1", "dummy_aux_var2"],
@@ -695,7 +691,7 @@ class TestImpute(TestCase):
     def test_custom_map_for_df5(self):
         with self.assertRaises(Exception):
             impute(
-                data=dummy_dataframe,
+                data=self.dummy_dataframe,
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars=["dummy_aux_var1", "dummy_aux_var2"],
@@ -715,7 +711,7 @@ class TestImpute(TestCase):
     def test_custom_map_for_df6(self):
         with self.assertRaises(Exception):
             impute(
-                data=dummy_dataframe,
+                data=self.dummy_dataframe,
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars=["dummy_aux_var1", "dummy_aux_var2"],
@@ -741,7 +737,7 @@ class TestImpute(TestCase):
 # --------------------------------------------------------------------------------------
 
 
-class TestDistanceFunctions(TestCase):
+class TestDistanceFunctions(RBEISTestCase):
 
     # --- Test distance function 1 returns correct values ---
     def test_df1(self):
@@ -806,15 +802,15 @@ class TestDistanceFunctions(TestCase):
 
 
 # --- Test impute column values are assigned correctly ---
-class TestAddImputeCol(TestCase):
+class TestAddImputeCol(RBEISTestCase):
 
     def test_assign_impute(self):
-        test_data = pd.read_csv(test_data_filepath)
-        _add_impute_col(test_data, test_impute_var)
+        test_data = pd.read_csv(self.test_data_filepath)
+        _add_impute_col(test_data, self.test_impute_var)
 
         # Check that correct Boolean values are assigned for _impute column
         self.assertTrue(test_data["_impute"].equals(
-            np.isnan(test_data[test_impute_var])))
+            np.isnan(test_data[self.test_impute_var])))
 
 
 # -----------------------------------------------------------------------------
@@ -825,12 +821,12 @@ class TestAddImputeCol(TestCase):
 
 
 # --- Test Igroup column values are assigned correctly ---
-class TestAssignIgroups(TestCase):
+class TestAssignIgroups(RBEISTestCase):
 
     def test_assign_igroups(self):
-        test_data = pd.read_csv(test_data_filepath)
-        _add_impute_col(test_data, test_impute_var)
-        _assign_igroups(test_data, [test_aux_var1, test_aux_var2])
+        test_data = pd.read_csv(self.test_data_filepath)
+        _add_impute_col(test_data, self.test_impute_var)
+        _assign_igroups(test_data, [self.test_aux_var1, self.test_aux_var2])
 
         # Check Igroup is set to -1 for non-recipient records
         donors = test_data[test_data["_impute"] == False]
@@ -850,8 +846,8 @@ class TestAssignIgroups(TestCase):
         multiple_recipiant_igroups = recipiant_freq[recipiant_freq > 1].index
         for igroup_number in multiple_recipiant_igroups:
             igroup_data = test_data[test_data["_IGroup"] == igroup_number]
-            self.assertTrue(len(igroup_data[test_aux_var1].unique()) == 1)
-            self.assertTrue(len(igroup_data[test_aux_var2].unique()) == 1)
+            self.assertTrue(len(igroup_data[self.test_aux_var1].unique()) == 1)
+            self.assertTrue(len(igroup_data[self.test_aux_var2].unique()) == 1)
 
         # Check single recipiant IGroups all have different combination of
         # auxiliary variables
@@ -861,8 +857,8 @@ class TestAssignIgroups(TestCase):
             single_recipiant_data["_IGroup"].isin(single_recipiant_list)]
 
         single_recipiant_data["combine_aux_vars"] = (
-            single_recipiant_data[test_aux_var1].astype(str) + " " +
-            single_recipiant_data[test_aux_var2].astype(str))
+            single_recipiant_data[self.test_aux_var1].astype(str) + " " +
+            single_recipiant_data[self.test_aux_var2].astype(str))
 
         single_recipiant_freq = single_recipiant_data.groupby(
             by="combine_aux_vars")["combine_aux_vars"].count()
@@ -879,24 +875,24 @@ class TestAssignIgroups(TestCase):
 
 
 # --- Test list of auxiliary variables values for each iGroup is correct ---
-class TestGetIGroupAuxVar(TestCase):
+class TestGetIGroupAuxVar(RBEISTestCase):
 
     def test_get_igroup_aux_var(self):
-        test_data = pd.read_csv(test_data_filepath)
-        _add_impute_col(test_data, test_impute_var)
-        _assign_igroups(test_data, [test_aux_var1, test_aux_var2])
+        test_data = pd.read_csv(self.test_data_filepath)
+        _add_impute_col(test_data, self.test_impute_var)
+        _assign_igroups(test_data, [self.test_aux_var1, self.test_aux_var2])
 
         # Get list of auxiliary variable values for each iGroup
-        aux_var1_list = _get_igroup_aux_var(test_data, test_aux_var1)
-        aux_var2_list = _get_igroup_aux_var(test_data, test_aux_var2)
+        aux_var1_list = _get_igroup_aux_var(test_data, self.test_aux_var1)
+        aux_var2_list = _get_igroup_aux_var(test_data, self.test_aux_var2)
 
         # Check records assigned to each iGroup match auxiliary values in list
         for igroup_number in range(1 + test_data["_IGroup"].max()):
             for row_index in range(test_data.shape[0]):
                 if test_data["_IGroup"].values[row_index] == igroup_number:
-                    self.assertTrue(test_data[test_aux_var1].values[row_index]
+                    self.assertTrue(test_data[self.test_aux_var1].values[row_index]
                                     == aux_var1_list[igroup_number])
-                    self.assertTrue(test_data[test_aux_var2].values[row_index]
+                    self.assertTrue(test_data[self.test_aux_var2].values[row_index]
                                     == aux_var2_list[igroup_number])
 
 
@@ -909,20 +905,20 @@ class TestGetIGroupAuxVar(TestCase):
 
 # --- Test distances are calulated correctly for each distance function ---
 # --- for iGroup 0 only ---
-class TestCalcDistances(TestCase):
+class TestCalcDistances(RBEISTestCase):
 
     # --- Test distance calculations using distance function 1  ---
     def test_calc_distances_df1(self):
-        test_data = pd.read_csv(test_data_filepath)
-        _add_impute_col(test_data, test_impute_var)
-        _assign_igroups(test_data, [test_aux_var1, test_aux_var_catagorical])
+        test_data = pd.read_csv(self.test_data_filepath)
+        _add_impute_col(test_data, self.test_impute_var)
+        _assign_igroups(test_data, [self.test_aux_var1, self.test_aux_var_categorial])
         _calc_distances(
             data=test_data,
-            aux_vars=[test_aux_var1, test_aux_var_catagorical],
+            aux_vars=[self.test_aux_var1, self.test_aux_var_categorial],
             dist_func=RBEISDistanceFunction(1),
             weights={
-                test_aux_var1: 2,
-                test_aux_var_catagorical: 3
+                self.test_aux_var1: 2,
+                self.test_aux_var_categorial: 3
             },
         )
 
@@ -933,11 +929,11 @@ class TestCalcDistances(TestCase):
 
         for row_index in donors_list:
             rbeis_distances_list = test_data.loc[row_index, "_distances"]
-            d1 = _df1(igroup0_aux_var1, test_data.loc[row_index,
-                                                      test_aux_var1], None)
+            d1 = _df1(self.igroup0_aux_var1, test_data.loc[row_index,
+                                                      self.test_aux_var1], None)
             d2 = _df1(
-                igroup0_aux_catagorical,
-                test_data.loc[row_index, test_aux_var_catagorical],
+                self.igroup0_aux_categorical,
+                test_data.loc[row_index, self.test_aux_var_categorial],
                 None,
             )
             weighted_distance = 2 * d1 + 3 * d2
@@ -945,16 +941,16 @@ class TestCalcDistances(TestCase):
 
     # --- Test distance calculations using distance function 2  ---
     def test_calc_distances_df2(self):
-        test_data = pd.read_csv(test_data_filepath)
-        _add_impute_col(test_data, test_impute_var)
-        _assign_igroups(test_data, [test_aux_var1, test_aux_var2])
+        test_data = pd.read_csv(self.test_data_filepath)
+        _add_impute_col(test_data, self.test_impute_var)
+        _assign_igroups(test_data, [self.test_aux_var1, self.test_aux_var2])
         _calc_distances(
             data=test_data,
-            aux_vars=[test_aux_var1, test_aux_var2],
+            aux_vars=[self.test_aux_var1, self.test_aux_var2],
             dist_func=RBEISDistanceFunction(2, threshold=0.1),
             weights={
-                test_aux_var1: 2,
-                test_aux_var2: 3
+                self.test_aux_var1: 2,
+                self.test_aux_var2: 3
             },
         )
 
@@ -965,25 +961,25 @@ class TestCalcDistances(TestCase):
 
         for row_index in donors_list:
             rbeis_distances_list = test_data.loc[row_index, "_distances"]
-            d1 = _df2(igroup0_aux_var1, test_data.loc[row_index,
-                                                      test_aux_var1], 0.1)
-            d2 = _df2(igroup0_aux_var2, test_data.loc[row_index,
-                                                      test_aux_var2], 0.1)
+            d1 = _df2(self.igroup0_aux_var1, test_data.loc[row_index,
+                                                      self.test_aux_var1], 0.1)
+            d2 = _df2(self.igroup0_aux_var2, test_data.loc[row_index,
+                                                      self.test_aux_var2], 0.1)
             weighted_distance = 2 * d1 + 3 * d2
             self.assertEqual(weighted_distance, rbeis_distances_list[0])
 
     # --- Test distance calculations using distance function 3  ---
     def test_calc_distances_df3(self):
-        test_data = pd.read_csv(test_data_filepath)
-        _add_impute_col(test_data, test_impute_var)
-        _assign_igroups(test_data, [test_aux_var1, test_aux_var2])
+        test_data = pd.read_csv(self.test_data_filepath)
+        _add_impute_col(test_data, self.test_impute_var)
+        _assign_igroups(test_data, [self.test_aux_var1, self.test_aux_var2])
         _calc_distances(
             data=test_data,
-            aux_vars=[test_aux_var1, test_aux_var2],
+            aux_vars=[self.test_aux_var1, self.test_aux_var2],
             dist_func=RBEISDistanceFunction(3, threshold=0.1),
             weights={
-                test_aux_var1: 2,
-                test_aux_var2: 3
+                self.test_aux_var1: 2,
+                self.test_aux_var2: 3
             },
         )
 
@@ -996,10 +992,10 @@ class TestCalcDistances(TestCase):
 
         for row_index in donors_list:
             rbeis_distances_list = test_data.loc[row_index, "_distances"]
-            d1 = _df3(igroup0_aux_var1, test_data.loc[row_index,
-                                                      test_aux_var1], 0.1)
-            d2 = _df3(igroup0_aux_var2, test_data.loc[row_index,
-                                                      test_aux_var2], 0.1)
+            d1 = _df3(self.igroup0_aux_var1, test_data.loc[row_index,
+                                                      self.test_aux_var1], 0.1)
+            d2 = _df3(self.igroup0_aux_var2, test_data.loc[row_index,
+                                                      self.test_aux_var2], 0.1)
             weighted_distance = 2 * d1 + 3 * d2
             self.assertAlmostEqual(weighted_distance,
                                    rbeis_distances_list[0],
@@ -1007,20 +1003,20 @@ class TestCalcDistances(TestCase):
 
     # --- Test distance calculations using distance function 4  ---
     def test_calc_distances_df4(self):
-        test_data = pd.read_csv(test_data_filepath)
-        _add_impute_col(test_data, test_impute_var)
-        _assign_igroups(test_data, [test_aux_var1, test_aux_var_catagorical])
+        test_data = pd.read_csv(self.test_data_filepath)
+        _add_impute_col(test_data, self.test_impute_var)
+        _assign_igroups(test_data, [self.test_aux_var1, self.test_aux_var_categorial])
         _calc_distances(
             data=test_data,
-            aux_vars=[test_aux_var1, test_aux_var_catagorical],
+            aux_vars=[self.test_aux_var1, self.test_aux_var_categorial],
             dist_func=RBEISDistanceFunction(4,
                                             custom_map={
                                                 (0, 1): 0.5,
                                                 ("American", "British"): 0.5
                                             }),
             weights={
-                test_aux_var1: 2,
-                test_aux_var_catagorical: 3
+                self.test_aux_var1: 2,
+                self.test_aux_var_categorial: 3
             },
         )
 
@@ -1035,11 +1031,11 @@ class TestCalcDistances(TestCase):
 
         for row_index in donors_list:
             rbeis_distances_list = test_data.loc[row_index, "_distances"]
-            d1 = df4(igroup0_aux_var1, test_data.loc[row_index, test_aux_var1],
+            d1 = df4(self.igroup0_aux_var1, test_data.loc[row_index, self.test_aux_var1],
                      None)
             d2 = df4(
-                igroup0_aux_catagorical,
-                test_data.loc[row_index, test_aux_var_catagorical],
+                self.igroup0_aux_categorical,
+                test_data.loc[row_index, self.test_aux_var_categorial],
                 None,
             )
             weighted_distance = 2 * d1 + 3 * d2
@@ -1047,18 +1043,18 @@ class TestCalcDistances(TestCase):
 
     # --- Test distance calculations using distance function 5  ---
     def test_calc_distances_df5(self):
-        test_data = pd.read_csv(test_data_filepath)
-        _add_impute_col(test_data, test_impute_var)
-        _assign_igroups(test_data, [test_aux_var1, test_aux_var2])
+        test_data = pd.read_csv(self.test_data_filepath)
+        _add_impute_col(test_data, self.test_impute_var)
+        _assign_igroups(test_data, [self.test_aux_var1, self.test_aux_var2])
         _calc_distances(
             data=test_data,
-            aux_vars=[test_aux_var1, test_aux_var2],
+            aux_vars=[self.test_aux_var1, self.test_aux_var2],
             dist_func=RBEISDistanceFunction(5,
                                             threshold=0.1,
                                             custom_df_map={(0, 1): 0.5}),
             weights={
-                test_aux_var1: 2,
-                test_aux_var2: 3
+                self.test_aux_var1: 2,
+                self.test_aux_var2: 3
             },
         )
 
@@ -1069,27 +1065,27 @@ class TestCalcDistances(TestCase):
 
         for row_index in donors_list:
             rbeis_distances_list = test_data.loc[row_index, "_distances"]
-            d1 = df5(igroup0_aux_var1, test_data.loc[row_index, test_aux_var1],
+            d1 = df5(self.igroup0_aux_var1, test_data.loc[row_index, self.test_aux_var1],
                      0.1)
-            d2 = df5(igroup0_aux_var2, test_data.loc[row_index, test_aux_var2],
+            d2 = df5(self.igroup0_aux_var2, test_data.loc[row_index, self.test_aux_var2],
                      0.1)
             weighted_distance = 2 * d1 + 3 * d2
             self.assertEqual(weighted_distance, rbeis_distances_list[0])
 
     # --- Test distance calculations using distance function 6  ---
     def test_calc_distances_df6(self):
-        test_data = pd.read_csv(test_data_filepath)
-        _add_impute_col(test_data, test_impute_var)
-        _assign_igroups(test_data, [test_aux_var1, test_aux_var2])
+        test_data = pd.read_csv(self.test_data_filepath)
+        _add_impute_col(test_data, self.test_impute_var)
+        _assign_igroups(test_data, [self.test_aux_var1, self.test_aux_var2])
         _calc_distances(
             data=test_data,
-            aux_vars=[test_aux_var1, test_aux_var2],
+            aux_vars=[self.test_aux_var1, self.test_aux_var2],
             dist_func=RBEISDistanceFunction(6,
                                             threshold=0.1,
                                             custom_df_map={(0, 1): 0.5}),
             weights={
-                test_aux_var1: 2,
-                test_aux_var2: 3
+                self.test_aux_var1: 2,
+                self.test_aux_var2: 3
             },
         )
 
@@ -1103,9 +1099,9 @@ class TestCalcDistances(TestCase):
 
         for row_index in donors_list:
             rbeis_distances_list = test_data.loc[row_index, "_distances"]
-            d1 = df6(igroup0_aux_var1, test_data.loc[row_index, test_aux_var1],
+            d1 = df6(self.igroup0_aux_var1, test_data.loc[row_index, self.test_aux_var1],
                      0.1)
-            d2 = df6(igroup0_aux_var2, test_data.loc[row_index, test_aux_var2],
+            d2 = df6(self.igroup0_aux_var2, test_data.loc[row_index, self.test_aux_var2],
                      0.1)
             weighted_distance = 2 * d1 + 3 * d2
             self.assertAlmostEqual(weighted_distance,
@@ -1121,22 +1117,22 @@ class TestCalcDistances(TestCase):
 
 
 # --- Test list of iGroups each donor can donate to is correct  ---
-class TestCalcDonors(TestCase):
+class TestCalcDonors(RBEISTestCase):
 
     # Test for min_quantile = None as min_quantile will be changed to ratio
     # Distance funtion 1 chosen
 
     def test_calc_donors(self):
-        test_data = pd.read_csv(test_data_filepath)
-        _add_impute_col(test_data, test_impute_var)
-        _assign_igroups(test_data, [test_aux_var1, test_aux_var2])
+        test_data = pd.read_csv(self.test_data_filepath)
+        _add_impute_col(test_data, self.test_impute_var)
+        _assign_igroups(test_data, [self.test_aux_var1, self.test_aux_var2])
         _calc_distances(
             data=test_data,
-            aux_vars=[test_aux_var1, test_aux_var2],
+            aux_vars=[self.test_aux_var1, self.test_aux_var2],
             dist_func=RBEISDistanceFunction(1),
             weights={
-                test_aux_var1: 2,
-                test_aux_var2: 3
+                self.test_aux_var1: 2,
+                self.test_aux_var2: 3
             },
         )
         _calc_donors(test_data, min_quantile=None)
@@ -1168,7 +1164,7 @@ class TestCalcDonors(TestCase):
 
 
 # --- Test list of donors for each iGroup is correct ---
-class TestGetDonors(TestCase):
+class TestGetDonors(RBEISTestCase):
 
     # Test list of donors for each iGroup ties up with list of
     # iGroups for each donor
@@ -1177,18 +1173,18 @@ class TestGetDonors(TestCase):
         # Test for min_quantile = None as min_quantile will be changed to ratio
         # Distance funtion 6 chosen
 
-        test_data = pd.read_csv(test_data_filepath)
-        _add_impute_col(test_data, test_impute_var)
-        _assign_igroups(test_data, [test_aux_var1, test_aux_var2])
+        test_data = pd.read_csv(self.test_data_filepath)
+        _add_impute_col(test_data, self.test_impute_var)
+        _assign_igroups(test_data, [self.test_aux_var1, self.test_aux_var2])
         _calc_distances(
             data=test_data,
-            aux_vars=[test_aux_var1, test_aux_var2],
+            aux_vars=[self.test_aux_var1, self.test_aux_var2],
             dist_func=RBEISDistanceFunction(6,
                                             threshold=2,
-                                            custom_map=test_custom_df_map),
+                                            custom_map=self.test_custom_map),
             weights={
-                test_aux_var1: 3,
-                test_aux_var2: 4
+                self.test_aux_var1: 3,
+                self.test_aux_var2: 4
             },
         )
         _calc_donors(test_data, min_quantile=None)
@@ -1212,25 +1208,25 @@ class TestGetDonors(TestCase):
 
 
 # --- Test frequency distribution is calulated correctly for each iGroup  ---
-class TestGetFrequencyDistribution(TestCase):
+class TestGetFrequencyDistribution(RBEISTestCase):
 
     # Test for min_quantile = None as min_quantile will be changed to ratio
     # Distance funtion 5 chosen, with threshold of 3
 
     def test_get_freq_dist(self):
-        test_data = pd.read_csv(test_data_filepath)
-        _add_impute_col(data=test_data, imp_var=test_impute_var)
+        test_data = pd.read_csv(self.test_data_filepath)
+        _add_impute_col(data=test_data, imp_var=self.test_impute_var)
         _assign_igroups(data=test_data,
-                        aux_vars=[test_aux_var1, test_aux_var2])
+                        aux_vars=[self.test_aux_var1, self.test_aux_var2])
         _calc_distances(
             data=test_data,
-            aux_vars=[test_aux_var1, test_aux_var2],
+            aux_vars=[self.test_aux_var1, self.test_aux_var2],
             dist_func=RBEISDistanceFunction(5,
                                             threshold=3,
-                                            custom_map=test_custom_df_map),
+                                            custom_map=self.test_custom_map),
             weights={
-                test_aux_var1: 2,
-                test_aux_var2: 3
+                self.test_aux_var1: 2,
+                self.test_aux_var2: 3
             },
         )
         _calc_donors(data=test_data, min_quantile=None)
@@ -1240,8 +1236,8 @@ class TestGetFrequencyDistribution(TestCase):
         for igroup_number in range(1 + test_data["_IGroup"].max()):
             freq_dist_list = _get_freq_dist(
                 data=test_data,
-                imp_var=test_impute_var,
-                possible_vals=test_pos_vals,
+                imp_var=self.test_impute_var,
+                possible_vals=self.test_pos_vals,
                 igroup=igroup_number,
             )
             self.assertTrue(sum(freq_dist_list) == Fraction(1, 1))
@@ -1255,31 +1251,31 @@ class TestGetFrequencyDistribution(TestCase):
 
 
 # --- Test frequency is translated in to expected numbers correctly for each iGroup ---
-class TestFrequencyToExpected(TestCase):
+class TestFrequencyToExpected(RBEISTestCase):
 
     # Test for min_quantile = None as min_quantile will be changed to ratio
     # Distance funtion 6 chosen, with threshold of 2
 
     def test_freq_to_exp(self):
-        test_data = pd.read_csv(test_data_filepath)
-        _add_impute_col(data=test_data, imp_var=test_impute_var)
+        test_data = pd.read_csv(self.test_data_filepath)
+        _add_impute_col(data=test_data, imp_var=self.test_impute_var)
         _assign_igroups(data=test_data,
-                        aux_vars=[test_aux_var1, test_aux_var2])
+                        aux_vars=[self.test_aux_var1, self.test_aux_var2])
         _calc_distances(
             data=test_data,
-            aux_vars=[test_aux_var1, test_aux_var2],
+            aux_vars=[self.test_aux_var1, self.test_aux_var2],
             dist_func=RBEISDistanceFunction(6,
                                             threshold=2,
-                                            custom_map=test_custom_df_map),
+                                            custom_map=self.test_custom_map),
             weights={
-                test_aux_var1: 2,
-                test_aux_var2: 3
+                self.test_aux_var1: 2,
+                self.test_aux_var2: 3
             },
         )
         _calc_donors(data=test_data, min_quantile=None)
 
         # Calculate the size of each iGroup
-        recipiants = test_data[test_data[test_impute_var].isnull()]
+        recipiants = test_data[test_data[self.test_impute_var].isnull()]
         igroup_size = recipiants.groupby(by="_IGroup")["_IGroup"].count()
 
         # For each iGroup, test that the expected values assigned to
@@ -1288,8 +1284,8 @@ class TestFrequencyToExpected(TestCase):
         for igroup_number in range(1 + test_data["_IGroup"].max()):
             freq_dist_list = _get_freq_dist(
                 data=test_data,
-                imp_var=test_impute_var,
-                possible_vals=test_pos_vals,
+                imp_var=self.test_impute_var,
+                possible_vals=self.test_pos_vals,
                 igroup=igroup_number,
             )
             expected_list = _freq_to_exp(test_data, freq_dist_list,
@@ -1305,26 +1301,26 @@ class TestFrequencyToExpected(TestCase):
 
 
 # --- Test imputed values returned for each iGroup ---
-class TestImputeIGroup(TestCase):
+class TestImputeIGroup(RBEISTestCase):
 
     # Test for min_quantile = None as min_quantile will be changed to ratio
     # Distance funtion 5 chosen, with threshold of 3
 
     def test_impute_igroup(self):
 
-        test_data = pd.read_csv(test_data_filepath)
-        _add_impute_col(data=test_data, imp_var=test_impute_var)
+        test_data = pd.read_csv(self.test_data_filepath)
+        _add_impute_col(data=test_data, imp_var=self.test_impute_var)
         _assign_igroups(data=test_data,
-                        aux_vars=[test_aux_var1, test_aux_var2])
+                        aux_vars=[self.test_aux_var1, self.test_aux_var2])
         _calc_distances(
             data=test_data,
-            aux_vars=[test_aux_var1, test_aux_var2],
+            aux_vars=[self.test_aux_var1, self.test_aux_var2],
             dist_func=RBEISDistanceFunction(5,
                                             threshold=3,
-                                            custom_map=test_custom_df_map),
+                                            custom_map=self.test_custom_map),
             weights={
-                test_aux_var1: 2,
-                test_aux_var2: 3
+                self.test_aux_var1: 2,
+                self.test_aux_var2: 3
             },
         )
         _calc_donors(data=test_data, min_quantile=None)
@@ -1336,8 +1332,8 @@ class TestImputeIGroup(TestCase):
         for igroup_number in range(1 + test_data["_IGroup"].max()):
             freq_dist_list = _get_freq_dist(
                 data=test_data,
-                imp_var=test_impute_var,
-                possible_vals=test_pos_vals,
+                imp_var=self.test_impute_var,
+                possible_vals=self.test_pos_vals,
                 igroup=igroup_number,
             )
             expected_list = _freq_to_exp(test_data, freq_dist_list,
@@ -1350,28 +1346,23 @@ class TestImputeIGroup(TestCase):
             imputed_list = _impute_igroup(
                 data=test_data,
                 exp_dist=expected_list,
-                possible_vals=test_pos_vals,
+                possible_vals=self.test_pos_vals,
                 igroup=igroup_number,
             )
 
             # Check each imputed value has an expected number ocurences > 0
             for imputed_val in imputed_list:
-                index = test_pos_vals.index(imputed_val)
+                index = self.test_pos_vals.index(imputed_val)
                 expected_num_occurences = save_expected_list[index]
                 self.assertTrue(float(expected_num_occurences) > 0)
 
             # Check values with expected number ocurences > 1 appear
             # appropriate number of times as imputed values
-            for pos_impute_val in test_pos_vals:
-                index = test_pos_vals.index(pos_impute_val)
+            for pos_impute_val in self.test_pos_vals:
+                index = self.test_pos_vals.index(pos_impute_val)
                 expected_num_occurences = float(save_expected_list[index])
                 if expected_num_occurences >= 1:
                     num_imputed = imputed_list.count(pos_impute_val)
                     self.assertTrue(
                         (num_imputed == int(expected_num_occurences))
                         or (num_imputed == 1 + int(expected_num_occurences)))
-
-
-# Procedures to run after unit tests, if necessary
-def tearDownModule():
-    pass
