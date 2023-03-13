@@ -154,10 +154,11 @@ def _add_impute_col(data, imp_var):
     Prepare the DataFrame by adding a boolean column 'impute' indicating whether
     or not a record is to be imputed.
     """
-    data["_impute"] = np.isnan(data[imp_var])
+    # data["_impute"] = np.isnan(data[imp_var]) # Does not work when imp_var is non-numeric
+    data["_impute"] = data.apply(lambda r: np.isnan(r[imp_var]) if isinstance(r[imp_var],Number) else False,axis=1)
 
 
-def _assign_igroups(data, aux_vars):
+def _assign_igroups(data, aux_var_names):
     """
     _assign_igroups(data, aux_vars)
 
@@ -175,7 +176,7 @@ def _assign_igroups(data, aux_vars):
     4. Remove column '_conc_aux'
     """
     data["_conc_aux"] = data.apply(
-        lambda r: str(list(map(lambda v: r[v], aux_vars)))
+        lambda r: str(list(map(lambda v: r[v], aux_var_names)))
         if r["_impute"] else "",
         axis=1,
     )
@@ -184,7 +185,7 @@ def _assign_igroups(data, aux_vars):
     del data["_conc_aux"]
 
 
-def _get_igroup_aux_var(data, aux_var):
+def _get_igroup_aux_var(data, aux_var_name):
     """
     _get_igroup_aux_var(data, aux_var)
 
@@ -196,18 +197,12 @@ def _get_igroup_aux_var(data, aux_var):
     out = []
     for i in range(1 + data["_IGroup"].max()):
         out += (data[[
-            "_IGroup", aux_var
+            "_IGroup", aux_var_name
         ]].drop_duplicates().query("_IGroup == " +
-                                   str(i))[aux_var].values.tolist())
+                                   str(i))[aux_var_name].values.tolist())
     return out
 
-
-def _calc_distances(data,
-                    aux_vars,
-                    dist_func,
-                    weights,
-                    threshold=None,
-                    custom_df_map=None):
+def _calc_distances(data,aux_vars):
     """
     _calc_distances(data, aux_vars, dist_func, weights, threshold=None,
                     custom_df_map=None)
@@ -240,34 +235,47 @@ def _calc_distances(data,
        taking into account the specified weights
     4. Remove column '_dists_temp'
     """
-    # Calculate the distances
-    dist_func = (_build_custom_df(
-        dist_func, custom_df_map, threshold=threshold)
-                 if dist_func >= 4 else [_df1, _df2, _df3][dist_func - 1])
-    # TODO: Check if dist_func is compatible with each auxvar dtype
-    #       (e.g. DF3 doesn't like strings)
+    pass
+
+# FIXME this is the _calc_distances function in progress; apologies for the absolute carnage
+def _test():
+    data = pd.read_csv("tests/artists_unique_galcount_spaceavg_missing.csv")
+    imp_var = "book"
+    aux_vars = {"artist_gender": RBEISDistanceFunction(1),"artist_nationality_other":RBEISDistanceFunction(1),"artist_race_nwi":RBEISDistanceFunction(1)}
+    _add_impute_col(data, imp_var)
+    _assign_igroups(data, aux_vars.keys())
     igroup_aux_vars = []
     vars_vals = list(
-        zip(aux_vars, map(lambda v: _get_igroup_aux_var(data, v), aux_vars)))
+        zip(aux_vars.keys(), map(lambda k: _get_igroup_aux_var(data, k), aux_vars.keys())))
     for i in range(1 + data["_IGroup"].max()):
         igroup_aux_vars.append({k: v[i] for k, v in vars_vals})
-    data["_dists_temp"] = data.apply(
-        lambda r: list(
-            map(
-                lambda x: {
-                    k: weights[k] * dist_func(x[k], r[k], threshold)
-                    for k in aux_vars
-                },
-                igroup_aux_vars,
-            )) if not (r["_impute"]) else [],
-        axis=1,
-    )
-    data["_distances"] = data.apply(
-        lambda r: list(
-            map(lambda d: reduce(add, list(d.values()), 0), r["_dists_temp"])),
-        axis=1,
-    )
-    del data["_dists_temp"]
+
+    data["_dists_temp"] = data.apply(lambda r: {k: aux_vars[k](r[k],igroup_aux_vars[r["_IGroup"]][k]) for k in aux_vars.keys()} if not(r["_impute"]) else {},axis=1)
+    return data, igroup_aux_vars
+
+    ## Calculate the distances
+    #dist_func = (_build_custom_df(
+    #    dist_func, custom_df_map, threshold=threshold)
+    #             if dist_func >= 4 else [_df1, _df2, _df3][dist_func - 1])
+    ## TODO: Check if dist_func is compatible with each auxvar dtype
+    ##       (e.g. DF3 doesn't like strings)
+    #data["_dists_temp"] = data.apply(
+    #    lambda r: list(
+    #        map(
+    #            lambda x: {
+    #                k: weights[k] * dist_func(x[k], r[k], threshold)
+    #                for k in aux_var_names
+    #            },
+    #            igroup_aux_vars,
+    #        )) if not (r["_impute"]) else [],
+    #    axis=1,
+    #)
+    #data["_distances"] = data.apply(
+    #    lambda r: list(
+    #        map(lambda d: reduce(add, list(d.values()), 0), r["_dists_temp"])),
+    #    axis=1,
+    #)
+    #del data["_dists_temp"]
 
 
 def _calc_donors(data, min_quantile=None):
@@ -420,10 +428,6 @@ def impute(
     imp_var,
     possible_vals,
     aux_vars,
-    weights,
-    dist_func,
-    threshold=None,
-    custom_df_map=None,
     min_quantile=None,
     overwrite=False,
     col_name=None,
@@ -545,17 +549,11 @@ def impute(
         pass
 
     # Imputation
-    # aux_vars = dist_func.keys() # TODO: Decide if we want this and uncomment/delete
     _add_impute_col(data, imp_var)
-    _assign_igroups(data, aux_vars)
+    _assign_igroups(data, aux_vars.keys())
     _calc_distances(
         data,
-        aux_vars,
-        dist_func,
-        weights,
-        threshold=threshold,
-        custom_df_map=custom_df_map,
-    )
+        aux_vars)
     _calc_donors(data, min_quantile=min_quantile)
     # TODO: tidy this up and return the dataframe properly (or modify in place)
     # TODO: include optional keyword arguments
