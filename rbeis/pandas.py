@@ -7,9 +7,13 @@ from numpy.random import choice
 from random import shuffle
 from copy import deepcopy
 from numbers import Number
+import warnings
 
 
 class RBEISInputException(Exception):
+    pass
+
+class RBEISInputWarning(UserWarning):
     pass
 
 
@@ -77,15 +81,47 @@ class RBEISDistanceFunction:
             return 1.0 if abs(x - y) > m else abs(x - y) / (m + 1.0)
 
     f = _df1
+    weight = 1.0
 
-    def __init__(self, df, custom_map=None, threshold=None):
-        # TODO: move type checking stuff from impute to here
-        assert df >= 1 and df <= 6
-        # TODO: print warning if map or threshold provided for functions that won't use them
-        if df != 1 and df != 4:
-            assert threshold  # TODO: nicer exception
+    def __init__(self, df, custom_map=None, threshold=None, weight=1.0):
+        # TODO: move all of the below type checking for dist_func to inside RBEISDistanceFunction
+        if df < 1 or df > 6:
+            raise RBEISInputException(
+                "The distance function must be an integer from 1 to 6 inclusive")
+        if df in [2, 3, 5, 6]:
+            try:
+                assert threshold
+                if not (isinstance(threshold, Number)):
+                    raise TypeError(
+                        "Distance function thresholds must be a numeric type")
+            except AssertionError:
+                raise RBEISInputException(
+                    "The chosen distance function requires a threshold value")
+        elif threshold:
+            warnings.warn("You have supplied a threshold value for a distance function that does not require one", RBEISInputWarning)
         if df >= 4:
-            assert custom_map  # TODO: nicer exception
+            try:
+                assert custom_map
+                if not (all(
+                        map(lambda x: isinstance(x, tuple),
+                            custom_map.keys()))):
+                    raise TypeError(
+                        "Distance function overrides must be expressed in a dictionary whose keys are tuples representing pairs of values"
+                    )
+                if not (all(
+                        map(lambda x: isinstance(x, Number),
+                            custom_map.values()))):
+                    raise TypeError(
+                        "Distance function overrides must be expressed in a dictionary whose values are numeric"
+                    )
+            except AssertionError:
+                raise RBEISInputException(
+                    "You have chosen a distance funtion with overrides, but have not provided them"
+                )
+        elif custom_map:
+            warnings.warn("You have supplied custom mappings for a distance function that does not use them", RBEISInputWarning)
+        if not(isinstance(weight,Number)):
+            raise TypeError("You have supplied a weight that is not numeric")
         if df == 1:
             self.f = self._df1
         elif df == 2:
@@ -105,7 +141,7 @@ class RBEISDistanceFunction:
                 if (x, y) in custom_map.keys() else self._df3(x, y, threshold))
 
     def __call__(self, x, y):
-        return self.f(x, y)
+        return self.weight * self.f(x, y)
 
 
 def _add_impute_col(data, imp_var):
@@ -405,9 +441,7 @@ def impute(
                                               imputed
                      possible_vals ('a list): A list of all possible values that
                                               imp_var can take
-                         aux_vars (str list): The names of the chosen auxiliary
-                                              variables
-                weights (str * numeric dict): Dictionary with auxiliary variable
+                aux_vars (str * numeric dict): Dictionary with auxiliary variable
                                               names as keys and chosen weights
                                               as values
                              dist_func (int): Which of the six standard distance
@@ -468,77 +502,15 @@ def impute(
         raise TypeError("Imputation variable name must be a string")
     if not (isinstance(possible_vals, list)):
         raise TypeError("Possible values must be contained in a list")
-    if not (isinstance(aux_vars, list)):
-        raise TypeError("Auxiliary variable names must be a list of strings")
-    if not (all(map(lambda x: isinstance(x, str), aux_vars))):
-        raise TypeError("Auxiliary variable names must be a list of strings")
-    if not (isinstance(weights, dict)):
+    if not (isinstance(aux_vars, dict)):
+        raise TypeError("aux_vars must be a dictionary whose keys are strings representing auxiliary vvariables and whose values are RBEISDistanceFunctions")
+    if not (all(map(lambda x: isinstance(x, str), aux_vars.keys()))):
         raise TypeError(
-            "Weights must be a dictionary whose keys are strings containing variable names and whose values are numeric"
+            "aux_vars must be a dictionary whose keys are strings containing auxiliary variable names"
         )
-    if not (all(map(lambda x: isinstance(x, str), weights.keys()))):
+    if not (all(map(lambda x: isinstance(x, RBEISDistanceFunction), aux_vars.values()))):
         raise TypeError(
-            "Weights must be a dictionary whose keys are strings containing variable names"
-        )
-    if not (all(map(lambda x: isinstance(x, Number), weights.values()))):
-        raise TypeError(
-            "Weights must be a dictionary whose values are numeric")
-    try:
-        assert all(map(lambda v: v in weights.keys(), aux_vars))
-    except AssertionError:
-        raise RBEISInputException(
-            "You have not specified a weight for every auxiliary variable")
-    if not (isinstance(dist_func, RBEISDistanceFunction)):
-        raise TypeError(  # TODO: Can probably remove aux_vars as an argument as the keys cover it, and then just include a line aux_vars = dist_func.keys() somewhere before the actual imputation begins
-            "Distance functions must be given by a dictionary whose keys are strings corresponding to auxiliary variables and whose values are RBEISDistanceFunction objects."
-        )
-    if (dist_func.keys() != aux_vars
-        ):  # TODO: remove if aux_vars is replaced with just the DF dict's keys
-        raise RBEISInputException(
-            "Auxiliary variables must match the keys in the distance function dictionary"
-        )  # TODO: Clearer error message
-    if not all(map(lambda x: isinstance(x, str), dist_func.keys())):
-        raise TypeError(
-            "Distance functions must be given by a dictionary whose keys are strings corresponding to auxiliary variables and whose values are RBEISDistanceFunction objects."
-        )
-    if not all(
-            map(lambda x: isinstance(x, RBEISDistanceFunction),
-                dist_func.values())):
-        raise TypeError(
-            "Distance functions must be given by a dictionary whose keys are strings corresponding to auxiliary variables and whose values are RBEISDistanceFunction objects."
-        )
-    # TODO: move all of the below type checking for dist_func to inside RBEISDistanceFunction
-    if dist_func < 1 or dist_func > 6:
-        raise RBEISInputException(
-            "The distance function must be an integer from 1 to 6 inclusive")
-    if dist_func in [2, 3, 5, 6]:
-        try:
-            assert threshold
-            if not (isinstance(threshold, Number)):
-                raise TypeError(
-                    "Distance function thresholds must be a numeric type")
-        except AssertionError:
-            raise RBEISInputException(
-                "The chosen distance function requires a threshold value")
-    if dist_func >= 4:
-        try:
-            assert custom_df_map
-            if not (all(
-                    map(lambda x: isinstance(x, tuple),
-                        custom_df_map.keys()))):
-                raise TypeError(
-                    "Distance function overrides must be expressed in a dictionary whose keys are tuples representing pairs of values"
-                )
-            if not (all(
-                    map(lambda x: isinstance(x, Number),
-                        custom_df_map.values()))):
-                raise TypeError(
-                    "Distance function overrides must be expressed in a dictionary whose values are numeric"
-                )
-        except AssertionError:
-            raise RBEISInputException(
-                "You have chosen a distance funtion with overrides, but have not provided them"
-            )
+            "aux_vars must be a dictionary whose values are RBEISDistanceFunctions")
     try:
         assert min_quantile
         if not (isinstance(min_quantile, int)):
