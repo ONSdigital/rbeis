@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
-from functools import partial, reduce
-from operator import add
+from functools import partial
 from fractions import Fraction
 from numpy.random import choice
 from random import shuffle
@@ -235,47 +234,15 @@ def _calc_distances(data,aux_vars):
        taking into account the specified weights
     4. Remove column '_dists_temp'
     """
-    pass
-
-# FIXME this is the _calc_distances function in progress; apologies for the absolute carnage
-def _test():
-    data = pd.read_csv("tests/artists_unique_galcount_spaceavg_missing.csv")
-    imp_var = "book"
-    aux_vars = {"artist_gender": RBEISDistanceFunction(1),"artist_nationality_other":RBEISDistanceFunction(1),"artist_race_nwi":RBEISDistanceFunction(1)}
-    _add_impute_col(data, imp_var)
-    _assign_igroups(data, aux_vars.keys())
     igroup_aux_vars = []
     vars_vals = list(
         zip(aux_vars.keys(), map(lambda k: _get_igroup_aux_var(data, k), aux_vars.keys())))
     for i in range(1 + data["_IGroup"].max()):
         igroup_aux_vars.append({k: v[i] for k, v in vars_vals})
 
-    data["_dists_temp"] = data.apply(lambda r: {k: aux_vars[k](r[k],igroup_aux_vars[r["_IGroup"]][k]) for k in aux_vars.keys()} if not(r["_impute"]) else {},axis=1)
-    return data, igroup_aux_vars
-
-    ## Calculate the distances
-    #dist_func = (_build_custom_df(
-    #    dist_func, custom_df_map, threshold=threshold)
-    #             if dist_func >= 4 else [_df1, _df2, _df3][dist_func - 1])
-    ## TODO: Check if dist_func is compatible with each auxvar dtype
-    ##       (e.g. DF3 doesn't like strings)
-    #data["_dists_temp"] = data.apply(
-    #    lambda r: list(
-    #        map(
-    #            lambda x: {
-    #                k: weights[k] * dist_func(x[k], r[k], threshold)
-    #                for k in aux_var_names
-    #            },
-    #            igroup_aux_vars,
-    #        )) if not (r["_impute"]) else [],
-    #    axis=1,
-    #)
-    #data["_distances"] = data.apply(
-    #    lambda r: list(
-    #        map(lambda d: reduce(add, list(d.values()), 0), r["_dists_temp"])),
-    #    axis=1,
-    #)
-    #del data["_dists_temp"]
+    data["_dists_temp"] = data.apply(lambda r: list(map(lambda g: {k: aux_vars[k](r[k],igroup_aux_vars[g][k]) for k in aux_vars.keys()},range(1+data["_IGroup"].max()))) if not(r["_impute"]) else [],axis=1)
+    data["_distances"] = data.apply(lambda r: list(map(lambda d: sum(d.values()),r["_dists_temp"])) if not(r["_impute"]) else [],axis=1)
+    del data["_dists_temp"]
 
 
 def _calc_donors(data, min_quantile=None):
