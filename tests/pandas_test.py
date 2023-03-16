@@ -21,6 +21,7 @@ from rbeis.pandas import (
     _impute_igroup,
 )
 
+
 class RBEISTestCase(TestCase):
 
     # --- Set up simple dummy dataframe for testing input parameters for impute function  ---
@@ -890,10 +891,12 @@ class TestGetIGroupAuxVar(RBEISTestCase):
         for igroup_number in range(1 + test_data["_IGroup"].max()):
             for row_index in range(test_data.shape[0]):
                 if test_data["_IGroup"].values[row_index] == igroup_number:
-                    self.assertTrue(test_data[self.test_aux_var1].values[row_index]
-                                    == aux_var1_list[igroup_number])
-                    self.assertTrue(test_data[self.test_aux_var2].values[row_index]
-                                    == aux_var2_list[igroup_number])
+                    self.assertTrue(
+                        test_data[self.test_aux_var1].values[row_index] ==
+                        aux_var1_list[igroup_number])
+                    self.assertTrue(
+                        test_data[self.test_aux_var2].values[row_index] ==
+                        aux_var2_list[igroup_number])
 
 
 # -----------------------------------------------------------------------------
@@ -911,7 +914,8 @@ class TestCalcDistances(RBEISTestCase):
     def test_calc_distances_df1(self):
         test_data = pd.read_csv(self.test_data_filepath)
         _add_impute_col(test_data, self.test_impute_var)
-        _assign_igroups(test_data, [self.test_aux_var1, self.test_aux_var_categorial])
+        _assign_igroups(test_data,
+                        [self.test_aux_var1, self.test_aux_var_categorial])
         _calc_distances(
             data=test_data,
             aux_vars=[self.test_aux_var1, self.test_aux_var_categorial],
@@ -929,8 +933,11 @@ class TestCalcDistances(RBEISTestCase):
 
         for row_index in donors_list:
             rbeis_distances_list = test_data.loc[row_index, "_distances"]
-            d1 = _df1(self.igroup0_aux_var1, test_data.loc[row_index,
-                                                      self.test_aux_var1], None)
+            d1 = _df1(
+                self.igroup0_aux_var1,
+                test_data.loc[row_index, self.test_aux_var1],
+                None,
+            )
             d2 = _df1(
                 self.igroup0_aux_categorical,
                 test_data.loc[row_index, self.test_aux_var_categorial],
@@ -961,10 +968,10 @@ class TestCalcDistances(RBEISTestCase):
 
         for row_index in donors_list:
             rbeis_distances_list = test_data.loc[row_index, "_distances"]
-            d1 = _df2(self.igroup0_aux_var1, test_data.loc[row_index,
-                                                      self.test_aux_var1], 0.1)
-            d2 = _df2(self.igroup0_aux_var2, test_data.loc[row_index,
-                                                      self.test_aux_var2], 0.1)
+            d1 = _df2(self.igroup0_aux_var1,
+                      test_data.loc[row_index, self.test_aux_var1], 0.1)
+            d2 = _df2(self.igroup0_aux_var2,
+                      test_data.loc[row_index, self.test_aux_var2], 0.1)
             weighted_distance = 2 * d1 + 3 * d2
             self.assertEqual(weighted_distance, rbeis_distances_list[0])
 
@@ -992,10 +999,10 @@ class TestCalcDistances(RBEISTestCase):
 
         for row_index in donors_list:
             rbeis_distances_list = test_data.loc[row_index, "_distances"]
-            d1 = _df3(self.igroup0_aux_var1, test_data.loc[row_index,
-                                                      self.test_aux_var1], 0.1)
-            d2 = _df3(self.igroup0_aux_var2, test_data.loc[row_index,
-                                                      self.test_aux_var2], 0.1)
+            d1 = _df3(self.igroup0_aux_var1,
+                      test_data.loc[row_index, self.test_aux_var1], 0.1)
+            d2 = _df3(self.igroup0_aux_var2,
+                      test_data.loc[row_index, self.test_aux_var2], 0.1)
             weighted_distance = 2 * d1 + 3 * d2
             self.assertAlmostEqual(weighted_distance,
                                    rbeis_distances_list[0],
@@ -1005,7 +1012,8 @@ class TestCalcDistances(RBEISTestCase):
     def test_calc_distances_df4(self):
         test_data = pd.read_csv(self.test_data_filepath)
         _add_impute_col(test_data, self.test_impute_var)
-        _assign_igroups(test_data, [self.test_aux_var1, self.test_aux_var_categorial])
+        _assign_igroups(test_data,
+                        [self.test_aux_var1, self.test_aux_var_categorial])
         _calc_distances(
             data=test_data,
             aux_vars=[self.test_aux_var1, self.test_aux_var_categorial],
@@ -1031,8 +1039,11 @@ class TestCalcDistances(RBEISTestCase):
 
         for row_index in donors_list:
             rbeis_distances_list = test_data.loc[row_index, "_distances"]
-            d1 = df4(self.igroup0_aux_var1, test_data.loc[row_index, self.test_aux_var1],
-                     None)
+            d1 = df4(
+                self.igroup0_aux_var1,
+                test_data.loc[row_index, self.test_aux_var1],
+                None,
+            )
             d2 = df4(
                 self.igroup0_aux_categorical,
                 test_data.loc[row_index, self.test_aux_var_categorial],
@@ -1065,10 +1076,10 @@ class TestCalcDistances(RBEISTestCase):
 
         for row_index in donors_list:
             rbeis_distances_list = test_data.loc[row_index, "_distances"]
-            d1 = df5(self.igroup0_aux_var1, test_data.loc[row_index, self.test_aux_var1],
-                     0.1)
-            d2 = df5(self.igroup0_aux_var2, test_data.loc[row_index, self.test_aux_var2],
-                     0.1)
+            d1 = df5(self.igroup0_aux_var1,
+                     test_data.loc[row_index, self.test_aux_var1], 0.1)
+            d2 = df5(self.igroup0_aux_var2,
+                     test_data.loc[row_index, self.test_aux_var2], 0.1)
             weighted_distance = 2 * d1 + 3 * d2
             self.assertEqual(weighted_distance, rbeis_distances_list[0])
 
@@ -1099,10 +1110,10 @@ class TestCalcDistances(RBEISTestCase):
 
         for row_index in donors_list:
             rbeis_distances_list = test_data.loc[row_index, "_distances"]
-            d1 = df6(self.igroup0_aux_var1, test_data.loc[row_index, self.test_aux_var1],
-                     0.1)
-            d2 = df6(self.igroup0_aux_var2, test_data.loc[row_index, self.test_aux_var2],
-                     0.1)
+            d1 = df6(self.igroup0_aux_var1,
+                     test_data.loc[row_index, self.test_aux_var1], 0.1)
+            d2 = df6(self.igroup0_aux_var2,
+                     test_data.loc[row_index, self.test_aux_var2], 0.1)
             weighted_distance = 2 * d1 + 3 * d2
             self.assertAlmostEqual(weighted_distance,
                                    rbeis_distances_list[0],

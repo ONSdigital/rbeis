@@ -12,6 +12,7 @@ import warnings
 class RBEISInputException(Exception):
     pass
 
+
 class RBEISInputWarning(UserWarning):
     pass
 
@@ -86,7 +87,8 @@ class RBEISDistanceFunction:
         # TODO: move all of the below type checking for dist_func to inside RBEISDistanceFunction
         if df < 1 or df > 6:
             raise RBEISInputException(
-                "The distance function must be an integer from 1 to 6 inclusive")
+                "The distance function must be an integer from 1 to 6 inclusive"
+            )
         if df in [2, 3, 5, 6]:
             try:
                 assert threshold
@@ -97,7 +99,10 @@ class RBEISDistanceFunction:
                 raise RBEISInputException(
                     "The chosen distance function requires a threshold value")
         elif threshold:
-            warnings.warn("You have supplied a threshold value for a distance function that does not require one", RBEISInputWarning)
+            warnings.warn(
+                "You have supplied a threshold value for a distance function that does not require one",
+                RBEISInputWarning,
+            )
         if df >= 4:
             try:
                 assert custom_map
@@ -118,8 +123,11 @@ class RBEISDistanceFunction:
                     "You have chosen a distance funtion with overrides, but have not provided them"
                 )
         elif custom_map:
-            warnings.warn("You have supplied custom mappings for a distance function that does not use them", RBEISInputWarning)
-        if not(isinstance(weight,Number)):
+            warnings.warn(
+                "You have supplied custom mappings for a distance function that does not use them",
+                RBEISInputWarning,
+            )
+        if not (isinstance(weight, Number)):
             raise TypeError("You have supplied a weight that is not numeric")
         if df == 1:
             self.f = self._df1
@@ -154,7 +162,11 @@ def _add_impute_col(data, imp_var):
     or not a record is to be imputed.
     """
     # data["_impute"] = np.isnan(data[imp_var]) # Does not work when imp_var is non-numeric
-    data["_impute"] = data.apply(lambda r: np.isnan(r[imp_var]) if isinstance(r[imp_var],Number) else False,axis=1)
+    data["_impute"] = data.apply(
+        lambda r: np.isnan(r[imp_var])
+        if isinstance(r[imp_var], Number) else False,
+        axis=1,
+    )
 
 
 def _assign_igroups(data, aux_var_names):
@@ -201,7 +213,8 @@ def _get_igroup_aux_var(data, aux_var_name):
                                    str(i))[aux_var_name].values.tolist())
     return out
 
-def _calc_distances(data,aux_vars):
+
+def _calc_distances(data, aux_vars):
     """
     _calc_distances(data, aux_vars, dist_func, weights, threshold=None,
                     custom_df_map=None)
@@ -236,12 +249,29 @@ def _calc_distances(data,aux_vars):
     """
     igroup_aux_vars = []
     vars_vals = list(
-        zip(aux_vars.keys(), map(lambda k: _get_igroup_aux_var(data, k), aux_vars.keys())))
+        zip(
+            aux_vars.keys(),
+            map(lambda k: _get_igroup_aux_var(data, k), aux_vars.keys()),
+        ))
     for i in range(1 + data["_IGroup"].max()):
         igroup_aux_vars.append({k: v[i] for k, v in vars_vals})
 
-    data["_dists_temp"] = data.apply(lambda r: list(map(lambda g: {k: aux_vars[k](r[k],igroup_aux_vars[g][k]) for k in aux_vars.keys()},range(1+data["_IGroup"].max()))) if not(r["_impute"]) else [],axis=1)
-    data["_distances"] = data.apply(lambda r: list(map(lambda d: sum(d.values()),r["_dists_temp"])) if not(r["_impute"]) else [],axis=1)
+    data["_dists_temp"] = data.apply(
+        lambda r: list(
+            map(
+                lambda g: {
+                    k: aux_vars[k](r[k], igroup_aux_vars[g][k])
+                    for k in aux_vars.keys()
+                },
+                range(1 + data["_IGroup"].max()),
+            )) if not (r["_impute"]) else [],
+        axis=1,
+    )
+    data["_distances"] = data.apply(
+        lambda r: list(map(lambda d: sum(d.values()), r["_dists_temp"]))
+        if not (r["_impute"]) else [],
+        axis=1,
+    )
     del data["_dists_temp"]
 
 
@@ -474,14 +504,19 @@ def impute(
     if not (isinstance(possible_vals, list)):
         raise TypeError("Possible values must be contained in a list")
     if not (isinstance(aux_vars, dict)):
-        raise TypeError("aux_vars must be a dictionary whose keys are strings representing auxiliary vvariables and whose values are RBEISDistanceFunctions")
+        raise TypeError(
+            "aux_vars must be a dictionary whose keys are strings representing auxiliary vvariables and whose values are RBEISDistanceFunctions"
+        )
     if not (all(map(lambda x: isinstance(x, str), aux_vars.keys()))):
         raise TypeError(
             "aux_vars must be a dictionary whose keys are strings containing auxiliary variable names"
         )
-    if not (all(map(lambda x: isinstance(x, RBEISDistanceFunction), aux_vars.values()))):
+    if not (all(
+            map(lambda x: isinstance(x, RBEISDistanceFunction),
+                aux_vars.values()))):
         raise TypeError(
-            "aux_vars must be a dictionary whose values are RBEISDistanceFunctions")
+            "aux_vars must be a dictionary whose values are RBEISDistanceFunctions"
+        )
     try:
         assert min_quantile
         if not (isinstance(min_quantile, int)):
@@ -518,9 +553,7 @@ def impute(
     # Imputation
     _add_impute_col(data, imp_var)
     _assign_igroups(data, aux_vars.keys())
-    _calc_distances(
-        data,
-        aux_vars)
+    _calc_distances(data, aux_vars)
     _calc_donors(data, min_quantile=min_quantile)
     # TODO: tidy this up and return the dataframe properly (or modify in place)
     # TODO: include optional keyword arguments
