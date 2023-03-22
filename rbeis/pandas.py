@@ -84,7 +84,7 @@ class RBEISDistanceFunction:
     weight = 1.0
 
     def __init__(self, df, custom_map=None, threshold=None, weight=1.0):
-        # TODO: move all of the below type checking for dist_func to inside RBEISDistanceFunction
+        self.weight = float(weight)
         if df < 1 or df > 6:
             raise RBEISInputException(
                 "The distance function must be an integer from 1 to 6 inclusive"
@@ -313,7 +313,7 @@ def _calc_donors(data, min_quantile=None):
                     zip(r["_distances"], max_donor_dists))))[0].tolist()
         if not (r["_impute"]) else [],
         axis=1,
-    )
+    ) # TODO: What if we have multiple minima?  Do we just choose the first, or choose one randomly?
 
 
 def _get_donors(data, igroup):
