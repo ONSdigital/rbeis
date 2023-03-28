@@ -275,7 +275,7 @@ def _calc_distances(data, aux_vars):
     del data["_dists_temp"]
 
 
-def _calc_donors(data, min_quantile=None):
+def _calc_donors(data, tolerance=None):
     """
     _calc_donors(data, min_quantile=None)
 
@@ -296,16 +296,7 @@ def _calc_donors(data, min_quantile=None):
     """
     igroups_dists = np.array(
         data.query("not(_impute)")["_distances"].values.tolist()).T.tolist()
-    for i in igroups_dists:
-        i.sort()
-    # This would be a lot nicer if we could have NumPy >= 1.15.0, which has
-    # np.quantile, but we're on 1.13.3
-    max_donor_dists = list(
-        map(
-            (lambda l: l[int(np.ceil(len(l) / min_quantile)) - 1])
-            if min_quantile else min,
-            igroups_dists,
-        ))
+    max_donor_dists = map(lambda l: max([i for i in l if i<=(1+tolerance)*min(l)]) if tolerance else min(l),igroups_dists)
     data["_donor"] = data.apply(
         lambda r: np.where(
             list(
@@ -425,7 +416,7 @@ def impute(
     imp_var,
     possible_vals,
     aux_vars,
-    min_quantile=None,
+    tolerance=None,
     overwrite=False,
     col_name=None,
     in_place=True,
@@ -518,10 +509,10 @@ def impute(
             "aux_vars must be a dictionary whose values are RBEISDistanceFunctions"
         )
     try:
-        assert min_quantile
-        if not (isinstance(min_quantile, int)):
+        assert tolerance
+        if not (isinstance(tolerance, Number)):
             raise TypeError(
-                "The required quantile partition must be specified with an integer"
+                "The tolerance must be numeric"
             )
     except AssertionError:
         pass
@@ -554,7 +545,7 @@ def impute(
     _add_impute_col(data, imp_var)
     _assign_igroups(data, aux_vars.keys())
     _calc_distances(data, aux_vars)
-    _calc_donors(data, min_quantile=min_quantile)
+    _calc_donors(data, tolerance=tolerance)
     # TODO: tidy this up and return the dataframe properly (or modify in place)
     # TODO: include optional keyword arguments
     imputed_vals = list(
