@@ -296,7 +296,12 @@ def _calc_donors(data, tolerance=None):
     """
     igroups_dists = np.array(
         data.query("not(_impute)")["_distances"].values.tolist()).T.tolist()
-    max_donor_dists = map(lambda l: max([i for i in l if i<=(1+tolerance)*min(l)]) if tolerance else min(l),igroups_dists)
+    # FIXME: This tolerance stuff still feels really wrong, like 10% of a very
+    #        small minimum is going to be a tiny margin - originally I
+    #        implemented this as min_quantile, not tolerance, in which the
+    #        bottom n-quantile would be chosen instead of values within a
+    #        tolerance of the minimum
+    max_donor_dists = list(map(lambda l: max([i for i in l if i<=(1+tolerance)*min(l)]) if tolerance else min(l),igroups_dists))
     data["_donor"] = data.apply(
         lambda r: np.where(
             list(
