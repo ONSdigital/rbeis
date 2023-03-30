@@ -523,6 +523,8 @@ def impute(
             raise TypeError(
                 "The ratio must be numeric"
             )
+        if ratio<1;
+            raise RBEISInputException("The ratio must be greater than 1")
     except AssertionError:
         pass
     try:
