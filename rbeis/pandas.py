@@ -25,6 +25,7 @@ class RBEISDistanceFunction:
     threshold value (where appropriate), any pairs of values to be overridden
     (for DFs 4-6), and a weight by which to scale its result.
     """
+
     # Standard distance functions
     # Where x is the IGroup's value, y is the current record's value, and m is a threshold value
     def _df1(self, x, y):
@@ -177,14 +178,23 @@ class RBEISDistanceFunction:
     def __call__(self, x, y):
         return self.weight * self.f(x, y)
 
-def _check_missing_auxvars(data,aux_vars):
+
+def _check_missing_auxvars(data, aux_vars):
     """
     TODO: Document
     """
     try:
-        assert not(any([any(map(lambda i: isinstance(i,float) and np.isnan(i),data[k].tolist())) for k in aux_vars.keys()]))
+        assert not (any([
+            any(
+                map(
+                    lambda i: isinstance(i, float) and np.isnan(i),
+                    data[k].tolist(),
+                )) for k in aux_vars.keys()
+        ]))
     except AssertionError:
-        raise RBEISInputException("Your dataset includes records for which the given auxiliary variables are missing")
+        raise RBEISInputException(
+            "Your dataset includes records for which the given auxiliary variables are missing"
+        )
 
 
 def _add_impute_col(data, imp_var):
@@ -336,7 +346,12 @@ def _calc_donors(data, ratio=None):
     """
     igroups_dists = np.array(
         data.query("not(_impute)")["_distances"].values.tolist()).T.tolist()
-    max_donor_dists = list(map(lambda l: max([i for i in l if i<=ratio*min(l)]) if ratio else min(l),igroups_dists))
+    max_donor_dists = list(
+        map(
+            lambda l: max([i for i in l if i <= ratio * min(l)])
+            if ratio else min(l),
+            igroups_dists,
+        ))
     data["_donor"] = data.apply(
         lambda r: np.where(
             list(
@@ -344,7 +359,7 @@ def _calc_donors(data, ratio=None):
                     zip(r["_distances"], max_donor_dists))))[0].tolist()
         if not (r["_impute"]) else [],
         axis=1,
-    ) # TODO: What if we have multiple minima?  Do we just choose the first, or choose one randomly?
+    )  # TODO: What if we have multiple minima?  Do we just choose the first, or choose one randomly?
 
 
 def _get_donors(data, igroup):
@@ -460,7 +475,7 @@ def impute(
     overwrite=False,
     col_name=None,
     in_place=True,
-    keep_intermediates=False
+    keep_intermediates=False,
 ):
     """
     impute(data, imp_var, possible_vals, aux_vars, weights, dist_func,
@@ -551,10 +566,8 @@ def impute(
     try:
         assert ratio
         if not (isinstance(ratio, Number)):
-            raise TypeError(
-                "The ratio must be numeric"
-            )
-        if ratio<1:
+            raise TypeError("The ratio must be numeric")
+        if ratio < 1:
             raise RBEISInputException("The ratio must be greater than 1")
     except AssertionError:
         pass
@@ -584,9 +597,9 @@ def impute(
         pass
 
     # Imputation
-    if not(in_place):
+    if not (in_place):
         data_old = deepcopy(data)
-    _check_missing_auxvars(data,aux_vars)
+    _check_missing_auxvars(data, aux_vars)
     _add_impute_col(data, imp_var)
     _assign_igroups(data, aux_vars.keys())
     _calc_distances(data, aux_vars)
@@ -612,12 +625,12 @@ def impute(
     )
     assert all(map(lambda l: l == [], imputed_vals))
     if not (keep_intermediates):
-        del(data["_impute"])
-        del(data["_IGroup"])
-        del(data["_distances"])
-        del(data["_donor"])
-    if not(in_place):
+        del data["_impute"]
+        del data["_IGroup"]
+        del data["_distances"]
+        del data["_donor"]
+    if not (in_place):
         data_new = deepcopy(data)
         data = deepcopy(data_old)
-        del(data_old)
+        del data_old
         return data_new

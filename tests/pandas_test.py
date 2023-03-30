@@ -35,9 +35,9 @@ class RBEISTestCase(TestCase):
     test_pos_vals = list(range(0, 41))
     test_aux_var1 = "moma_count"
     test_threshold1 = 2
-    test_custom_map1 = {(1, 0): 0.5}    
+    test_custom_map1 = {(1, 0): 0.5}
     test_aux_var2 = "space_ratio_per_page_avg"
-    test_threshold2 = 0.2    
+    test_threshold2 = 0.2
     test_aux_var_categorial = "artist_nationality_other"
     test_custom_map_categorial = {("British", "American"): 2}
 
@@ -49,21 +49,22 @@ class RBEISTestCase(TestCase):
     igroup0_aux_var2 = 0.197291
     igroup0_aux_categorical = "American"
 
+
 # =============================================================================
 # --------------- TESTING TEMPLATE ---------------------------
 # =============================================================================
-# - Test type validation on all input parameters 
+# - Test type validation on all input parameters
 # - Test constrainst on input parameters:
 # --     impute variable and auxiliary variables are in the dataframe
 # --     auxiliry variables have no missing values
 # --     weights and distance functions are within range
-# --     threshold & custom_map are specified for, and only for, appropriate 
+# --     threshold & custom_map are specified for, and only for, appropriate
 #                                                          distance function
 # - Test each function does what it is expected to do
 # - Test if output dataframe is as expected, both new columns and data content
 
 # TEST DATA:
-# Data is loaded for each function test as the order tests are carried out in 
+# Data is loaded for each function test as the order tests are carried out in
 # cannot be controlled
 # =============================================================================
 
@@ -85,23 +86,22 @@ class TestImpute(RBEISTestCase):
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars={
-                        "dummy_aux_var1": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=2), 
-                        "dummy_aux_var2": 
-                            RBEISDistanceFunction(1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=3)
-                        },
+                    "dummy_aux_var1":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=2),
+                    "dummy_aux_var2":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=3),
+                },
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
-                keep_intermediates=True
+                keep_intermediates=True,
             )
 
     # --- Test type validation on the impute variable (string) ---
@@ -112,26 +112,24 @@ class TestImpute(RBEISTestCase):
                 imp_var=["Not", "A", "String"],
                 possible_vals=list(range(1, 101)),
                 aux_vars={
-                        "dummy_aux_var1": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=2), 
-                        "dummy_aux_var2": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=3)
-                        },
+                    "dummy_aux_var1":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=2),
+                    "dummy_aux_var2":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=3),
+                },
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
-                keep_intermediates=True
+                keep_intermediates=True,
             )
-            
+
     # --- Test type validation on possible values for impute variable (list) ---
     def test_type_validation_possible_vals(self):
         with self.assertRaises(TypeError):
@@ -140,24 +138,22 @@ class TestImpute(RBEISTestCase):
                 imp_var="dummy_impute_var",
                 possible_vals="Not_a_List",
                 aux_vars={
-                        "dummy_aux_var1": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=2), 
-                        "dummy_aux_var2": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=3)
-                        },
+                    "dummy_aux_var1":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=2),
+                    "dummy_aux_var2":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=3),
+                },
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
-                keep_intermediates=True
+                keep_intermediates=True,
             )
 
     # --- Test type validation on auxiliary variables (dictionary) ---
@@ -172,9 +168,9 @@ class TestImpute(RBEISTestCase):
                 overwrite=False,
                 col_name=None,
                 in_place=True,
-                keep_intermediates=True
+                keep_intermediates=True,
             )
-            
+
     # --- Test type validation on auxiliary variables dictionary keys (string) ---
     def test_type_validation_aux_vars(self):
         with self.assertRaises(TypeError):
@@ -183,26 +179,24 @@ class TestImpute(RBEISTestCase):
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars={
-                        ["Not", "A", "String"]: 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=2), 
-                        "dummy_aux_var2": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=3)
-                        },
+                    ["Not", "A", "String"]:
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=2),
+                    "dummy_aux_var2":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=3),
+                },
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
-                keep_intermediates=True
+                keep_intermediates=True,
             )
-                                  
+
     # --- Test type validation on RBEISDistanceFunction (RBEISDistanceFunction) ---
     def test_type_validation_dist_func(self):
         with self.assertRaises(TypeError):
@@ -211,22 +205,21 @@ class TestImpute(RBEISTestCase):
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars={
-                        "dummy_aux_var1": 
-                            "Not_an_RBEISDistanceFunction", 
-                        "dummy_aux_var2": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=3)
-                        },
+                    "dummy_aux_var1":
+                    "Not_an_RBEISDistanceFunction",
+                    "dummy_aux_var2":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=3),
+                },
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
-                keep_intermediates=True
+                keep_intermediates=True,
             )
-                    
+
     # --- Test type validation on distance function number ---
     def test_type_validation_df(self):
         with self.assertRaises(TypeError):
@@ -235,26 +228,24 @@ class TestImpute(RBEISTestCase):
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars={
-                        "dummy_aux_var1": 
-                            RBEISDistanceFunction(
-                            "Not_a_Number", 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=2), 
-                        "dummy_aux_var2": 
-                            RBEISDistanceFunction(
-                            4, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=3)
-                        },
+                    "dummy_aux_var1":
+                    RBEISDistanceFunction("Not_a_Number",
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=2),
+                    "dummy_aux_var2":
+                    RBEISDistanceFunction(4,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=3),
+                },
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
-                keep_intermediates=True
+                keep_intermediates=True,
             )
-                 
+
     # --- Test type validation on custom_map (dictionary) ---
     def test_type_validation_custom_map(self):
         with self.assertRaises(TypeError):
@@ -263,26 +254,24 @@ class TestImpute(RBEISTestCase):
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars={
-                        "dummy_aux_var1": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=2), 
-                        "dummy_aux_var2": 
-                            RBEISDistanceFunction(
-                            4, 
-                            custom_map="Not_a_Dictionary", 
-                            threshold=None, 
-                            weight=3)
-                        },
+                    "dummy_aux_var1":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=2),
+                    "dummy_aux_var2":
+                    RBEISDistanceFunction(4,
+                                          custom_map="Not_a_Dictionary",
+                                          threshold=None,
+                                          weight=3),
+                },
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
-                keep_intermediates=True
+                keep_intermediates=True,
             )
-                    
+
     # --- Test type validation on threshhold (numeric) ---
     def test_type_validation_threshold(self):
         with self.assertRaises(TypeError):
@@ -291,24 +280,22 @@ class TestImpute(RBEISTestCase):
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars={
-                        "dummy_aux_var1": 
-                            RBEISDistanceFunction(
-                            2, 
-                            custom_map=None, 
-                            threshold="Not_a_Number", 
-                            weight=2), 
-                        "dummy_aux_var2": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=3)
-                        },               
+                    "dummy_aux_var1":
+                    RBEISDistanceFunction(2,
+                                          custom_map=None,
+                                          threshold="Not_a_Number",
+                                          weight=2),
+                    "dummy_aux_var2":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=3),
+                },
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
-                keep_intermediates=True
+                keep_intermediates=True,
             )
 
     # --- Test type validation on weights (numeric) ---
@@ -319,24 +306,22 @@ class TestImpute(RBEISTestCase):
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars={
-                        "dummy_aux_var1": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight="Not_a_Number"), 
-                        "dummy_aux_var2": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=3)
-                        },               
+                    "dummy_aux_var1":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight="Not_a_Number"),
+                    "dummy_aux_var2":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=3),
+                },
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
-                keep_intermediates=True
+                keep_intermediates=True,
             )
 
     # --- Test type validation on min_quantile  ---
@@ -347,24 +332,22 @@ class TestImpute(RBEISTestCase):
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars={
-                        "dummy_aux_var1": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=2), 
-                        "dummy_aux_var2": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=3)
-                        },
+                    "dummy_aux_var1":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=2),
+                    "dummy_aux_var2":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=3),
+                },
                 min_quantile="Not_a_number",
                 overwrite=False,
                 col_name=None,
                 in_place=True,
-                keep_intermediates=True
+                keep_intermediates=True,
             )
 
     # --- Test type validation on overwrite  ---
@@ -375,24 +358,22 @@ class TestImpute(RBEISTestCase):
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars={
-                        "dummy_aux_var1": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=2), 
-                        "dummy_aux_var2": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=3)
-                        },
+                    "dummy_aux_var1":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=2),
+                    "dummy_aux_var2":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=3),
+                },
                 min_quantile=None,
                 overwrite="Not_a_Boolean",
                 col_name=None,
                 in_place=True,
-                keep_intermediates=True
+                keep_intermediates=True,
             )
 
     # --- Test type validation on col_name  ---
@@ -403,24 +384,22 @@ class TestImpute(RBEISTestCase):
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars={
-                        "dummy_aux_var1": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=2), 
-                        "dummy_aux_var2": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=3)
-                        },
+                    "dummy_aux_var1":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=2),
+                    "dummy_aux_var2":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=3),
+                },
                 min_quantile=None,
                 overwrite=False,
                 col_name=["Not", "A", "String"],
                 in_place=True,
-                keep_intermediates=True
+                keep_intermediates=True,
             )
 
     # --- Test type validation on in_place  ---
@@ -431,24 +410,22 @@ class TestImpute(RBEISTestCase):
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars={
-                        "dummy_aux_var1": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=2), 
-                        "dummy_aux_var2": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=3)
-                        },
+                    "dummy_aux_var1":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=2),
+                    "dummy_aux_var2":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=3),
+                },
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
                 in_place="Not_a_Boolean",
-                keep_intermediates=True
+                keep_intermediates=True,
             )
 
     # --- Test type validation on keep_intermediates  ---
@@ -459,26 +436,23 @@ class TestImpute(RBEISTestCase):
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars={
-                        "dummy_aux_var1": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=2), 
-                        "dummy_aux_var2": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=3)
-                        },
+                    "dummy_aux_var1":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=2),
+                    "dummy_aux_var2":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=3),
+                },
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
-                keep_intermediates="Not_a_Boolean"
+                keep_intermediates="Not_a_Boolean",
             )
-
 
     # -----------------------------------
     # --- CHECK INPUT VARIABLES TESTS ---
@@ -492,26 +466,23 @@ class TestImpute(RBEISTestCase):
                 imp_var="not_in_dataframe",
                 possible_vals=list(range(1, 101)),
                 aux_vars={
-                        "dummy_aux_var1": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=2), 
-                        "dummy_aux_var2": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=3)
-                        },                
+                    "dummy_aux_var1":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=2),
+                    "dummy_aux_var2":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=3),
+                },
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
-                keep_intermediates=True
+                keep_intermediates=True,
             )
-                    
 
     # --- Test exception when possible_vals do not match range of impute variable  ---
     # def self.test_pos_vals_match_range(self):
@@ -521,26 +492,24 @@ class TestImpute(RBEISTestCase):
     #          imp_var="dummy_impute_var",
     #          possible_vals=list(range(100,120)),
     #            aux_vars={
-    #                    "dummy_aux_var1": 
+    #                    "dummy_aux_var1":
     #                        RBEISDistanceFunction(
-    #                        1, 
-    #                        custom_map=None, 
-    #                        threshold=None, 
-    #                        weight=2), 
-    #                    "dummy_aux_var2": 
+    #                        1,
+    #                        custom_map=None,
+    #                        threshold=None,
+    #                        weight=2),
+    #                    "dummy_aux_var2":
     #                        RBEISDistanceFunction(
-    #                        1, 
-    #                        custom_map=None, 
-    #                        threshold=None, 
+    #                        1,
+    #                        custom_map=None,
+    #                        threshold=None,
     #                        weight=3)
-    #                    },                
+    #                    },
     #          min_quantile=None,
     #          overwrite=False,
     #          col_name=None,
     #          in_place=True,
     #          keep_intermediates=True)
-
-
 
     # --- Test exception when auxiliary variable is not a variable in the dataframe
     def test_aux_vars_in_df(self):
@@ -550,24 +519,22 @@ class TestImpute(RBEISTestCase):
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars={
-                        "not_in_dataframe": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=2), 
-                        "dummy_aux_var2": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=3)
-                        },                
+                    "not_in_dataframe":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=2),
+                    "dummy_aux_var2":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=3),
+                },
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
-                keep_intermediates=True
+                keep_intermediates=True,
             )
 
     # --- Test exception when auxiliary variable has missing values
@@ -578,24 +545,22 @@ class TestImpute(RBEISTestCase):
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars={
-                        "dummy_aux_var1": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=2), 
-                        "dummy_aux_var_missing": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=3)
-                        },
+                    "dummy_aux_var1":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=2),
+                    "dummy_aux_var_missing":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=3),
+                },
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
-                keep_intermediates=True
+                keep_intermediates=True,
             )
 
     # --- Test exception when weights are not positive values
@@ -605,20 +570,18 @@ class TestImpute(RBEISTestCase):
                 data=self.dummy_dataframe,
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
-               aux_vars={
-                        "dummy_aux_var1": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=-1), 
-                        "dummy_aux_var2": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=3)
-                        },
+                aux_vars={
+                    "dummy_aux_var1":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=-1),
+                    "dummy_aux_var2":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=3),
+                },
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
@@ -634,26 +597,24 @@ class TestImpute(RBEISTestCase):
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars={
-                        "dummy_aux_var1": 
-                            RBEISDistanceFunction(
-                            7, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=2), 
-                        "dummy_aux_var2": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=3)
-                        },
+                    "dummy_aux_var1":
+                    RBEISDistanceFunction(7,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=2),
+                    "dummy_aux_var2":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=3),
+                },
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
                 keep_intermediates=True,
             )
-            
+
     # --- Test exception when threshold IS specified for distance function 1
     def test_threshold_for_df1(self):
         with self.assertRaises(Exception):
@@ -662,19 +623,17 @@ class TestImpute(RBEISTestCase):
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars={
-                        "dummy_aux_var1": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=3, 
-                            weight=2), 
-                        "dummy_aux_var2": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=3)
-                        },
+                    "dummy_aux_var1":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=3,
+                                          weight=2),
+                    "dummy_aux_var2":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=3),
+                },
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
@@ -690,26 +649,23 @@ class TestImpute(RBEISTestCase):
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars={
-                        "dummy_aux_var1": 
-                            RBEISDistanceFunction(
-                            2, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=2), 
-                        "dummy_aux_var2": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=3)
-                        },
+                    "dummy_aux_var1":
+                    RBEISDistanceFunction(2,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=2),
+                    "dummy_aux_var2":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=3),
+                },
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
                 keep_intermediates=True,
             )
-
 
     # --- Test exception when threshold NOT specified for distance function 3
     def test_threshold_for_df3(self):
@@ -719,19 +675,17 @@ class TestImpute(RBEISTestCase):
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars={
-                        "dummy_aux_var1": 
-                            RBEISDistanceFunction(
-                            3, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=2), 
-                        "dummy_aux_var2": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=3)
-                        },
+                    "dummy_aux_var1":
+                    RBEISDistanceFunction(3,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=2),
+                    "dummy_aux_var2":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=3),
+                },
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
@@ -747,26 +701,24 @@ class TestImpute(RBEISTestCase):
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars={
-                        "dummy_aux_var1": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=2), 
-                        "dummy_aux_var2": 
-                            RBEISDistanceFunction(
-                            4, 
-                            custom_map={(1, 1): 2}, 
-                            threshold=3, 
-                            weight=3)
-                        },
+                    "dummy_aux_var1":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=2),
+                    "dummy_aux_var2":
+                    RBEISDistanceFunction(4,
+                                          custom_map={(1, 1): 2},
+                                          threshold=3,
+                                          weight=3),
+                },
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
                 keep_intermediates=True,
             )
-                
+
     # --- Test exception when threshold NOT specified for distance function 5
     def test_threshold_for_df5(self):
         with self.assertRaises(Exception):
@@ -775,19 +727,17 @@ class TestImpute(RBEISTestCase):
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars={
-                        "dummy_aux_var1": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=2), 
-                        "dummy_aux_var2": 
-                            RBEISDistanceFunction(
-                            5, 
-                            custom_map={(1, 1): 2}, 
-                            threshold=None, 
-                            weight=3)
-                        },
+                    "dummy_aux_var1":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=2),
+                    "dummy_aux_var2":
+                    RBEISDistanceFunction(5,
+                                          custom_map={(1, 1): 2},
+                                          threshold=None,
+                                          weight=3),
+                },
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
@@ -803,19 +753,17 @@ class TestImpute(RBEISTestCase):
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars={
-                        "dummy_aux_var1": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=2), 
-                        "dummy_aux_var2": 
-                            RBEISDistanceFunction(
-                            6, 
-                            custom_map={(1, 1): 2}, 
-                            threshold=None, 
-                            weight=3)
-                        },
+                    "dummy_aux_var1":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=2),
+                    "dummy_aux_var2":
+                    RBEISDistanceFunction(6,
+                                          custom_map={(1, 1): 2},
+                                          threshold=None,
+                                          weight=3),
+                },
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
@@ -831,19 +779,17 @@ class TestImpute(RBEISTestCase):
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars={
-                        "dummy_aux_var1": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map={(1, 1): 2}, 
-                            threshold=None, 
-                            weight=2), 
-                        "dummy_aux_var2": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=3)
-                        },
+                    "dummy_aux_var1":
+                    RBEISDistanceFunction(1,
+                                          custom_map={(1, 1): 2},
+                                          threshold=None,
+                                          weight=2),
+                    "dummy_aux_var2":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=3),
+                },
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
@@ -859,26 +805,23 @@ class TestImpute(RBEISTestCase):
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars={
-                        "dummy_aux_var1": 
-                            RBEISDistanceFunction(
-                            2, 
-                            custom_map={(1, 1): 2}, 
-                            threshold=1, 
-                            weight=2), 
-                        "dummy_aux_var2": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=3)
-                        },
+                    "dummy_aux_var1":
+                    RBEISDistanceFunction(2,
+                                          custom_map={(1, 1): 2},
+                                          threshold=1,
+                                          weight=2),
+                    "dummy_aux_var2":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=3),
+                },
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
                 keep_intermediates=True,
             )
-                
 
     # --- Test exception when custom_map IS specified for distance function 3
     def test_custom_map_for_df3(self):
@@ -888,19 +831,17 @@ class TestImpute(RBEISTestCase):
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars={
-                        "dummy_aux_var1": 
-                            RBEISDistanceFunction(
-                            3, 
-                            custom_map={(1, 1): 2}, 
-                            threshold=1, 
-                            weight=2), 
-                        "dummy_aux_var2": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=3)
-                        },
+                    "dummy_aux_var1":
+                    RBEISDistanceFunction(3,
+                                          custom_map={(1, 1): 2},
+                                          threshold=1,
+                                          weight=2),
+                    "dummy_aux_var2":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=3),
+                },
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
@@ -916,19 +857,17 @@ class TestImpute(RBEISTestCase):
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars={
-                        "dummy_aux_var1": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=2), 
-                        "dummy_aux_var2": 
-                            RBEISDistanceFunction(
-                            4, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=3)
-                        },
+                    "dummy_aux_var1":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=2),
+                    "dummy_aux_var2":
+                    RBEISDistanceFunction(4,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=3),
+                },
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
@@ -944,19 +883,17 @@ class TestImpute(RBEISTestCase):
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars={
-                        "dummy_aux_var1": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=2), 
-                        "dummy_aux_var2": 
-                            RBEISDistanceFunction(
-                            5, 
-                            custom_map=None, 
-                            threshold=1, 
-                            weight=3)
-                        },
+                    "dummy_aux_var1":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=2),
+                    "dummy_aux_var2":
+                    RBEISDistanceFunction(5,
+                                          custom_map=None,
+                                          threshold=1,
+                                          weight=3),
+                },
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
@@ -972,19 +909,17 @@ class TestImpute(RBEISTestCase):
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars={
-                        "dummy_aux_var1": 
-                            RBEISDistanceFunction(
-                            1, 
-                            custom_map=None, 
-                            threshold=None, 
-                            weight=2), 
-                        "dummy_aux_var2": 
-                            RBEISDistanceFunction(
-                            6, 
-                            custom_map=None, 
-                            threshold=1, 
-                            weight=3)
-                        },              
+                    "dummy_aux_var1":
+                    RBEISDistanceFunction(1,
+                                          custom_map=None,
+                                          threshold=None,
+                                          weight=2),
+                    "dummy_aux_var2":
+                    RBEISDistanceFunction(6,
+                                          custom_map=None,
+                                          threshold=1,
+                                          weight=3),
+                },
                 min_quantile=None,
                 overwrite=False,
                 col_name=None,
@@ -1000,52 +935,56 @@ class TestImpute(RBEISTestCase):
 # 1. missing values cannot be passed to the distance functions
 #    as imputation will be prevented when the impute function is called
 #    if any of the auxiliary values contain missing values.
-# 2. the df number will be between 1 & 6 as an exeption will be 
-#    raised when the impute function is called if not    
+# 2. the df number will be between 1 & 6 as an exeption will be
+#    raised when the impute function is called if not
 # --------------------------------------------------------------------------------------
 class TestDistanceFunctions(RBEISTestCase):
 
-     # --- Test distance function 1 returns correct values ---
+    # --- Test distance function 1 returns correct values ---
     def test_df1(self):
         df1 = RBEISDistanceFunction(1)
-        self.assertEqual(df1(1,1), 0)        
+        self.assertEqual(df1(1, 1), 0)
         self.assertEqual(df1("abcd", "abcd"), 0)
         self.assertEqual(df1(0, 1), 1)
         self.assertEqual(df1(2.3, 1.2), 1)
         self.assertEqual(df1("abcd", "bcde"), 1)
-    
-      
+
     # --- Test distance function 2 returns correct values ---
     def test_df2(self):
-        df2 = RBEISDistanceFunction(2,threshold=3)        
+        df2 = RBEISDistanceFunction(2, threshold=3)
         self.assertEqual(df2(1, 1), 0)
-        self.assertEqual(df2(1, 5), 1)  
-        df2 = RBEISDistanceFunction(2,threshold=3.0)          
+        self.assertEqual(df2(1, 5), 1)
+        df2 = RBEISDistanceFunction(2, threshold=3.0)
         self.assertEqual(df2(1.1, 3.5), 0)
-        df2 = RBEISDistanceFunction(2,threshold=3.5)  
+        df2 = RBEISDistanceFunction(2, threshold=3.5)
         self.assertEqual(df2(7.8, 2.1), 1)
 
     # --- Test distance function 3 returns correct values ---
     def test_df3(self):
-        df3 = RBEISDistanceFunction(3,threshold=3)   
+        df3 = RBEISDistanceFunction(3, threshold=3)
         self.assertEqual(df3(1, 1), 0)
         self.assertEqual(df3(1, 3), 0.5)
         self.assertEqual(df3(7, 6), 0.25)
         self.assertEqual(df3(7, 2), 1)
-  
+
     # --- Test distance function 4 returns correct values ---
     def test_df4(self):
-        df4 = RBEISDistanceFunction(4,custom_map={(1, 1): 2, (2.2, 3.3): 8})
+        df4 = RBEISDistanceFunction(4, custom_map={(1, 1): 2, (2.2, 3.3): 8})
         self.assertEqual(df4(2.2, 3.3), 8.0)
         self.assertEqual(df4(2, 3), 1)
         self.assertEqual(df4(2, 2), 0)
         self.assertEqual(df4("abcd", "abcd"), 0)
         self.assertEqual(df4(1.1, 2.2), 1)
-        self.assertEqual(df4("abcd", "bcde"), 1) 
+        self.assertEqual(df4("abcd", "bcde"), 1)
 
     # --- Test distance function 5 returns correct values ---
     def test_df5(self):
-        df5 = RBEISDistanceFunction(5, custom_map={(1, 1): 2, (2, 3): 8}, threshold=3)
+        df5 = RBEISDistanceFunction(5,
+                                    custom_map={
+                                        (1, 1): 2,
+                                        (2, 3): 8
+                                    },
+                                    threshold=3)
         self.assertEqual(df5(1, 1), 2)
         self.assertEqual(df5(1, 4), 0)
         self.assertEqual(df5(1.1, 5.5), 1)
@@ -1165,12 +1104,12 @@ class TestGetIGroupAuxVar(RBEISTestCase):
 # distances of each record's auxiliary variables from those of its IGroup.
 # -----------------------------------------------------------------------------
 class TestCalcDistances(RBEISTestCase):
-    
-# Test distances are calulated correctly for each distance function
-# For iGroup 0 only
-# Distance function object takes parameters (donor record value, iGroup value)
-# Format for custom_map is (donor record value, iGroup value) : new distance                 
-  
+
+    # Test distances are calulated correctly for each distance function
+    # For iGroup 0 only
+    # Distance function object takes parameters (donor record value, iGroup value)
+    # Format for custom_map is (donor record value, iGroup value) : new distance
+
     # --- Test distance calculations using distance function 1  ---
     def test_calc_distances_df1(self):
         test_data = pd.read_csv(self.test_data_filepath)
@@ -1181,48 +1120,11 @@ class TestCalcDistances(RBEISTestCase):
             data=test_data,
             aux_vars={
                 self.test_aux_var1: RBEISDistanceFunction(1, weight=2),
-                self.test_aux_var_categorial: RBEISDistanceFunction(1, weight=3)
-            }
+                self.test_aux_var_categorial: RBEISDistanceFunction(1,
+                                                                    weight=3),
+            },
         )
-     
-        # Recalculate distances for iGroup 0 and check they match
-        # dataframe for all donor records
 
-        donors_list = test_data[test_data["_impute"] == False].index
-
-        for row_index in donors_list:
-            rbeis_distances_list = test_data.loc[row_index, "_distances"]
-            d1 = RBEISDistanceFunction(1, weight=2)(
-                test_data.loc[row_index, self.test_aux_var1],
-                self.igroup0_aux_var1                
-            )
-            d2 = RBEISDistanceFunction(1, weight=3)(
-                test_data.loc[row_index, self.test_aux_var_categorial],
-                self.igroup0_aux_categorical                
-            )
-            weighted_distance = d1 + d2
-            self.assertEqual(weighted_distance, rbeis_distances_list[0])
-
-  
-    # --- Test distance calculations using distance function 2  ---
-    def test_calc_distances_df2(self):
-        test_data = pd.read_csv(self.test_data_filepath)
-        _add_impute_col(test_data, self.test_impute_var)
-        _assign_igroups(test_data, [self.test_aux_var1, self.test_aux_var2])
-        _calc_distances(
-            data=test_data,
-            aux_vars={
-                self.test_aux_var1: RBEISDistanceFunction(
-                        2, 
-                        threshold=self.test_threshold1, 
-                        weight=2),
-                self.test_aux_var2: RBEISDistanceFunction(
-                        2, 
-                        threshold=self.test_threshold2, 
-                        weight=3)
-            }
-        )
-        
         # Recalculate distances for iGroup 0 and check they match
         # dataframe for all donor records
 
@@ -1231,22 +1133,55 @@ class TestCalcDistances(RBEISTestCase):
         for row_index in donors_list:
             rbeis_distances_list = test_data.loc[row_index, "_distances"]
             d1 = RBEISDistanceFunction(
-                    2, 
-                    threshold=self.test_threshold1, 
-                    weight=2)(
-                test_data.loc[row_index, self.test_aux_var1],
-                self.igroup0_aux_var1                    
-            )
-            d2 = RBEISDistanceFunction(
-                    2, 
-                    threshold=self.test_threshold2, 
-                    weight=3)(                  
-                test_data.loc[row_index, self.test_aux_var2],
-                self.igroup0_aux_var2                    
+                1, weight=2)(test_data.loc[row_index, self.test_aux_var1],
+                             self.igroup0_aux_var1)
+            d2 = RBEISDistanceFunction(1, weight=3)(
+                test_data.loc[row_index, self.test_aux_var_categorial],
+                self.igroup0_aux_categorical,
             )
             weighted_distance = d1 + d2
             self.assertEqual(weighted_distance, rbeis_distances_list[0])
-                      
+
+    # --- Test distance calculations using distance function 2  ---
+    def test_calc_distances_df2(self):
+        test_data = pd.read_csv(self.test_data_filepath)
+        _add_impute_col(test_data, self.test_impute_var)
+        _assign_igroups(test_data, [self.test_aux_var1, self.test_aux_var2])
+        _calc_distances(
+            data=test_data,
+            aux_vars={
+                self.test_aux_var1:
+                RBEISDistanceFunction(2,
+                                      threshold=self.test_threshold1,
+                                      weight=2),
+                self.test_aux_var2:
+                RBEISDistanceFunction(2,
+                                      threshold=self.test_threshold2,
+                                      weight=3),
+            },
+        )
+
+        # Recalculate distances for iGroup 0 and check they match
+        # dataframe for all donor records
+
+        donors_list = test_data[test_data["_impute"] == False].index
+
+        for row_index in donors_list:
+            rbeis_distances_list = test_data.loc[row_index, "_distances"]
+            d1 = RBEISDistanceFunction(2,
+                                       threshold=self.test_threshold1,
+                                       weight=2)(
+                                           test_data.loc[row_index,
+                                                         self.test_aux_var1],
+                                           self.igroup0_aux_var1)
+            d2 = RBEISDistanceFunction(2,
+                                       threshold=self.test_threshold2,
+                                       weight=3)(
+                                           test_data.loc[row_index,
+                                                         self.test_aux_var2],
+                                           self.igroup0_aux_var2)
+            weighted_distance = d1 + d2
+            self.assertEqual(weighted_distance, rbeis_distances_list[0])
 
     # --- Test distance calculations using distance function 3  ---
     def test_calc_distances_df3(self):
@@ -1256,15 +1191,109 @@ class TestCalcDistances(RBEISTestCase):
         _calc_distances(
             data=test_data,
             aux_vars={
-                self.test_aux_var1: RBEISDistanceFunction(
-                        3, 
-                        threshold=self.test_threshold1, 
-                        weight=2),
-                self.test_aux_var2: RBEISDistanceFunction(
-                        3, 
-                        threshold=self.test_threshold2, 
-                        weight=3)
-            }
+                self.test_aux_var1:
+                RBEISDistanceFunction(3,
+                                      threshold=self.test_threshold1,
+                                      weight=2),
+                self.test_aux_var2:
+                RBEISDistanceFunction(3,
+                                      threshold=self.test_threshold2,
+                                      weight=3),
+            },
+        )
+
+        # Recalculate distances for iGroup 0 and check they match
+        # dataframe for all donor records.
+
+        donors_list = test_data[test_data["_impute"] == False].index
+
+        for row_index in donors_list:
+            rbeis_distances_list = test_data.loc[row_index, "_distances"]
+            d1 = RBEISDistanceFunction(3,
+                                       threshold=self.test_threshold1,
+                                       weight=2)(
+                                           test_data.loc[row_index,
+                                                         self.test_aux_var1],
+                                           self.igroup0_aux_var1)
+            d2 = RBEISDistanceFunction(3,
+                                       threshold=self.test_threshold2,
+                                       weight=3)(
+                                           test_data.loc[row_index,
+                                                         self.test_aux_var2],
+                                           self.igroup0_aux_var2)
+            weighted_distance = d1 + d2
+
+            # For dfs 3 & 6, assertAlmostEqual is used as calculated distances
+            # differ from rbeis distances after about the 7th decimal place
+            self.assertAlmostEqual(weighted_distance,
+                                   rbeis_distances_list[0],
+                                   places=5)
+
+    # --- Test distance calculations using distance function 4  ---
+    def test_calc_distances_df4(self):
+        test_data = pd.read_csv(self.test_data_filepath)
+        _add_impute_col(test_data, self.test_impute_var)
+        _assign_igroups(test_data,
+                        [self.test_aux_var1, self.test_aux_var_categorial])
+
+        _calc_distances(
+            data=test_data,
+            aux_vars={
+                self.test_aux_var1:
+                RBEISDistanceFunction(4,
+                                      custom_map=self.test_custom_map1,
+                                      weight=2),
+                self.test_aux_var_categorial:
+                RBEISDistanceFunction(
+                    4, custom_map=self.test_custom_map_categorial, weight=3),
+            },
+        )
+
+        # Recalculate distances for iGroup 0 and check they match
+        # dataframe for all donor records
+
+        donors_list = test_data[test_data["_impute"] == False].index
+
+        for row_index in donors_list:
+            rbeis_distances_list = test_data.loc[row_index, "_distances"]
+            d1 = RBEISDistanceFunction(4,
+                                       custom_map=self.test_custom_map1,
+                                       weight=2)(
+                                           test_data.loc[row_index,
+                                                         self.test_aux_var1],
+                                           self.igroup0_aux_var1)
+            d2 = RBEISDistanceFunction(
+                4, custom_map=self.test_custom_map_categorial, weight=3)(
+                    test_data.loc[row_index, self.test_aux_var_categorial],
+                    self.igroup0_aux_categorical,
+                )
+            weighted_distance = d1 + d2
+
+            self.assertEqual(weighted_distance, rbeis_distances_list[0])
+
+    # --- Test distance calculations using distance functions 5 & 6 ---
+    def test_calc_distances_df5_df6(self):
+        test_data = pd.read_csv(self.test_data_filepath)
+        _add_impute_col(test_data, self.test_impute_var)
+        _assign_igroups(test_data, [self.test_aux_var1, self.test_aux_var2])
+        _calc_distances(
+            data=test_data,
+            aux_vars={
+                self.test_aux_var1:
+                RBEISDistanceFunction(
+                    5,
+                    threshold=self.test_threshold1,
+                    custom_map=self.test_custom_map1,
+                    weight=2,
+                ),
+                self.test_aux_var2:
+                RBEISDistanceFunction(
+                    6,
+                    threshold=self.test_threshold2,
+                    custom_map=self.test_custom_map1,
+                    weight=3,
+                ),
+            },
         )
 
         # Recalculate distances for iGroup 0 and check they match
@@ -1275,124 +1304,24 @@ class TestCalcDistances(RBEISTestCase):
         for row_index in donors_list:
             rbeis_distances_list = test_data.loc[row_index, "_distances"]
             d1 = RBEISDistanceFunction(
-                    3, 
-                    threshold=self.test_threshold1, 
-                    weight=2)(
-                test_data.loc[row_index, self.test_aux_var1],
-                self.igroup0_aux_var1                    
-            )
+                5,
+                threshold=self.test_threshold1,
+                custom_map=self.test_custom_map1,
+                weight=2,
+            )(test_data.loc[row_index, self.test_aux_var1],
+              self.igroup0_aux_var1)
             d2 = RBEISDistanceFunction(
-                    3, 
-                    threshold=self.test_threshold2, 
-                    weight=3)(
-                test_data.loc[row_index, self.test_aux_var2],
-                self.igroup0_aux_var2                    
-            )
-            weighted_distance = d1 + d2      
-            
+                6,
+                threshold=self.test_threshold2,
+                custom_map=self.test_custom_map1,
+                weight=3,
+            )(test_data.loc[row_index, self.test_aux_var2],
+              self.igroup0_aux_var2)
+            weighted_distance = d1 + d2
+
             # For dfs 3 & 6, assertAlmostEqual is used as calculated distances
             # differ from rbeis distances after about the 7th decimal place
             self.assertAlmostEqual(weighted_distance,
-                                   rbeis_distances_list[0],
-                                   places=5)
-
- 
-    # --- Test distance calculations using distance function 4  ---
-    def test_calc_distances_df4(self):
-        test_data = pd.read_csv(self.test_data_filepath)
-        _add_impute_col(test_data, self.test_impute_var)
-        _assign_igroups(test_data,
-                        [self.test_aux_var1, self.test_aux_var_categorial])
-        
-        _calc_distances(
-            data=test_data,
-            aux_vars={
-                self.test_aux_var1: RBEISDistanceFunction(
-                        4, 
-                        custom_map=self.test_custom_map1, 
-                        weight=2),
-                self.test_aux_var_categorial: RBEISDistanceFunction(
-                        4,
-                        custom_map=self.test_custom_map_categorial, 
-                        weight=3)
-            }
-        )
-
-        # Recalculate distances for iGroup 0 and check they match
-        # dataframe for all donor records
-
-        donors_list = test_data[test_data["_impute"] == False].index
-
-        for row_index in donors_list:
-            rbeis_distances_list = test_data.loc[row_index, "_distances"]
-            d1 = RBEISDistanceFunction(
-                    4, 
-                    custom_map=self.test_custom_map1, 
-                    weight=2)(
-                test_data.loc[row_index, self.test_aux_var1],
-                self.igroup0_aux_var1                
-            )
-            d2 = RBEISDistanceFunction(
-                    4,
-                    custom_map=self.test_custom_map_categorial, 
-                    weight=3)(
-                test_data.loc[row_index, self.test_aux_var_categorial],
-                self.igroup0_aux_categorical                
-            )
-            weighted_distance = d1 + d2
-
-            self.assertEqual(weighted_distance, rbeis_distances_list[0])
-
-
-    # --- Test distance calculations using distance functions 5 & 6 ---    
-    def test_calc_distances_df5_df6(self):
-        test_data = pd.read_csv(self.test_data_filepath)
-        _add_impute_col(test_data, self.test_impute_var)
-        _assign_igroups(test_data, [self.test_aux_var1, self.test_aux_var2])
-        _calc_distances(
-            data=test_data,
-            aux_vars={
-                self.test_aux_var1: RBEISDistanceFunction(
-                        5, 
-                        threshold=self.test_threshold1,
-                        custom_map=self.test_custom_map1, 
-                        weight=2),
-                self.test_aux_var2: RBEISDistanceFunction(
-                        6,
-                        threshold=self.test_threshold2,
-                        custom_map=self.test_custom_map1,
-                        weight=3)
-            }
-        )
-
-        # Recalculate distances for iGroup 0 and check they match 
-        # dataframe for all donor records.        
-        
-        donors_list = test_data[test_data["_impute"] == False].index
-
-        for row_index in donors_list:
-            rbeis_distances_list = test_data.loc[row_index, "_distances"]
-            d1 = RBEISDistanceFunction(
-                    5, 
-                    threshold=self.test_threshold1, 
-                    custom_map=self.test_custom_map1, 
-                    weight=2)(
-                    test_data.loc[row_index, self.test_aux_var1],
-                    self.igroup0_aux_var1                    
-            )
-            d2 = RBEISDistanceFunction(
-                    6, 
-                    threshold=self.test_threshold2, 
-                    custom_map=self.test_custom_map1, 
-                    weight=3)(
-                    test_data.loc[row_index, self.test_aux_var2],
-                    self.igroup0_aux_var2                    
-            )
-            weighted_distance = d1 + d2
-
-            # For dfs 3 & 6, assertAlmostEqual is used as calculated distances
-            # differ from rbeis distances after about the 7th decimal place
-            self.assertAlmostEqual(weighted_distance, 
                                    rbeis_distances_list[0],
                                    places=5)
 
@@ -1416,11 +1345,10 @@ class TestCalcDonors(RBEISTestCase):
             data=test_data,
             aux_vars={
                 self.test_aux_var1: RBEISDistanceFunction(1, weight=2),
-                self.test_aux_var2: RBEISDistanceFunction(1, weight=3)
-            }
+                self.test_aux_var2: RBEISDistanceFunction(1, weight=3),
+            },
         )
         _calc_donors(test_data, min_quantile=None)
-        
 
         # Check recipiants have empty list in donors column
         recipiants = test_data[test_data["_impute"] == True]
@@ -1452,8 +1380,8 @@ class TestGetDonors(RBEISTestCase):
     # iGroups for each donor.
     # Test for min_quantile = None as min_quantile will be changed to ratio.
     # Distance funtions 4 & 5 chosen.
-        
-    # --- Test list of donors for each iGroup is correct ---    
+
+    # --- Test list of donors for each iGroup is correct ---
     def test_get_donors(self):
         test_data = pd.read_csv(self.test_data_filepath)
         _add_impute_col(test_data, self.test_impute_var)
@@ -1461,16 +1389,17 @@ class TestGetDonors(RBEISTestCase):
         _calc_distances(
             data=test_data,
             aux_vars={
-                self.test_aux_var1: RBEISDistanceFunction(
-                        5, 
-                        threshold=self.test_threshold1,
-                        custom_map=self.test_custom_map1, 
-                        weight=3),
-                self.test_aux_var_categorial: RBEISDistanceFunction(
-                        4,
-                        custom_map=self.test_custom_map_categorial,
-                        weight=4)
-            }
+                self.test_aux_var1:
+                RBEISDistanceFunction(
+                    5,
+                    threshold=self.test_threshold1,
+                    custom_map=self.test_custom_map1,
+                    weight=3,
+                ),
+                self.test_aux_var_categorial:
+                RBEISDistanceFunction(
+                    4, custom_map=self.test_custom_map_categorial, weight=4),
+            },
         )
         _calc_donors(test_data, min_quantile=None)
 
@@ -1480,8 +1409,8 @@ class TestGetDonors(RBEISTestCase):
             donors_for_igroup = _get_donors(test_data, igroup=igroup_nummber)
             row_indices_donors = np.where(donors_for_igroup)[0]
             for row_index in row_indices_donors:
-                self.assertTrue(igroup_nummber in 
-                        test_data.loc[row_index, "_donor"])
+                self.assertTrue(igroup_nummber in test_data.loc[row_index,
+                                                                "_donor"])
 
 
 # -----------------------------------------------------------------------------
@@ -1493,9 +1422,9 @@ class TestGetDonors(RBEISTestCase):
 class TestGetFrequencyDistribution(RBEISTestCase):
 
     # Test for min_quantile = None as min_quantile will be changed to ratio
-    # Distance funtions 4 & 5 chosen 
+    # Distance funtions 4 & 5 chosen
 
-# --- Test frequency distribution is calulated correctly for each iGroup  ---
+    # --- Test frequency distribution is calulated correctly for each iGroup  ---
     def test_get_freq_dist(self):
         test_data = pd.read_csv(self.test_data_filepath)
         _add_impute_col(test_data, self.test_impute_var)
@@ -1503,16 +1432,17 @@ class TestGetFrequencyDistribution(RBEISTestCase):
         _calc_distances(
             data=test_data,
             aux_vars={
-                self.test_aux_var1: RBEISDistanceFunction(
-                        5, 
-                        threshold=self.test_threshold1,
-                        custom_map=self.test_custom_map1, 
-                        weight=3),
-                self.test_aux_var_categorial: RBEISDistanceFunction(
-                        4,
-                        custom_map=self.test_custom_map_categorial,
-                        weight=4)
-            }
+                self.test_aux_var1:
+                RBEISDistanceFunction(
+                    5,
+                    threshold=self.test_threshold1,
+                    custom_map=self.test_custom_map1,
+                    weight=3,
+                ),
+                self.test_aux_var_categorial:
+                RBEISDistanceFunction(
+                    4, custom_map=self.test_custom_map_categorial, weight=4),
+            },
         )
         _calc_donors(data=test_data, min_quantile=None)
 
@@ -1526,7 +1456,7 @@ class TestGetFrequencyDistribution(RBEISTestCase):
                 igroup=igroup_number,
             )
             self.assertTrue(sum(freq_dist_list) == Fraction(1, 1))
-            
+
 
 # -----------------------------------------------------------------------------
 # TESTS: Function: _freq_to_exp
@@ -1546,16 +1476,17 @@ class TestFrequencyToExpected(RBEISTestCase):
         _calc_distances(
             data=test_data,
             aux_vars={
-                self.test_aux_var1: RBEISDistanceFunction(
-                        6, 
-                        threshold=self.test_threshold1,
-                        custom_map=self.test_custom_map1, 
-                        weight=3),
-                self.test_aux_var_categorial: RBEISDistanceFunction(
-                        4,
-                        custom_map=self.test_custom_map_categorial,
-                        weight=4)
-            }
+                self.test_aux_var1:
+                RBEISDistanceFunction(
+                    6,
+                    threshold=self.test_threshold1,
+                    custom_map=self.test_custom_map1,
+                    weight=3,
+                ),
+                self.test_aux_var_categorial:
+                RBEISDistanceFunction(
+                    4, custom_map=self.test_custom_map_categorial, weight=4),
+            },
         )
         _calc_donors(data=test_data, min_quantile=None)
 
@@ -1597,16 +1528,17 @@ class TestImputeIGroup(RBEISTestCase):
         _calc_distances(
             data=test_data,
             aux_vars={
-                self.test_aux_var1: RBEISDistanceFunction(
-                        6, 
-                        threshold=self.test_threshold1,
-                        custom_map=self.test_custom_map1, 
-                        weight=3),
-                self.test_aux_var_categorial: RBEISDistanceFunction(
-                        4,
-                        custom_map=self.test_custom_map_categorial,
-                        weight=4)
-            }            
+                self.test_aux_var1:
+                RBEISDistanceFunction(
+                    6,
+                    threshold=self.test_threshold1,
+                    custom_map=self.test_custom_map1,
+                    weight=3,
+                ),
+                self.test_aux_var_categorial:
+                RBEISDistanceFunction(
+                    4, custom_map=self.test_custom_map_categorial, weight=4),
+            },
         )
         _calc_donors(data=test_data, min_quantile=None)
 
