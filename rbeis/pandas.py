@@ -91,6 +91,26 @@ class RBEISDistanceFunction:
     weight = 1.0
 
     def __init__(self, df, custom_map=None, threshold=None, weight=1.0):
+        """
+        RBEISDistanceFunction(df, custom_map=None, threshold=None, weight=1.0)
+
+                                     df (int): An integer from 1 to 6
+                                               corresponding to one of the
+                                               standard RBEIS distance functions
+        custom_map (('a * 'a) * numeric dict): [Optional] A dictionary mapping
+                                               pairs (2-tuples) of values to
+                                               distances, overriding the
+                                               underlying standard distance
+                                               function.  Note that (x,y) -> z
+                                               does not imply that (y,x) -> z.
+                          threshold (numeric): [Optional] A threshold value for
+                                               the distance function
+                             weight (numeric): [Optional] A weight value by
+                                               which to scale the output of the
+                                               distance function
+
+        Initialise a new RBEISDistanceFunction object with the above parameters.
+        """
         self.weight = float(weight)
         if df < 1 or df > 6:
             raise RBEISInputException(
@@ -262,6 +282,10 @@ def _calc_distances(data, aux_vars):
        list of calculated distances from its IGroup's auxiliary variables,
        taking into account the specified weights
     4. Remove column '_dists_temp'
+
+    TODO: Document that when DFs are called, the argument order is (record,
+    IGroup) - this is relevant when defining custom_map and has led to some
+    confusion in testing.
     """
     igroup_aux_vars = []
     vars_vals = list(
