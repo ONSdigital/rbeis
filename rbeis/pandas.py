@@ -151,6 +151,9 @@ class RBEISDistanceFunction:
         return self.weight * self.f(x, y)
 
 def _check_missing_auxvars(data,aux_vars):
+    """
+    TODO: Document
+    """
     try:
         assert not(any([any(np.isnan(d[k]).tolist()) for k in aux_vars.keys()]))
     except AssertionError:
@@ -281,7 +284,7 @@ def _calc_distances(data, aux_vars):
     del data["_dists_temp"]
 
 
-def _calc_donors(data, tolerance=None):
+def _calc_donors(data, ratio=None):
     """
     _calc_donors(data, min_quantile=None)
 
@@ -302,12 +305,7 @@ def _calc_donors(data, tolerance=None):
     """
     igroups_dists = np.array(
         data.query("not(_impute)")["_distances"].values.tolist()).T.tolist()
-    # FIXME: This tolerance stuff still feels really wrong, like 10% of a very
-    #        small minimum is going to be a tiny margin - originally I
-    #        implemented this as min_quantile, not tolerance, in which the
-    #        bottom n-quantile would be chosen instead of values within a
-    #        tolerance of the minimum
-    max_donor_dists = list(map(lambda l: max([i for i in l if i<=(1+tolerance)*min(l)]) if tolerance else min(l),igroups_dists))
+    max_donor_dists = list(map(lambda l: max([i for i in l if i<=ratio*min(l)]) if ratio else min(l),igroups_dists))
     data["_donor"] = data.apply(
         lambda r: np.where(
             list(
@@ -427,7 +425,7 @@ def impute(
     imp_var,
     possible_vals,
     aux_vars,
-    tolerance=None,
+    ratio=None,
     overwrite=False,
     col_name=None,
     in_place=True,
@@ -520,21 +518,12 @@ def impute(
             "aux_vars must be a dictionary whose values are RBEISDistanceFunctions"
         )
     try:
-        assert tolerance
-        if not (isinstance(tolerance, Number)):
+        assert ratio
+        if not (isinstance(ratio, Number)):
             raise TypeError(
-                "The tolerance must be numeric"
+                "The ratio must be numeric"
             )
     except AssertionError:
-        pass
-    # TODO: Uncomment if/when we know that tolerance should be between 0 and 1
-    # try:
-    #     assert tolerance
-    #     if not (tolerance>0 and tolerance<1):
-    #         raise TypeError(
-    #             "The tolerance must be between 0 and 1"
-    #         )
-    # except AssertionError:
         pass
     try:
         assert overwrite
@@ -562,11 +551,13 @@ def impute(
         pass
 
     # Imputation
+    if not(in_place):
+        data_old = deepcopy(data)
     _check_missing_auxvars(data,aux_vars)
     _add_impute_col(data, imp_var)
     _assign_igroups(data, aux_vars.keys())
     _calc_distances(data, aux_vars)
-    _calc_donors(data, tolerance=tolerance)
+    _calc_donors(data, ratio=ratio)
     # TODO: tidy this up and return the dataframe properly (or modify in place)
     # TODO: include optional keyword arguments
     imputed_vals = list(
@@ -592,3 +583,7 @@ def impute(
         del data["_IGroup"]
         del data["_distances"]
         del data["_donor"]
+    if not(in_place):
+        data_new = deepcopy(data)
+        data = deepcopy(data_old)
+        return data_new
