@@ -521,6 +521,15 @@ def impute(
             )
     except AssertionError:
         pass
+    # TODO: Uncomment if/when we know that tolerance should be between 0 and 1
+    # try:
+    #     assert tolerance
+    #     if not (tolerance>0 and tolerance<1):
+    #         raise TypeError(
+    #             "The tolerance must be between 0 and 1"
+    #         )
+    # except AssertionError:
+        pass
     try:
         assert overwrite
         if not (isinstance(overwrite, bool)):
