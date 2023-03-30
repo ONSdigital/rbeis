@@ -18,6 +18,13 @@ class RBEISInputWarning(UserWarning):
 
 
 class RBEISDistanceFunction:
+    """
+    RBEISDistanceFunction
+
+    Callable object encapsulating one of the six RBEIS distance functions, its
+    threshold value (where appropriate), any pairs of values to be overridden
+    (for DFs 4-6), and a weight by which to scale its result.
+    """
     # Standard distance functions
     # Where x is the IGroup's value, y is the current record's value, and m is a threshold value
     def _df1(self, x, y):
@@ -27,9 +34,9 @@ class RBEISDistanceFunction:
         x ('a): A data point for comparison
         y ('a): A data point for comparison
 
-        Distance Function 1: return 1 if x and y are not equal, otherwise 0.  This
-        function (and it's derivative, DF4) can be used with any data types that
-        are comparable using =.
+        Distance Function 1: return 1 if x and y are not equal, otherwise 0.
+        This function (and its derivative, DF4) can be used with any data types
+        that are comparable using =.
         """
         return int(x != y)
 
@@ -41,9 +48,9 @@ class RBEISDistanceFunction:
         y (numeric): A data point for comparison
         m (numeric): A threshold value
 
-        Distance Function 2: return 1 if the difference between x and y is greater
-        than the threshold m, otherwise 0.  This function (and its derivative, DF5)
-        may only be used with numeric data.
+        Distance Function 2: return 1 if the difference between x and y is
+        greater than the threshold m, otherwise 0.  This function (and its
+        derivative, DF5) may only be used with numeric data.
         """
         if not (isinstance(x, Number) or isinstance(y, Number)):
             raise TypeError(
@@ -64,10 +71,10 @@ class RBEISDistanceFunction:
         y (numeric): A data point for comparison
         m (numeric): A threshold value
 
-        Distance Function 3: return 1 if the difference between x and y is greater
-        than the threshold m, otherwise return the difference between x and y,
-        divided by m + 1.  This function (and its derivative, DF6) may only be used
-        with numeric data.
+        Distance Function 3: return 1 if the difference between x and y is
+        greater than the threshold m, otherwise return the difference between x
+        and y, divided by m + 1.  This function (and its derivative, DF6) may
+        only be used with numeric data.
         """
         if not (isinstance(x, Number) or isinstance(y, Number)):
             raise TypeError(
@@ -155,7 +162,7 @@ def _check_missing_auxvars(data,aux_vars):
     TODO: Document
     """
     try:
-        assert not(any([any(np.isnan(d[k]).tolist()) for k in aux_vars.keys()]))
+        assert not(any([any(np.isnan(data[k]).tolist()) for k in aux_vars.keys()]))
     except AssertionError:
         raise RBEISInputException("Your dataset includes records for which the given auxiliary variables are missing")
 
@@ -523,7 +530,7 @@ def impute(
             raise TypeError(
                 "The ratio must be numeric"
             )
-        if ratio<1;
+        if ratio<1:
             raise RBEISInputException("The ratio must be greater than 1")
     except AssertionError:
         pass
