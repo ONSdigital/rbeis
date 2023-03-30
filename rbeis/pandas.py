@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 import warnings
-import sys
 from functools import partial
 from fractions import Fraction
 from numpy.random import choice
@@ -437,9 +436,7 @@ def impute(
     overwrite=False,
     col_name=None,
     in_place=True,
-    keep_intermediates=False,
-    log_level=0,
-    logfile=None
+    keep_intermediates=False
 ):
     """
     impute(data, imp_var, possible_vals, aux_vars, weights, dist_func,
@@ -563,10 +560,6 @@ def impute(
         pass
 
     # Imputation
-    if logfile:
-        stdout_old = sys.stdout
-        logf = open(logfile, 'w')
-        sys.stdout = logf
     if not(in_place):
         data_old = deepcopy(data)
     _check_missing_auxvars(data,aux_vars)
@@ -599,9 +592,6 @@ def impute(
         del(data["_IGroup"])
         del(data["_distances"])
         del(data["_donor"])
-    if logfile:
-        sys.stdout = stdout_old
-        logf.close()
     if not(in_place):
         data_new = deepcopy(data)
         data = deepcopy(data_old)
