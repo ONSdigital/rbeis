@@ -1,10 +1,10 @@
 import numpy as np
 import pandas as pd
+import copy
 from functools import partial
 from fractions import Fraction
 from numpy.random import choice
 from random import shuffle
-from copy import deepcopy
 from numbers import Number
 import warnings
 
@@ -554,7 +554,7 @@ def impute(
 
     # Imputation
     if not(in_place):
-        data_old = deepcopy(data)
+        data_old = copy.copy(data)
     _check_missing_auxvars(data,aux_vars)
     _add_impute_col(data, imp_var)
     _assign_igroups(data, aux_vars.keys())
@@ -581,11 +581,12 @@ def impute(
     )
     assert all(map(lambda l: l == [], imputed_vals))
     if not (keep_intermediates):
-        del data["_impute"]
-        del data["_IGroup"]
-        del data["_distances"]
-        del data["_donor"]
+        del(data["_impute"])
+        del(data["_IGroup"])
+        del(data["_distances"])
+        del(data["_donor"])
     if not(in_place):
-        data_new = deepcopy(data)
-        data = deepcopy(data_old)
+        data_new = copy.deepcopy(data)
+        data = copy.copy(data_old)
+        del(data_old)
         return data_new
