@@ -150,6 +150,12 @@ class RBEISDistanceFunction:
     def __call__(self, x, y):
         return self.weight * self.f(x, y)
 
+def _check_missing_auxvars(data,aux_vars):
+    try:
+        assert not(any([any(np.isnan(d[k]).tolist()) for k in aux_vars.keys()]))
+    except AssertionError:
+        raise RBEISInputException("Your dataset includes records for which the given auxiliary variables are missing")
+
 
 def _add_impute_col(data, imp_var):
     """
@@ -556,6 +562,7 @@ def impute(
         pass
 
     # Imputation
+    _check_missing_auxvars(data,aux_vars)
     _add_impute_col(data, imp_var)
     _assign_igroups(data, aux_vars.keys())
     _calc_distances(data, aux_vars)
