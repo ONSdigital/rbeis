@@ -1,12 +1,13 @@
 import numpy as np
 import pandas as pd
-import copy
+import warnings
+import sys
 from functools import partial
 from fractions import Fraction
 from numpy.random import choice
 from random import shuffle
 from numbers import Number
-import warnings
+from copy import deepcopy
 
 
 class RBEISInputException(Exception):
@@ -162,7 +163,7 @@ def _check_missing_auxvars(data,aux_vars):
     TODO: Document
     """
     try:
-        assert not(any([any(np.isnan(data[k]).tolist()) for k in aux_vars.keys()]))
+        assert not(any([any(map(lambda i: isinstance(i,float) and np.isnan(i),data[k].tolist())) for k in aux_vars.keys()]))
     except AssertionError:
         raise RBEISInputException("Your dataset includes records for which the given auxiliary variables are missing")
 
@@ -437,6 +438,8 @@ def impute(
     col_name=None,
     in_place=True,
     keep_intermediates=False,
+    log_level=0,
+    logfile=None
 ):
     """
     impute(data, imp_var, possible_vals, aux_vars, weights, dist_func,
@@ -560,8 +563,12 @@ def impute(
         pass
 
     # Imputation
+    if logfile:
+        stdout_old = sys.stdout
+        logf = open(logfile, 'w')
+        sys.stdout = logf
     if not(in_place):
-        data_old = copy.copy(data)
+        data_old = deepcopy(data)
     _check_missing_auxvars(data,aux_vars)
     _add_impute_col(data, imp_var)
     _assign_igroups(data, aux_vars.keys())
@@ -592,8 +599,11 @@ def impute(
         del(data["_IGroup"])
         del(data["_distances"])
         del(data["_donor"])
+    if logfile:
+        sys.stdout = stdout_old
+        logf.close()
     if not(in_place):
-        data_new = copy.deepcopy(data)
-        data = copy.copy(data_old)
+        data_new = deepcopy(data)
+        data = deepcopy(data_old)
         del(data_old)
         return data_new
