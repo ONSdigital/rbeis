@@ -26,6 +26,7 @@ class RBEISTestCase(TestCase):
         "dummy_aux_var1": [21, 19, 18, 67, 20],
         "dummy_aux_var2": [2, 3, 1, 1, 3],
         "dummy_aux_var_missing": [4, 3, 6, None, 6],
+        "dummy_aux_var_categorical": ['dog', 'cat', 'parrot', 'giraffe', 'hedgehog'] 
     }
     dummy_dataframe = pd.DataFrame(dummy_data)
 
@@ -54,7 +55,7 @@ class RBEISTestCase(TestCase):
 # --------------- TESTING TEMPLATE ---------------------------
 # =============================================================================
 # - Test type validation on all input parameters
-# - Test constrainst on input parameters:
+# - Test constraints on input parameters:
 # --     impute variable and auxiliary variables are in the dataframe
 # --     auxiliry variables have no missing values
 # --     weights and distance functions are within range
@@ -70,15 +71,11 @@ class RBEISTestCase(TestCase):
 
 
 # -----------------------------------------------------------------------------
-# TESTS: IMPUTE MAIN METHOD
+# TESTS: TYPE VALIDATION ON INPUT PARAMETERS
 # -----------------------------------------------------------------------------
-class TestImpute(RBEISTestCase):
+class TestInputTypeValidation(RBEISTestCase):
 
-    # ---------------------------------------------------
-    # --- TYPE VALIDATION TESTS ON INPUT PARAMETERS   ---
-    # ---------------------------------------------------
-
-    # --- Test type validation on the input data (dataframe)  ---
+   # --- Test type validation on the input data (dataframe)  ---
     def test_type_validation_data(self):
         with self.assertRaises(TypeError):
             impute(
@@ -97,7 +94,7 @@ class TestImpute(RBEISTestCase):
                                           threshold=None,
                                           weight=3),
                 },
-                min_quantile=None,
+                ratio=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
@@ -123,7 +120,7 @@ class TestImpute(RBEISTestCase):
                                           threshold=None,
                                           weight=3),
                 },
-                min_quantile=None,
+                ratio=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
@@ -149,7 +146,7 @@ class TestImpute(RBEISTestCase):
                                           threshold=None,
                                           weight=3),
                 },
-                min_quantile=None,
+                ratio=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
@@ -164,7 +161,7 @@ class TestImpute(RBEISTestCase):
                 imp_var="dummy_impute_var",
                 possible_vals=list(range(1, 101)),
                 aux_vars="Not_a_Dictionary",
-                min_quantile=None,
+                ratio=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
@@ -190,7 +187,7 @@ class TestImpute(RBEISTestCase):
                                           threshold=None,
                                           weight=3),
                 },
-                min_quantile=None,
+                ratio=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
@@ -213,7 +210,7 @@ class TestImpute(RBEISTestCase):
                                           threshold=None,
                                           weight=3),
                 },
-                min_quantile=None,
+                ratio=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
@@ -239,7 +236,7 @@ class TestImpute(RBEISTestCase):
                                           threshold=None,
                                           weight=3),
                 },
-                min_quantile=None,
+                ratio=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
@@ -265,7 +262,7 @@ class TestImpute(RBEISTestCase):
                                           threshold=None,
                                           weight=3),
                 },
-                min_quantile=None,
+                ratio=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
@@ -291,7 +288,7 @@ class TestImpute(RBEISTestCase):
                                           threshold=None,
                                           weight=3),
                 },
-                min_quantile=None,
+                ratio=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
@@ -317,15 +314,15 @@ class TestImpute(RBEISTestCase):
                                           threshold=None,
                                           weight=3),
                 },
-                min_quantile=None,
+                ratio=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
                 keep_intermediates=True,
             )
 
-    # --- Test type validation on min_quantile  ---
-    def test_type_validation_min_quantile(self):
+    # --- Test type validation on ratio  ---
+    def test_type_validation_ratio(self):
         with self.assertRaises(TypeError):
             impute(
                 data=self.dummy_dataframe,
@@ -343,7 +340,7 @@ class TestImpute(RBEISTestCase):
                                           threshold=None,
                                           weight=3),
                 },
-                min_quantile="Not_a_number",
+                ratio="Not_a_number",
                 overwrite=False,
                 col_name=None,
                 in_place=True,
@@ -369,7 +366,7 @@ class TestImpute(RBEISTestCase):
                                           threshold=None,
                                           weight=3),
                 },
-                min_quantile=None,
+                ratio=None,
                 overwrite="Not_a_Boolean",
                 col_name=None,
                 in_place=True,
@@ -395,7 +392,7 @@ class TestImpute(RBEISTestCase):
                                           threshold=None,
                                           weight=3),
                 },
-                min_quantile=None,
+                ratio=None,
                 overwrite=False,
                 col_name=["Not", "A", "String"],
                 in_place=True,
@@ -421,7 +418,7 @@ class TestImpute(RBEISTestCase):
                                           threshold=None,
                                           weight=3),
                 },
-                min_quantile=None,
+                ratio=None,
                 overwrite=False,
                 col_name=None,
                 in_place="Not_a_Boolean",
@@ -447,16 +444,17 @@ class TestImpute(RBEISTestCase):
                                           threshold=None,
                                           weight=3),
                 },
-                min_quantile=None,
+                ratio=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
                 keep_intermediates="Not_a_Boolean",
             )
 
-    # -----------------------------------
-    # --- CHECK INPUT VARIABLES TESTS ---
-    # -----------------------------------
+# ----------------------------------------------
+# --- TESTS: CHECK VALUES OFINPUT VARIABLES  ---
+# ----------------------------------------------
+class TestInputValues(RBEISTestCase):
 
     # --- Test exception when impute variable is not in the dataframe  ---
     def test_imp_var_in_df(self):
@@ -477,7 +475,7 @@ class TestImpute(RBEISTestCase):
                                           threshold=None,
                                           weight=3),
                 },
-                min_quantile=None,
+                ratio=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
@@ -485,7 +483,7 @@ class TestImpute(RBEISTestCase):
             )
 
     # --- Test exception when possible_vals do not match range of impute variable  ---
-    # def self.test_pos_vals_match_range(self):
+    # def test_pos_vals_match_range(self):
     #    with self.assertRaises(Exception):
     #        impute(
     #          data=self.dummy_dataframe,
@@ -505,7 +503,7 @@ class TestImpute(RBEISTestCase):
     #                        threshold=None,
     #                        weight=3)
     #                    },
-    #          min_quantile=None,
+    #          ratio=None,
     #          overwrite=False,
     #          col_name=None,
     #          in_place=True,
@@ -530,7 +528,7 @@ class TestImpute(RBEISTestCase):
                                           threshold=None,
                                           weight=3),
                 },
-                min_quantile=None,
+                ratio=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
@@ -556,7 +554,7 @@ class TestImpute(RBEISTestCase):
                                           threshold=None,
                                           weight=3),
                 },
-                min_quantile=None,
+                ratio=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
@@ -582,7 +580,7 @@ class TestImpute(RBEISTestCase):
                                           threshold=None,
                                           weight=3),
                 },
-                min_quantile=None,
+                ratio=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
@@ -608,12 +606,39 @@ class TestImpute(RBEISTestCase):
                                           threshold=None,
                                           weight=3),
                 },
-                min_quantile=None,
+                ratio=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
                 keep_intermediates=True,
             )
+
+     # --- Test exception when distance function 2,3,5 or 6 is specified when
+     #      auxiliary variable is categorical (only df 1 or 4 allowed)
+    def test_df_for_categorical_data(self):
+        with self.assertRaises(Exception):
+            impute(
+                data=self.dummy_dataframe,
+                imp_var="dummy_impute_var",
+                possible_vals=list(range(1, 101)),
+                aux_vars={
+                        "dummy_aux_var1": 
+                        RBEISDistanceFunction(1, 
+                                              custom_map=None, 
+                                              threshold=None, 
+                                              weight=2), 
+                        "dummy_aux_var_categorical": 
+                        RBEISDistanceFunction(3, 
+                                              custom_map=None, 
+                                              threshold=2, 
+                                              weight=3)
+                },
+                ratio=None,
+                overwrite=False,
+                col_name=None,
+                in_place=True,
+                keep_intermediates=True,
+            )     
 
     # --- Test exception when threshold IS specified for distance function 1
     def test_threshold_for_df1(self):
@@ -634,7 +659,7 @@ class TestImpute(RBEISTestCase):
                                           threshold=None,
                                           weight=3),
                 },
-                min_quantile=None,
+                ratio=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
@@ -660,7 +685,7 @@ class TestImpute(RBEISTestCase):
                                           threshold=None,
                                           weight=3),
                 },
-                min_quantile=None,
+                ratio=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
@@ -686,7 +711,7 @@ class TestImpute(RBEISTestCase):
                                           threshold=None,
                                           weight=3),
                 },
-                min_quantile=None,
+                ratio=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
@@ -712,7 +737,7 @@ class TestImpute(RBEISTestCase):
                                           threshold=3,
                                           weight=3),
                 },
-                min_quantile=None,
+                ratio=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
@@ -738,7 +763,7 @@ class TestImpute(RBEISTestCase):
                                           threshold=None,
                                           weight=3),
                 },
-                min_quantile=None,
+                ratio=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
@@ -764,7 +789,7 @@ class TestImpute(RBEISTestCase):
                                           threshold=None,
                                           weight=3),
                 },
-                min_quantile=None,
+                ratio=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
@@ -790,7 +815,7 @@ class TestImpute(RBEISTestCase):
                                           threshold=None,
                                           weight=3),
                 },
-                min_quantile=None,
+                ratio=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
@@ -816,7 +841,7 @@ class TestImpute(RBEISTestCase):
                                           threshold=None,
                                           weight=3),
                 },
-                min_quantile=None,
+                ratio=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
@@ -842,7 +867,7 @@ class TestImpute(RBEISTestCase):
                                           threshold=None,
                                           weight=3),
                 },
-                min_quantile=None,
+                ratio=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
@@ -868,7 +893,7 @@ class TestImpute(RBEISTestCase):
                                           threshold=None,
                                           weight=3),
                 },
-                min_quantile=None,
+                ratio=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
@@ -894,7 +919,7 @@ class TestImpute(RBEISTestCase):
                                           threshold=1,
                                           weight=3),
                 },
-                min_quantile=None,
+                ratio=None,
                 overwrite=False,
                 col_name=None,
                 in_place=True,
@@ -920,9 +945,61 @@ class TestImpute(RBEISTestCase):
                                           threshold=1,
                                           weight=3),
                 },
-                min_quantile=None,
+                ratio=None,
                 overwrite=False,
                 col_name=None,
+                in_place=True,
+                keep_intermediates=True,
+            )
+
+    # --- Test exception when ratio is NOT greater than 1
+    def test_ratio_greater1(self):
+        with self.assertRaises(Exception):
+            impute(
+                data=self.dummy_dataframe,
+                imp_var="dummy_impute_var",
+                possible_vals=list(range(1, 101)),
+                aux_vars={
+                    "dummy_aux_var1": 
+                    RBEISDistanceFunction(1, 
+                                          custom_map=None, 
+                                          threshold=None, 
+                                          weight=2), 
+                    "dummy_aux_var2": 
+                    RBEISDistanceFunction(1, 
+                                          custom_map=None, 
+                                          threshold=None, 
+                                          weight=3)
+                },              
+                ratio=0.5,
+                overwrite=False,
+                col_name=None,
+                in_place=True,
+                keep_intermediates=True,
+            )
+
+    # --- Test exception if col_name IS specified but overwrite is TRUE
+    def test_col_name_if_overwrite(self):
+        with self.assertRaises(Exception):
+            impute(
+                data=self.dummy_dataframe,
+                imp_var="dummy_impute_var",
+                possible_vals=list(range(1, 101)),
+                aux_vars={
+                    "dummy_aux_var1": 
+                    RBEISDistanceFunction(1, 
+                                          custom_map=None, 
+                                          threshold=None, 
+                                          weight=2), 
+                    "dummy_aux_var2": 
+                    RBEISDistanceFunction(1, 
+                                          custom_map=None, 
+                                          threshold=None, 
+                                          weight=3)
+                },              
+                ratio=None,
+                overwrite=True,
+                col_name="test_imputed_column",
                 in_place=True,
                 keep_intermediates=True,
             )
@@ -1333,8 +1410,7 @@ class TestCalcDistances(RBEISTestCase):
 # -----------------------------------------------------------------------------
 class TestCalcDonors(RBEISTestCase):
 
-    # Test for min_quantile = None as min_quantile will be changed to ratio
-    # Distance funtion 1 chosen
+    # Distance funtion 1 & 3 chosen, with ratio set to None and to 2
 
     # --- Test list of iGroups each donor can donate to is correct  ---
     def test_calc_donors(self):
@@ -1345,11 +1421,41 @@ class TestCalcDonors(RBEISTestCase):
             data=test_data,
             aux_vars={
                 self.test_aux_var1: RBEISDistanceFunction(1, weight=2),
-                self.test_aux_var2: RBEISDistanceFunction(1, weight=3),
+                self.test_aux_var2: RBEISDistanceFunction(
+                        3,
+                        threshold=self.test_threshold2, 
+                        weight=3)
             },
         )
-        _calc_donors(test_data, min_quantile=None)
 
+        # Test for ratio = None
+        _calc_donors(test_data, ratio=None)
+
+        # Check recipiants have empty list in donors column
+        recipiants = test_data[test_data["_impute"] == True]
+        for row_index in range(recipiants.shape[0]):
+            self.assertTrue(len(recipiants["_donor"].values[row_index]) == 0)
+
+        # Check donor records have list of correct iGroups
+        for igroup_nummber in range(1 + test_data["_IGroup"].max()):
+            # Calculate the minumum sum weighted distance for iGroup
+            test_data["IGroup_distances"] = [
+                dist[igroup_nummber] if len(dist) > 0 else np.nan
+                for dist in test_data["_distances"]
+            ]
+            min_distance = test_data["IGroup_distances"].min()
+            # For ratio = None, donors with minimum distance are chosen
+            igroup_donors = test_data[test_data["IGroup_distances"] ==
+                                      min_distance].index
+            for row_index in igroup_donors:                
+                self.assertTrue(
+                    igroup_nummber in test_data.loc[row_index, "_donor"])
+  
+       # Test for ratio = 2 
+        # Drop _donor column and call _calc_donors to re-add the column for ratio = 2
+        test_data = test_data.drop('_donor', axis=1)
+        _calc_donors(test_data, ratio=2)
+        
         # Check recipiants have empty list in donors column
         recipiants = test_data[test_data["_impute"] == True]
         for row_index in range(recipiants.shape[0]):
@@ -1357,17 +1463,19 @@ class TestCalcDonors(RBEISTestCase):
 
         # Check donors have list of correct iGroups
         for igroup_nummber in range(1 + test_data["_IGroup"].max()):
+            # Calculate the minumum sum weighted distance for iGroup           
             test_data["IGroup_distances"] = [
                 dist[igroup_nummber] if len(dist) > 0 else np.nan
                 for dist in test_data["_distances"]
-            ]
+            ]          
             min_distance = test_data["IGroup_distances"].min()
-            igroup_donors = test_data[test_data["IGroup_distances"] ==
-                                      min_distance].index
-            for row_index in igroup_donors:
-                self.assertTrue(igroup_nummber in test_data.loc[row_index,
-                                                                "_donor"])
-
+            # For ratio = 2, donors within 2 times minimum distance are chosen  
+            igroup_donors = test_data[test_data["IGroup_distances"] <=
+                                      2*min_distance].index
+            for row_index in igroup_donors:                
+                self.assertTrue(
+                    igroup_nummber in test_data.loc[row_index, "_donor"])
+       
 
 # -----------------------------------------------------------------------------
 # TESTS: Function: _get_donors
@@ -1378,7 +1486,6 @@ class TestGetDonors(RBEISTestCase):
 
     # Test list of donors for each iGroup ties up with list of
     # iGroups for each donor.
-    # Test for min_quantile = None as min_quantile will be changed to ratio.
     # Distance funtions 4 & 5 chosen.
 
     # --- Test list of donors for each iGroup is correct ---
@@ -1394,14 +1501,13 @@ class TestGetDonors(RBEISTestCase):
                     5,
                     threshold=self.test_threshold1,
                     custom_map=self.test_custom_map1,
-                    weight=3,
-                ),
+                    weight=3),
                 self.test_aux_var_categorial:
                 RBEISDistanceFunction(
                     4, custom_map=self.test_custom_map_categorial, weight=4),
             },
         )
-        _calc_donors(test_data, min_quantile=None)
+        _calc_donors(test_data, ratio=None)
 
         # Test list of donors for each iGroup ties up with list of
         # iGroups for each donor
@@ -1421,8 +1527,7 @@ class TestGetDonors(RBEISTestCase):
 # -----------------------------------------------------------------------------
 class TestGetFrequencyDistribution(RBEISTestCase):
 
-    # Test for min_quantile = None as min_quantile will be changed to ratio
-    # Distance funtions 4 & 5 chosen
+    # Distance funtions 4 & 5 chosen, with ratio set to None and to 3
 
     # --- Test frequency distribution is calulated correctly for each iGroup  ---
     def test_get_freq_dist(self):
@@ -1444,7 +1549,9 @@ class TestGetFrequencyDistribution(RBEISTestCase):
                     4, custom_map=self.test_custom_map_categorial, weight=4),
             },
         )
-        _calc_donors(data=test_data, min_quantile=None)
+
+        # Test for ratio set to None (default ratio=1)
+        _calc_donors(data=test_data, ratio=None)
 
         # For each iGroup, test that the probabilities assigned to possible
         # values add up to 1
@@ -1457,6 +1564,22 @@ class TestGetFrequencyDistribution(RBEISTestCase):
             )
             self.assertTrue(sum(freq_dist_list) == Fraction(1, 1))
 
+        # Test for ratio = 3 
+        # Drop _donor column and call _calc_donors to re-add the column for ratio = 3
+        test_data = test_data.drop('_donor', axis=1)
+        _calc_donors(test_data, ratio=3)
+        
+        # For each iGroup, test that the probabilities assigned to possible
+        # values add up to 1
+        for igroup_number in range(1 + test_data["_IGroup"].max()):
+            freq_dist_list = _get_freq_dist(
+                data=test_data,
+                imp_var=self.test_impute_var,
+                possible_vals=self.test_pos_vals,
+                igroup=igroup_number
+            )
+            self.assertTrue(sum(freq_dist_list) == Fraction(1, 1))
+       
 
 # -----------------------------------------------------------------------------
 # TESTS: Function: _freq_to_exp
@@ -1465,7 +1588,6 @@ class TestGetFrequencyDistribution(RBEISTestCase):
 # -----------------------------------------------------------------------------
 class TestFrequencyToExpected(RBEISTestCase):
 
-    # Test for min_quantile = None as min_quantile will be changed to ratio
     # Distance funtions 4 & 6 chosen
 
     # --- Test frequency is correctly translated into expected numbers for each iGroup ---
@@ -1488,7 +1610,7 @@ class TestFrequencyToExpected(RBEISTestCase):
                     4, custom_map=self.test_custom_map_categorial, weight=4),
             },
         )
-        _calc_donors(data=test_data, min_quantile=None)
+        _calc_donors(data=test_data, ratio=None)
 
         # Calculate the size of each iGroup
         recipiants = test_data[test_data[self.test_impute_var].isnull()]
@@ -1516,7 +1638,6 @@ class TestFrequencyToExpected(RBEISTestCase):
 # -----------------------------------------------------------------------------
 class TestImputeIGroup(RBEISTestCase):
 
-    # Test for min_quantile = None as min_quantile will be changed to ratio
     # Distance funtiosn 4 & 6 chosen
 
     # --- Test imputed values returned for each iGroup ---
@@ -1540,7 +1661,7 @@ class TestImputeIGroup(RBEISTestCase):
                     4, custom_map=self.test_custom_map_categorial, weight=4),
             },
         )
-        _calc_donors(data=test_data, min_quantile=None)
+        _calc_donors(data=test_data, ratio=None)
 
         # For each iGroup, check that all values in list have expected number
         # occurences > 0 and if expected number of occurences > 1,
