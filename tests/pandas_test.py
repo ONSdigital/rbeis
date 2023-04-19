@@ -548,9 +548,9 @@ class TestInputValues(RBEISTestCase):
                 keep_intermediates=True,
             )     
 
-    # --- Test exception when threshold IS specified for distance function 1
+    # --- Test warning is given when threshold IS specified for distance function 1
     def test_threshold_for_df1(self):
-        with self.assertRaises(Exception):
+        with self.assertWarns(UserWarning):
             impute(
                 data=self.dummy_dataframe,
                 imp_var="dummy_impute_var",
@@ -558,7 +558,6 @@ class TestInputValues(RBEISTestCase):
                 aux_vars={
                     "dummy_aux_var1":
                     RBEISDistanceFunction(1,
-                                          custom_map=None,
                                           threshold=3,
                                           weight=2),
                     "dummy_aux_var2":
@@ -620,9 +619,9 @@ class TestInputValues(RBEISTestCase):
                 keep_intermediates=True,
             )
 
-    # --- Test exception when threshold IS specified for distance function 4
+    # --- Test warning is given when threshold IS specified for distance function 4
     def test_threshold_for_df4(self):
-        with self.assertRaises(Exception):
+        with self.assertWarns(UserWarning):
             impute(
                 data=self.dummy_dataframe,
                 imp_var="dummy_impute_var",
@@ -692,9 +691,9 @@ class TestInputValues(RBEISTestCase):
                 keep_intermediates=True,
             )
 
-    # --- Test exception when custom_map IS specified for distance function 1
+    # --- Test warning is given when custom_map IS specified for distance function 1
     def test_custom_map_for_df1(self):
-        with self.assertRaises(Exception):
+        with self.assertWarns(UserWarning):
             impute(
                 data=self.dummy_dataframe,
                 imp_var="dummy_impute_var",
@@ -716,9 +715,9 @@ class TestInputValues(RBEISTestCase):
                 keep_intermediates=True,
             )
 
-    # --- Test exception when custom_map IS specified for distance function 2
+    # --- Test warning is given when custom_map IS specified for distance function 2
     def test_custom_map_for_df2(self):
-        with self.assertRaises(Exception):
+        with self.assertWarns(UserWarning):
             impute(
                 data=self.dummy_dataframe,
                 imp_var="dummy_impute_var",
@@ -740,9 +739,9 @@ class TestInputValues(RBEISTestCase):
                 keep_intermediates=True,
             )
 
-    # --- Test exception when custom_map IS specified for distance function 3
+    # --- Test warning is given when custom_map IS specified for distance function 3
     def test_custom_map_for_df3(self):
-        with self.assertRaises(Exception):
+        with self.assertWarns(UserWarning):
             impute(
                 data=self.dummy_dataframe,
                 imp_var="dummy_impute_var",
