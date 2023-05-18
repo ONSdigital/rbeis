@@ -26,7 +26,7 @@ class RBEISDistanceFunction:
     (for DFs 4-6), and a weight by which to scale its result.
     """
 
-    # Standard distance functions
+    # Standard distance functions 1-3 (4-6 are 1-3 with custom overrides)
     # Where x is the IGroup's value, y is the current record's value, and m is a threshold value
     def _df1(self, x, y):
         """
@@ -38,6 +38,9 @@ class RBEISDistanceFunction:
         Distance Function 1: return 1 if x and y are not equal, otherwise 0.
         This function (and its derivative, DF4) can be used with any data types
         that are comparable using =.
+
+        e.g. _df1(2, 2) => 0
+             _df1(2, 4) => 1
         """
         return int(x != y)
 
@@ -52,6 +55,10 @@ class RBEISDistanceFunction:
         Distance Function 2: return 1 if the difference between x and y is
         greater than the threshold m, otherwise 0.  This function (and its
         derivative, DF5) may only be used with numeric data.
+
+        e.g. _df2(2, 2, 2) => 0
+             _df2(2, 3, 2) => 0
+             _df2(2, 8, 2) => 1
         """
         if not (isinstance(x, Number) or isinstance(y, Number)):
             raise TypeError(
@@ -76,6 +83,10 @@ class RBEISDistanceFunction:
         greater than the threshold m, otherwise return the difference between x
         and y, divided by m + 1.  This function (and its derivative, DF6) may
         only be used with numeric data.
+
+        e.g. _df3(2, 2, 3) => 0
+             _df3(2, 3, 3) => 0.25
+             _df3(2, 8, 3) => 1
         """
         if not (isinstance(x, Number) or isinstance(y, Number)):
             raise TypeError(
@@ -100,17 +111,30 @@ class RBEISDistanceFunction:
                                                standard RBEIS distance functions
         custom_map (('a * 'a) * numeric dict): [Optional] A dictionary mapping
                                                pairs (2-tuples) of values to
-                                               distances, overriding the
-                                               underlying standard distance
+                                               distances (value pair as key,
+                                               distance as value), overriding
+                                               the underlying standard distance
                                                function.  Note that (x,y) -> z
                                                does not imply that (y,x) -> z.
+                                               This is required for distance
+                                               functions 4, 5 and 6.
                           threshold (numeric): [Optional] A threshold value for
-                                               the distance function
+                                               distance functions 2, 3, 5 and 6.
                              weight (numeric): [Optional] A weight value by
                                                which to scale the output of the
                                                distance function
 
         Initialise a new RBEISDistanceFunction object with the above parameters.
+
+        e.g. myDF = RBEISDistanceFunction(6,
+                                          custom_map = {(2, 3): 4, (8, 8): 0.25},
+                                          threshold = 3,
+                                          weight = 10)
+             myDF(2, 2) => 0
+             myDF(2, 4) => 5
+             myDF(2, 8) => 10
+             myDF(2, 3) => 40
+             myDF(8, 8) => 2.5
         """
         self.weight = float(weight)
         if df < 1 or df > 6:
@@ -181,7 +205,31 @@ class RBEISDistanceFunction:
 
 def _check_missing_auxvars(data, aux_vars):
     """
-    TODO: Document
+    _check_missing_auxvars(data, aux_vars)
+
+
+                                  data (pd.DataFrame): The dataset undergoing
+                                                       imputation
+          aux_vars (str * RBEISDistanceFunction dict): A dictionary whose keys
+                                                       are strings corresponding
+                                                       to the names of auxiliary
+                                                       variables and whose values
+                                                       are the
+                                                       RBEISDistanceFunctions to
+                                                       be used to compare
+                                                       instances of each
+                                                       auxiliary variable.
+
+    Raise an RBEISInputException if the DataFrame contains any records for which
+    any of the chosen auxiliary variables are missing.
+
+    e.g. _check_missing_auxvars(pd.read_csv("my_data.csv"),
+                                {"height": RBEISDistanceFunction(1,
+                                                                 weight = 5),
+                                 "length": RBEISDistanceFunction(5,
+                                                                 custom_map = {(2, 3): 0,
+                                                                               (8, 8): 0.25},
+                                                                 threshold = 2)})
     """
     try:
         assert not (any([
@@ -204,10 +252,15 @@ def _add_impute_col(data, imp_var):
     data (pd.DataFrame): The dataset undergoing imputation
           imp_var (str): The name of the variable to be imputed
 
-    Prepare the DataFrame by adding a boolean column 'impute' indicating whether
-    or not a record is to be imputed.
+    Prepare the DataFrame by adding a boolean column '_impute' indicating
+    whether or not a record is to be imputed.  A record will be marked for
+    imputation if a value for the specified imputation variable is missing.
+    This function modifies the DataFrame in place, rather than returning a
+    new DataFrame.
+
+    e.g. _add_impute_col(pd.read_csv("my_data.csv"), "length")
     """
-    # data["_impute"] = np.isnan(data[imp_var]) # Does not work when imp_var is non-numeric
+    # Note that data["_impute"] = np.isnan(data[imp_var]) does not work when imp_var is non-numeric
     data["_impute"] = data.apply(
         lambda r: np.isnan(r[imp_var])
         if isinstance(r[imp_var], Number) else False,
