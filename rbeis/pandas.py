@@ -616,7 +616,7 @@ def impute(
         raise TypeError("Imputation variable name must be a string")
     if not (isinstance(possible_vals, list)):
         raise TypeError("Possible values must be contained in a list")
-    if not (all(map(lambda v: v in possible_vals,data[imp_var].unique()))):
+    if not (all(list(map(lambda v: v in possible_vals,data[imp_var].unique()))+[np.nan])):
         raise RBEISInputException("The column to undergo imputation contains values that are not included in possible_vals")
     if not (isinstance(aux_vars, dict)):
         raise TypeError(
