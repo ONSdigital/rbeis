@@ -616,6 +616,8 @@ def impute(
         raise TypeError("Imputation variable name must be a string")
     if not (isinstance(possible_vals, list)):
         raise TypeError("Possible values must be contained in a list")
+    if not (all(map(lambda v: v in possible_vals,data[imp_var].unique()))):
+        raise RBEISInputException("The column to undergo imputation contains values that are not included in possible_vals")
     if not (isinstance(aux_vars, dict)):
         raise TypeError(
             "aux_vars must be a dictionary whose keys are strings representing auxiliary vvariables and whose values are RBEISDistanceFunctions"
@@ -636,18 +638,6 @@ def impute(
             raise TypeError("The ratio must be numeric")
         if ratio < 1:
             raise RBEISInputException("The ratio must be greater than 1")
-    except AssertionError:
-        pass
-    try:
-        assert overwrite
-        if not (isinstance(overwrite, bool)):
-            raise TypeError("overwrite must be either True or False")
-    except AssertionError:
-        pass
-    try:
-        assert col_name
-        if not (isinstance(col_name, str)):
-            raise TypeError("col_name must be a string")
     except AssertionError:
         pass
     try:
