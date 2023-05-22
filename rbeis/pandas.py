@@ -24,6 +24,10 @@ class RBEISDistanceFunction:
     Callable object encapsulating one of the six RBEIS distance functions, its
     threshold value (where appropriate), any pairs of values to be overridden
     (for DFs 4-6), and a weight by which to scale its result.
+
+    PLEASE NOTE that, in rbeis._calc_distances, the argument order is assumed to
+    be (record, IGroup).  This is especially important when defining custom maps
+    for DFs 4-6, which *do not* assume that f(x,y) == f(y,x).
     """
 
     # Standard distance functions 1-3 (4-6 are 1-3 with custom overrides)
@@ -270,13 +274,14 @@ def _add_impute_col(data, imp_var):
 
 def _assign_igroups(data, aux_var_names):
     """
-    _assign_igroups(data, aux_vars)
+    _assign_igroups(data, aux_var_names)
 
-    data (pd.DataFrame): The dataset undergoing imputation
-    aux_vars (str list): The names of the chosen auxiliary variables
+         data (pd.DataFrame): The dataset undergoing imputation
+    aux_var_names (str list): The names of the chosen auxiliary variables
 
-    Add a column 'IGroup' containing integers representing the IGroup each
-    recipient record is assigned to:
+    Add a column 'IGroup' containing integers representing the IGroup that each
+    recipient record is assigned to.  This function modifies the DataFrame in
+    place, rather than returning a new DataFrame.
     1. Add a column '_conc_aux' containing the string representation of the list
        of values corresponding to the record's auxiliary variables
     2. Group by '_conc_aux' and extract group integers from the internal grouper
@@ -284,6 +289,8 @@ def _assign_igroups(data, aux_var_names):
     3. Subtract 1 from each IGroup value, giving -1 for all non-recipient
        records and zero-indexing all others
     4. Remove column '_conc_aux'
+
+    e.g. _assign_igroups(myDataFrame, ["height", "width", "length"]
     """
     data["_conc_aux"] = data.apply(
         lambda r: str(list(map(lambda v: r[v], aux_var_names)))
@@ -297,12 +304,15 @@ def _assign_igroups(data, aux_var_names):
 
 def _get_igroup_aux_var(data, aux_var_name):
     """
-    _get_igroup_aux_var(data, aux_var)
+    _get_igroup_aux_var(data, aux_var_name)
 
     data (pd.DataFrame): The dataset undergoing imputation
-          aux_var (str): The desired auxiliary variable
+     aux_var_name (str): The name of the desired auxiliary variable
 
     Return a list containing each IGroup's value of a given auxiliary variable.
+    The value at index i corresponds to the value for IGroup i.
+
+    e.g. _get_igroup_aux_var(myDataFrame, "height") => [188, 154, 192, ...]
     """
     out = []
     for i in range(1 + data["_IGroup"].max()):
@@ -315,28 +325,21 @@ def _get_igroup_aux_var(data, aux_var_name):
 
 def _calc_distances(data, aux_vars):
     """
-    _calc_distances(data, aux_vars, dist_func, weights, threshold=None,
-                    custom_df_map=None)
+    _calc_distances(data, aux_vars)
 
-                         data (pd.DataFrame): The dataset undergoing imputation
-                         aux_vars (str list): The names of the chosen auxiliary
-                                              variables
-                             dist_func (int): Which of the six standard distance
-                                              functions to use
-                weights (str * numeric dict): Dictionary with auxiliary variable
-                                              names as keys and chosen weights
-                                              as values
-                         threshold (numeric): [Optional] A threshold value for
-                                              the distance function, if required
-    custom_df_map (('a * 'a) * numeric dict): [Optional] A dictionary mapping
-                                              pairs (2-tuples) of values to
-                                              distances, overriding the
-                                              underlying standard distance
-                                              function.  Note that (x,y) -> z
-                                              does not imply that (y,z) -> z.
+                            data (pd.DataFrame): The dataset undergoing
+                                                 imputation
+    aux_vars (str * RBEISDistanceFunction dict): A dictionary whose keys are
+                                                 strings corresponding to the
+                                                 names of auxiliary variables
+                                                 and whose values are the
+                                                 RBEISDistanceFunctions to be
+                                                 used to compare instances of
+                                                 each auxiliary variable.
 
     Add a column '_distances' containing lists of calculated distances of each
-    record's auxiliary variables from those of its IGroup:
+    record's auxiliary variables from those of its IGroup.  This function
+    modifies the DataFrame in place, rather than returning a new DataFrame.
     1. Create a list of dictionaries containing the values of each IGroup's
        auxiliary variables
     2. Add a column '_dists_temp' containing, for each potential donor record, a
@@ -346,9 +349,14 @@ def _calc_distances(data, aux_vars):
        taking into account the specified weights
     4. Remove column '_dists_temp'
 
-    TODO: Document that when DFs are called, the argument order is (record,
-    IGroup) - this is relevant when defining custom_map and has led to some
-    confusion in testing.
+    PLEASE NOTE that the argument order is assumed to be (record, IGroup).  This
+    is especially important when using custom maps with distance functions 4-6,
+    which *do not* assume that f(x,y) == f(y,x).
+
+    e.g. _calc_distances(myDataFrame, {"length": RBEISDistanceFunction(2, threshold=1.5),
+                                       "genre": RBEISDistanceFunction(1, weight=8),
+                                       "rating": RBEISDistanceFunction(4, custom_map={(3,4): 0,
+                                                                                      (1,1): 10}})
     """
     igroup_aux_vars = []
     vars_vals = list(
@@ -380,22 +388,25 @@ def _calc_distances(data, aux_vars):
 
 def _calc_donors(data, ratio=None):
     """
-    _calc_donors(data, min_quantile=None)
+    _calc_donors(data, ratio=None)
 
     data (pd.DataFrame): The dataset undergoing imputation
-     min_quantile (int): [Optional] Instead of choosing the minimum distance,
-                         choose records in the lowest n-quantile, where
-                         min_quantile specifies n (e.g. if min_quantile is 10,
-                         then accept records in the bottom decile).
+        ratio (numeric): [Optional] Instead of choosing the minimum distance,
+                         choose records less than or equal to ratio * the
+                         minimum distance.
 
     Add a column 'donor' containing a list of IGroup numbers to which each
-    record is a donor.
+    record is a donor.  This function modifies the DataFrame in place, rather
+    than returning a new DataFrame.
     1. Calculate the distances less than or equal to which a record may be
        accepted as a donor to each respective IGroup.
     2. Zip each record's distances to the list of distances calculated in step
        1, and identify where the record distances are less than or equal to the
        maximum required IGroup distances, giving a list of indices where this is
        the case.
+
+    e.g. _calc_donors(myDataFrame)
+         _calc_donors(myDataFrame, ratio=2.5)
     """
     igroups_dists = np.array(
         data.query("not(_impute)")["_distances"].values.tolist()).T.tolist()
@@ -424,6 +435,8 @@ def _get_donors(data, igroup):
 
     Return a list of indices corresponding to records in data that are donors to
     the specified IGroup.
+
+    e.g. _get_donors(myDataFrame, 24) => [10, 14, 29, ...]
     """
     return list(map(lambda x: igroup in x, data["_donor"].values.tolist()))
 
@@ -439,7 +452,9 @@ def _get_freq_dist(data, imp_var, possible_vals, igroup):
 
     For a given IGroup, return a frequency distribution for each possible value
     of the variable to be imputed.  This takes the form of a list of the
-    proportions of a given igroup taken up by each possible value.
+    proportions of a given IGroup taken up by each possible value.
+
+    e.g. _get_freq_fist(myDataFrame, "genre", ["jungle", "acid house", "UK garage"], 48) => [0.5, 0.3, 0.2]
     """
     pool = data[_get_donors(data, igroup)][imp_var].values.tolist()
     return list(
@@ -462,6 +477,8 @@ def _freq_to_exp(data, freq_dist, igroup):
 
     Convert a frequency distribution to the expected numbers of occurrences for
     a given IGroup.
+
+    e.g. _freq_to_exp(myDataFrame, [0.5, 0.3, 0.2], 48) => [100, 60, 40]
     """
     igroup_size = len(data.query("_IGroup==" + str(igroup)).values.tolist())
     return list(map(lambda f: f * igroup_size, freq_dist))
@@ -488,6 +505,8 @@ def _impute_igroup(data, exp_dist, possible_vals, igroup):
        probabilities accordingly
     4. Repeat step 3 until there are no more values still to impute
     5. Randomise the order of the list of imputed values, then return it
+
+    e.g. _impute_igroup(myDataFrame, [100, 60, 40], ["jungle", "acid house", "UK garage"], 48)
     """
     out = []
     if all(map(lambda e: e == 0, exp_dist)):
@@ -525,65 +544,50 @@ def impute(
     possible_vals,
     aux_vars,
     ratio=None,
-    overwrite=False,
-    col_name=None,
     in_place=True,
     keep_intermediates=False,
 ):
     """
-    impute(data, imp_var, possible_vals, aux_vars, weights, dist_func,
-           threshold=None, custom_df_map=None, min_quantile=None,
-           overwrite=False, col_name=None, in_place=True,
+    impute(data, imp_var, possible_vals, aux_vars, ratio=None, in_place=True,
            keep_intermediates=False)
 
-                         data (pd.DataFrame): The dataset undergoing imputation
-                               imp_var (str): The name of the variable to be
-                                              imputed
-                     possible_vals ('a list): A list of all possible values that
-                                              imp_var can take
-                aux_vars (str * numeric dict): Dictionary with auxiliary variable
-                                              names as keys and chosen weights
-                                              as values
-                             dist_func (int): Which of the six standard distance
-                                              functions to use
-                         threshold (numeric): [Optional] A threshold value for
-                                              the distance function, if required
-    custom_df_map (('a * 'a) * numeric dict): [Optional] A dictionary mapping
-                                              pairs (2-tuples) of values to
-                                              distances, overriding the
-                                              underlying standard distance
-                                              function.  Note that (x,y) -> z
-                                              does not imply that (y,z) -> z.
-                          min_quantile (int): [Optional] Instead of choosing the
-                                              minimum distance, choose records
-                                              in the lowest n-quantile, where
-                                              min_quantile specifies n (e.g. if
-                                              min_quantile is 10, then accept
-                                              records in the bottom decile).
-                            overwrite (bool): [Optional, default False] True if
-                                              the column to undergo imputation
-                                              should be overwritten with the
-                                              results, False if imputed values
-                                              are to go into a new column.
-                              col_name (str): [Optional] If overwrite is False,
-                                              the name of the new column in
-                                              which to write the imputed values
-                             in_place (bool): [Optional, default True] If True,
-                                              modify the original DataFrame in
-                                              place.  If False, return a new
-                                              (deep) copy of the DataFrame
-                                              having undergone imputation.
-                   keep_intermediates (bool): [Optional, default False] If True,
-                                              retain the intermediate columns
-                                              created by this implementation of
-                                              RBEIS in the process of
-                                              imputation.  If False,
-                                              remove them from the output.
+                            data (pd.DataFrame): The dataset undergoing
+                                                 imputation
+                                  imp_var (str): The name of the variable to be
+                                                 imputed
+                        possible_vals ('a list): A list of all possible values
+                                                 that imp_var can take
+    aux_vars (str * RBEISDistanceFunction dict): A dictionary whose keys are
+                                                 strings corresponding to the
+                                                 names of auxiliary variables
+                                                 and whose values are the
+                                                 RBEISDistanceFunctions to be
+                                                 used to compare instances of
+                                                 each auxiliary variable.
+                                ratio (numeric): [Optional] Instead of choosing
+                                                 the minimum distance, choose
+                                                 records less than or equal to
+                                                 ratio * the minimum distance.
+                                in_place (bool): [Optional, default True] If
+                                                 True, modify the original
+                                                 DataFrame in place.  If False,
+                                                 return a new (deep) copy of the
+                                                 DataFrame having undergone
+                                                 imputation.
+                      keep_intermediates (bool): [Optional, default False] If
+                                                 True, retain the intermediate
+                                                 columns created by this
+                                                 implementation of RBEIS in the
+                                                 process of imputation.  If
+                                                 False, remove them from the
+                                                 output.
 
     Impute missing values for a given variable using the Rogers & Berriman
-    Editing and Imputation System (RBEIS).  A high-level overview of the
-    approach is given here (for more detail, see the documentation for each of
-    the intermediate functions in this library):
+    Editing and Imputation System (RBEIS).  By default, this function modifies
+    the existing DataFrame in place, rather than returning a new DataFrame,
+    unless in_place is set to False.  A high-level overview of the approach is
+    given here (for more detail, see the documentation for each of the
+    intermediate functions in this library):
     1. Identify values to be imputed
     2. Assign imputation groups ("IGroups") based on a given set of auxiliary
        variables
@@ -593,6 +597,16 @@ def impute(
        IGroups
     5. Impute values for each IGroup
     6. Insert imputed values into the original DataFrame
+
+    e.g. impute(pd.read_csv("my_data.csv"),
+                "genre",
+                ["jungle", "acid house", "UK garage"],
+                {"artist": RBEISDistanceFunction(1, weight = 5),
+                 "bpm": RBEISDistanceFunction(5, custom_map = {(170, 180): 0, (140, 160): 100}, threshold = 5),
+                 "length": RBEISDistanceFunction(2, threshold = 1.25)},
+                ratio = 1.5,
+                in_place = False,
+                keep_intermediates = True)
     """
 
     # Input checks
@@ -657,8 +671,6 @@ def impute(
     _assign_igroups(data, aux_vars.keys())
     _calc_distances(data, aux_vars)
     _calc_donors(data, ratio=ratio)
-    # TODO: tidy this up and return the dataframe properly (or modify in place)
-    # TODO: include optional keyword arguments
     imputed_vals = list(
         map(
             lambda i: _impute_igroup(
