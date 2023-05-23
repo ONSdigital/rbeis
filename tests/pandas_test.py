@@ -52,7 +52,7 @@ class RBEISTestCase(TestCase):
 
 
 # =============================================================================
-# --------------- TESTING TEMPLATE ---------------------------
+# ----------------------      TESTING TEMPLATE      ---------------------------
 # =============================================================================
 # - Test type validation on all input parameters
 # - Test constraints on input parameters:
@@ -161,7 +161,7 @@ class TestInputTypeValidation(RBEISTestCase):
             )
 
     # --- Test type validation on auxiliary variables dictionary keys (string) ---
-    def test_type_validation_aux_vars(self):
+    def test_type_validation_aux_var_keys(self):
         with self.assertRaises(TypeError):
             impute(
                 data=self.dummy_dataframe,
@@ -373,9 +373,9 @@ class TestInputTypeValidation(RBEISTestCase):
                 keep_intermediates="Not_a_Boolean",
             )
 
-# ----------------------------------------------
-# --- TESTS: CHECK VALUES OFINPUT VARIABLES  ---
-# ----------------------------------------------
+# -----------------------------------------------------------------------------
+# TESTS: CHECK VALUES OF INPUT VARIABLES 
+# -----------------------------------------------------------------------------
 class TestInputValues(RBEISTestCase):
 
     # --- Test exception when impute variable is not in the dataframe  ---
