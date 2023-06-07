@@ -957,48 +957,51 @@ class TestAddImputeCol(RBEISTestCase):
 class TestAssignIgroups(RBEISTestCase):
 
     # --- Test Igroup column values are assigned correctly ---
+    # Categorical auxiliary variable used to ensure there are some iGroups
+    # with a single recipient and some with multiple recipients
     def test_assign_igroups(self):
         test_data = pd.read_csv(self.test_data_filepath)
         _add_impute_col(test_data, self.test_impute_var)
-        _assign_igroups(test_data, [self.test_aux_var1, self.test_aux_var2])
+        _assign_igroups(test_data, [self.test_aux_var1, self.test_aux_var_categorial])
 
         # Check Igroup is set to -1 for non-recipient records
         donors = test_data[test_data["_impute"] == False]
         for row_index in range(donors.shape[0]):
             self.assertTrue(donors["_IGroup"].values[row_index] == -1)
 
-        # Check Igroup isassigned for recipiants
-        recipiants = test_data[test_data["_impute"] == True]
-        for row_index in range(recipiants.shape[0]):
-            self.assertTrue(recipiants["_IGroup"].values[row_index] > -1)
+        # Check Igroup is assigned for recipients
+        recipients = test_data[test_data["_impute"] == True]
+        for row_index in range(recipients.shape[0]):
+            self.assertTrue(recipients["_IGroup"].values[row_index] > -1)
 
-        # Calculate how many recipiants in each IGroup
-        recipiant_freq = recipiants.groupby(by="_IGroup")["_IGroup"].count()
+        # Calculate how many recipients in each IGroup
+        recipient_freq = recipients.groupby(by="_IGroup")["_IGroup"].count()
 
         # Check records assigned to same IGroup have same valueas for
         # auxiliary variables
-        multiple_recipiant_igroups = recipiant_freq[recipiant_freq > 1].index
-        for igroup_number in multiple_recipiant_igroups:
+        multiple_recipient_igroups = recipient_freq[recipient_freq > 1].index
+        
+        for igroup_number in multiple_recipient_igroups:
             igroup_data = test_data[test_data["_IGroup"] == igroup_number]
             self.assertTrue(len(igroup_data[self.test_aux_var1].unique()) == 1)
-            self.assertTrue(len(igroup_data[self.test_aux_var2].unique()) == 1)
+            self.assertTrue(len(igroup_data[self.test_aux_var_categorial].unique()) == 1)         
 
-        # Check single recipiant IGroups all have different combination of
+        # Check single recipient IGroups all have different combination of
         # auxiliary variables
-        single_recipiant_list = recipiant_freq[recipiant_freq == 1].index
-        single_recipiant_data = test_data.copy()
-        single_recipiant_data = single_recipiant_data[
-            single_recipiant_data["_IGroup"].isin(single_recipiant_list)]
+        single_recipient_list = recipient_freq[recipient_freq == 1].index
+        single_recipient_data = test_data.copy()
+        single_recipient_data = single_recipient_data[
+            single_recipient_data["_IGroup"].isin(single_recipient_list)]
 
-        single_recipiant_data["combine_aux_vars"] = (
-            single_recipiant_data[self.test_aux_var1].astype(str) + " " +
-            single_recipiant_data[self.test_aux_var2].astype(str))
+        single_recipient_data["combine_aux_vars"] = (
+            single_recipient_data[self.test_aux_var1].astype(str) + " " +
+            single_recipient_data[self.test_aux_var_categorial].astype(str))
 
-        single_recipiant_freq = single_recipiant_data.groupby(
+        single_recipient_freq = single_recipient_data.groupby(
             by="combine_aux_vars")["combine_aux_vars"].count()
 
         self.assertTrue(
-            len(single_recipiant_freq[single_recipiant_freq > 1].index) == 0)
+            len(single_recipient_freq[single_recipient_freq > 1].index) == 0)
 
 
 # -----------------------------------------------------------------------------
@@ -1286,10 +1289,10 @@ class TestCalcDonors(RBEISTestCase):
         # Test for ratio = None
         _calc_donors(test_data, ratio=None)
 
-        # Check recipiants have empty list in donors column
-        recipiants = test_data[test_data["_impute"] == True]
-        for row_index in range(recipiants.shape[0]):
-            self.assertTrue(len(recipiants["_donor"].values[row_index]) == 0)
+        # Check recipients have empty list in donors column
+        recipients = test_data[test_data["_impute"] == True]
+        for row_index in range(recipients.shape[0]):
+            self.assertTrue(len(recipients["_donor"].values[row_index]) == 0)
 
         # Check donor records have list of correct iGroups
         for igroup_nummber in range(1 + test_data["_IGroup"].max()):
@@ -1311,10 +1314,10 @@ class TestCalcDonors(RBEISTestCase):
         test_data = test_data.drop('_donor', axis=1)
         _calc_donors(test_data, ratio=2)
         
-        # Check recipiants have empty list in donors column
-        recipiants = test_data[test_data["_impute"] == True]
-        for row_index in range(recipiants.shape[0]):
-            self.assertTrue(len(recipiants["_donor"].values[row_index]) == 0)
+        # Check recipients have empty list in donors column
+        recipients = test_data[test_data["_impute"] == True]
+        for row_index in range(recipients.shape[0]):
+            self.assertTrue(len(recipients["_donor"].values[row_index]) == 0)
 
         # Check donors have list of correct iGroups
         for igroup_nummber in range(1 + test_data["_IGroup"].max()):
@@ -1469,8 +1472,8 @@ class TestFrequencyToExpected(RBEISTestCase):
         _calc_donors(data=test_data, ratio=None)
 
         # Calculate the size of each iGroup
-        recipiants = test_data[test_data[self.test_impute_var].isnull()]
-        igroup_size = recipiants.groupby(by="_IGroup")["_IGroup"].count()
+        recipients = test_data[test_data[self.test_impute_var].isnull()]
+        igroup_size = recipients.groupby(by="_IGroup")["_IGroup"].count()
 
         # For each iGroup, test that the expected values assigned to
         # possible values add up to the number in each iGroup
