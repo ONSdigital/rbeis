@@ -689,3 +689,18 @@ def impute(
         data = deepcopy(data_old)
         del data_old
         return data_new
+
+def _parse_imp_spec(imp_spec):
+    """
+    TODO
+    """
+
+def impute_from_spec(spec_file,encoding=None):
+    """
+    TODO
+    """
+    try:
+        imp_spec = pd.read_csv(spec_file,encoding=encoding)
+    except UnicodeDecodeError:
+        print("Your ImpSpec file appears to be in a format other than UTF-8.  Try again, but this set the `encoding` kwarg to one of Python's recognised encodings (see https://docs.python.org/3/library/codecs.html#standard-encodings)..")
+        exit(1)
