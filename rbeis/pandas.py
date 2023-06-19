@@ -7,6 +7,7 @@ from numpy.random import choice
 from random import shuffle
 from numbers import Number
 from copy import deepcopy
+from ast import literal_eval
 
 
 class RBEISInputException(Exception):
@@ -690,17 +691,34 @@ def impute(
         del data_old
         return data_new
 
+def _check_valid_response_imp_spec(data,imp_spec_entry):
+    """
+    TODO
+    """
+    e = imp_spec_entry.to_dict()
+    check = e["valid_response"].replace("&","and").replace("|","or").replace(e["variable"],'r["'+e["variable"]+'"]')
+    try:
+        assert all(data.apply(lambda r: eval(check),axis=1).tolist()) # FIXME: inelegant and probably dangerous - also, should this use ast.literal_eval?
+    except AssertionError:
+        raise RBEISInputException("There are values of "+e["variable"]+" that do not meet the validity condition given in the imputation specification ("+e["valid_response"]+")")
+
+# TODO: REMOVE TEST DATA #######################################################
+d = pd.read_csv("tests/artists_unique_galcount_spaceavg_missing.csv")
+spec = pd.read_csv("impspec_example_was_round_8.csv",encoding="latin_1")
+d[spec.loc[0]["variable"]] = d["moma_count"].copy()
+# TODO: REMOVE TEST DATA #######################################################
+
 def _parse_imp_spec(imp_spec):
     """
     TODO
     """
+    pass
 
-def impute_from_spec(spec_file,encoding=None):
+def impute_from_spec(spec_file,encoding=None): # TODO: options to be passed to impute
     """
     TODO
     """
     try:
         imp_spec = pd.read_csv(spec_file,encoding=encoding)
     except UnicodeDecodeError:
-        print("Your ImpSpec file appears to be in a format other than UTF-8.  Try again, but this set the `encoding` kwarg to one of Python's recognised encodings (see https://docs.python.org/3/library/codecs.html#standard-encodings)..")
-        exit(1)
+        raise RBEISInputException("Your ImpSpec file appears to be in a format other than UTF-8.  Try again, but this set the `encoding` kwarg to one of Python's recognised encodings (see https://docs.python.org/3/library/codecs.html#standard-encodings)..")
