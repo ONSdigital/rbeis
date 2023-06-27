@@ -4,4 +4,4 @@ dist
 **/*.swp
 impspec_example_was_round_8.csv
 i.csv
-impspec_notes.txt
+impspec_notes*
