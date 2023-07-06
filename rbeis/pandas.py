@@ -8,6 +8,7 @@ from random import shuffle
 from numbers import Number
 from copy import deepcopy
 from ast import literal_eval
+from re import sub
 
 
 class RBEISInputException(Exception):
@@ -691,22 +692,65 @@ def impute(
         del data_old
         return data_new
 
-def _check_valid_response_imp_spec(data,imp_spec_entry):
-    """
-    TODO
-    """
-    e = imp_spec_entry.to_dict()
-    check = e["valid_response"].replace("&","and").replace("|","or").replace(e["variable"],'r["'+e["variable"]+'"]')
-    try:
-        assert all(data.apply(lambda r: eval(check),axis=1).tolist()) # FIXME: inelegant and probably dangerous - also, should this use ast.literal_eval?
-    except AssertionError:
-        raise RBEISInputException("There are values of "+e["variable"]+" that do not meet the validity condition given in the imputation specification ("+e["valid_response"]+")")
-
 # TODO: REMOVE TEST DATA #######################################################
 d = pd.read_csv("tests/artists_unique_galcount_spaceavg_missing.csv")
 spec = pd.read_csv("impspec_example_was_round_8.csv",encoding="latin_1")
 d[spec.loc[0]["variable"]] = d["moma_count"].copy()
+d['wrkingr8']=1
+d['wrkingr8'].loc[0]=8
+d['was_flagr8']=1
+d['dvager8']=32
+d['iout1r8']=1
 # TODO: REMOVE TEST DATA #######################################################
+
+    # input checks
+    # check missing auxvars
+    # add impute col
+    # assign igroups
+    # calculate distances
+    # calculate donors
+    # impute
+
+    # dataframe
+    # imputation variable == "variable"
+    # possible values ~= "valid_response"
+    # auxvars (incl. DFs, custom maps, thresholds, weights)
+    # ratio of minimum below which to accept
+    # in_place
+    # keep_intermediates
+
+    # TODO: change possible_vals from a list to a condition/function in (univariate) impute?
+
+def _check_valid_response_imp_spec(data,imp_spec_entry):
+    """
+    TODO
+    """
+    # FIXME: exclude nans otherwise this will always fail!
+    # FIXME: use of `eval` inelegant and probably dangerous - also, should this use ast.literal_eval?
+    e = imp_spec_entry.to_dict()
+    # Convert ImpSpec format to Python expressions
+    check_valid_response = e["valid_response"].replace("&","and").replace("|","or").replace(e["variable"],'r["'+e["variable"]+'"]')
+    check_route = sub(r'(\b\w[a-zA-Z]\w*\b)',r'r["\1"]',e["route"]).replace("&","and").replace("|","or")
+    # If any records have invalid responses, mark them for imputation
+    data["_impute"] = data.apply(lambda r: r["_impute"] or not eval(check_valid_response),axis=1)
+    # If any records fail the route check, throw an exception
+    try:
+        assert all(data.apply(lambda r: eval(check_route),axis=1).tolist())
+    except AssertionError:
+        raise RBEISInputException("There are some records which do not meet the condition given in the `route` column in the imputation specification ("+e["route"]+")")
+
+def _generate_df_col(data,imp_spec_entry):
+    """
+    TODO
+    Generate a new column `_df` containing an RBEISDistanceFunction derived from the ImpSpec - this can later be used as the argument to `impute`
+    If none provided, assume DF1
+    """
+    # FIXME: Don't just assume DF1; find out how HFS does it automatically
+    # FIXME: use of `eval` inelegant and probably dangerous - also, should this use ast.literal_eval?
+    spec['_tmp_auxvars'] = spec.apply(lambda r: eval(r['matching_variables']),axis=1)
+    spec['_tmp_df'] =  spec.apply(lambda r: {k: int(v[0]) for k,v in list(eval(r['distance_function']).items()),axis=1)
+    # TODO check that any vars covered by the `distance_function` column are in `matching_variables`
+    pass
 
 def _parse_imp_spec(imp_spec):
     """
@@ -717,7 +761,10 @@ def _parse_imp_spec(imp_spec):
 def impute_from_spec(spec_file,encoding=None): # TODO: options to be passed to impute
     """
     TODO
+    N.B. This assumes an HFS- or WAS-style ImpSpec
     """
+    if any(map(lambda v: not np.isnan(v),spec_file[spec_file['rbeis_on']['imputation_minimum_value'].tolist())):
+        warnings.warn("You have provided `imputation_minimum_value` values for some records using RBEIS, not CANCEIS.  These values will be ignored.",RBEISInputWarning)
     try:
         imp_spec = pd.read_csv(spec_file,encoding=encoding)
     except UnicodeDecodeError:
