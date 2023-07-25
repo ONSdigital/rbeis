@@ -1,6 +1,46 @@
-# Example usage
+# Rogers and Berriman Editing and Imputation System (RBEIS)
 
-> _**N.B.:** This guide assumes familiarity with the RBEIS algorithm.  If you are not familiar with how RBEIS works, please consult the methodological specification._
+## 1 Meta
+
+- **Support Area:** Editing and Imputation
+- **Method Theme:** Editing and Imputation
+- **Last reviewed:** 2023-07-25
+
+## 2 Terminology
+
+<!--
+A bulleted list of technical terms specific to this method that are used in the specification
+-->
+
+TODO
+
+## 3 Summary
+
+<!--
+A brief (~100 words) summary of what your method does, how it achieves it, and what kinds of data it expects to receive and produce.  These will each be explored in greater depth in later sections, so make sure not to go into too much detail here
+-->
+
+RBEIS is a method originally developed for imputing categorical data in relatively small social surveys with the intention of minimising conditional imputation variance.  It is derived from CANCEIS, which is better suited to large datasets such as the Census.  RBEIS differs from CANCEIS by constructing donor pools for each IGroup, rather than for each record.  These donor pools are then further processed to be the same size as the IGroup.  This implementation of RBEIS expects a Pandas DataFrame as input.
+
+## 4 Assumptions
+
+<!--
+A bulleted list of assumptions that your method makes about its inputs
+-->
+
+TODO
+
+## 5 Method input and output
+
+<!--
+A section detailing the kinds of data that your method expects to receive as input and produce as output, along with any related information (e.g. “fields must not contain null values”)
+-->
+
+### 5.1 Input records
+
+<!--
+Details about the expected input, including (if applicable) the expected fields within each record and the formats in which they are expected
+-->
 
 `impute` is the function that runs RBEIS on a Pandas DataFrame.  It takes four required positional arguments, and has several optional keyword arguments.  An example call to `impute` follows:
 
@@ -60,3 +100,43 @@ It is possible to provide redundant arguments, for example providing a threshold
 myDF = RBEISDistanceFunction(6, custom_map = {(1, 2): 10, (5, 3): 400}, threshold = 2.5, weight = 4)
 myDF(2,3)
 ```
+
+### 5.2 Output records
+
+<!--
+Details about the require output, including (if applicable) the expected fields within each record and the formats in which they are required
+-->
+
+`impute` modifies its input DataFrame by adding a new column containing the imputed values for a given variable, named _`<variable>`_`_imputed`.  If `in_place` is set to `False`, a new DataFrame containing this column is returned.
+
+### 5.3 Error handling
+
+<!--
+Details about what the method should do in the event of various classes of errors
+-->
+
+RBEIS performs extensive checks on its inputs.  Where checks find incompatible or nonsensical inputs, an exception is raised and `impute` is terminated.  `TypeError`s are raised when inputs of inappropriate type are supplied. `RBEISInputException`s are raised where inputs do not make sense for RBEIS (e.g. choosing distance function 7 when RBEIS only provides six) or where required data is missing.  Where checks find unnecessary inputs (for example redundant optional arguments), a warning of class `RBEISInputWarning` is raised.
+
+### 5.4 Metadata
+
+<!--
+Details about what other metadata should be provided by the method, e.g. the number of times a donor was used in imputation
+-->
+
+Currently, RBEIS collects no metadata by default.  If `keep_intermediates` is set to `True`, the temporary values calculated by the `impute` function are able to be inspected post-imputation.  These values are IGroup assignments, calculated distances and records to which each record may be a donor.
+
+## 6 Method
+
+<!--
+A detailed, formal, prose description of your method including, where appropriate, the underlying mathematics.  This section is best broken up into multiple subsections, especially for more complex methods
+-->
+
+1. TODO
+
+## 7 Further information
+
+<!--
+If appropriate, a bulleted list of links to external documents that provide further information about the method
+-->
+
+- [Presentation to UNECE, September 2020](https://web.archive.org/web/20230725125247/https://unece.org/fileadmin/DAM/stats/documents/ece/ces/ge.58/2020/mtg1/SDE2020_T1-A_UK_Leather_Presentation.pdf)

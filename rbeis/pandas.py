@@ -410,6 +410,11 @@ def _calc_donors(data, ratio=None):
     e.g. _calc_donors(myDataFrame)
          _calc_donors(myDataFrame, ratio=2.5)
     """
+    if ratio:
+        try:
+            assert ratio>=1
+        except AssertionError:
+            raise RBEISInputException("You have provided a ratio value of less than 1, meaning that RBEIS would be looking for distances less than the minimum")
     igroups_dists = np.array(
         data.query("not(_impute)")["_distances"].values.tolist()).T.tolist()
     max_donor_dists = list(
