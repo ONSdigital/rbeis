@@ -107,7 +107,7 @@ myDF(2,3)
 Details about the require output, including (if applicable) the expected fields within each record and the formats in which they are required
 -->
 
-`impute` modifies its input DataFrame by adding a new column containing the imputed values for a given variable, named _`<variable>`_`_imputed`.  If `in_place` is set to `False`, a new DataFrame containing this column is returned.
+`impute` modifies its input DataFrame by adding a new column containing the imputed values for a given variable, named <code><em>&lt;variable&gt;</em>_imputed</code>.  If `in_place` is set to `False`, a new DataFrame containing this column is returned.
 
 ### 5.3 Error handling
 
@@ -131,7 +131,10 @@ Currently, RBEIS collects no metadata by default.  If `keep_intermediates` is se
 A detailed, formal, prose description of your method including, where appropriate, the underlying mathematics.  This section is best broken up into multiple subsections, especially for more complex methods
 -->
 
-1. TODO
+1. Assign each record requiring imputation to an imputation group ("IGroup") based on the values of its auxiliary variables.
+1. Calculate distances
+1. Determine donors
+1. Impute
 
 ## 7 Further information
 
