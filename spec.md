@@ -142,7 +142,7 @@ $$
 \sum_{v \in A} w_{v}{f_{v}(v_{record},v_{IGroup})}
 $$
 
-    Where $A$ is the set of auxiliary variables, $w_v$ is the weight assigned to the auxiliary variable $v$, $f_v$ is the distance function assigned to the auxiliary variable $v$, $v_{record}$ is the value of the auxiliary variable for the current record, and $v_{IGroup}$ is the value of the auxiliary variable for the current IGroup.
+  Where $A$ is the set of auxiliary variables, $w_v$ is the weight assigned to the auxiliary variable $v$, $f_v$ is the distance function assigned to the auxiliary variable $v$, $v_{record}$ is the value of the auxiliary variable for the current record, and $v_{IGroup}$ is the value of the auxiliary variable for the current IGroup.
 1. Determine donors
 1. Impute
 
