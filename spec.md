@@ -29,6 +29,8 @@ A bulleted list of assumptions that your method makes about its inputs
 -->
 
 TODO
+- DFs expect (record, IGroup) ordering
+- DFs assume that categorical data is ordered, i.e. cat 1 is less than cat 2
 
 ## 5 Method input and output
 
@@ -107,7 +109,9 @@ myDF(2,3)
 Details about the require output, including (if applicable) the expected fields within each record and the formats in which they are required
 -->
 
-`impute` modifies its input DataFrame by adding a new column containing the imputed values for a given variable, named <code><em>&lt;variable&gt;</em>_imputed</code>.  If `in_place` is set to `False`, a new DataFrame containing this column is returned.
+TODO: Uncomment
+
+<!--`impute` modifies its input DataFrame by adding a new column containing the imputed values for a given variable, named <code><em>&lt;variable&gt;</em>_imputed</code>.  If `in_place` is set to `False`, a new DataFrame containing this column is returned.-->
 
 ### 5.3 Error handling
 
@@ -132,9 +136,23 @@ A detailed, formal, prose description of your method including, where appropriat
 -->
 
 1. Assign each record requiring imputation to an imputation group ("IGroup") based on the values of its auxiliary variables.
-1. Calculate distances
+1. For each record requiring imputation, calculate the distance between the values of its auxiliary variables and those of each IGroup.  Each auxiliary variable should have a distance function assigned to it, and may also be assigned a weight.  The total distance is calculated thus:
+
+$$
+\sum_{v \in A} w_{v}{f_{v}(v_{record},v_{IGroup})}
+$$
+
+Where $A$ is the set of auxiliary variables, $w_v$ is the weight assigned to the auxiliary variable $v$, $f_v$ is the distance function assigned to the auxiliary variable $v$, $v_{record}$ is the value of the auxiliary variable for the current record, and $v_{IGroup}$ is the value of the auxiliary variable for the current IGroup.
 1. Determine donors
 1. Impute
+
+- IGroup
+- Auxiliary variable
+- Distance
+- Donor pool
+- Donor
+- Impute
+- Distance function
 
 ## 7 Further information
 
