@@ -138,11 +138,11 @@ A detailed, formal, prose description of your method including, where appropriat
 1. Assign each record requiring imputation to an imputation group ("IGroup") based on the values of its auxiliary variables.
 1. For each record requiring imputation, calculate the distance between the values of its auxiliary variables and those of each IGroup.  Each auxiliary variable should have a distance function assigned to it, and may also be assigned a weight.  The total distance is calculated thus:
 
-$$
-\sum_{v \in A} w_{v}{f_{v}(v_{record},v_{IGroup})}
-$$
+    $$
+    \sum_{v \in A} w_{v}{f_{v}(v_{record},v_{IGroup})}
+    $$
 
-Where $A$ is the set of auxiliary variables, $w_v$ is the weight assigned to the auxiliary variable $v$, $f_v$ is the distance function assigned to the auxiliary variable $v$, $v_{record}$ is the value of the auxiliary variable for the current record, and $v_{IGroup}$ is the value of the auxiliary variable for the current IGroup.
+    Where $A$ is the set of auxiliary variables, $w_v$ is the weight assigned to the auxiliary variable $v$, $f_v$ is the distance function assigned to the auxiliary variable $v$, $v_{record}$ is the value of the auxiliary variable for the current record, and $v_{IGroup}$ is the value of the auxiliary variable for the current IGroup.
 1. Determine donors
 1. Impute
 
