@@ -12,17 +12,21 @@ from re import sub
 
 
 class RBEISInputException(Exception):
+    """
+    Exception raised in the case of faulty input to `impute` that is not covered by a TypeError.
+    """
     pass
 
 
 class RBEISInputWarning(UserWarning):
+    """
+    Warning raised in the case of redundant input to `impute`.
+    """
     pass
 
 
 class RBEISDistanceFunction:
     """
-    RBEISDistanceFunction
-
     Callable object encapsulating one of the six RBEIS distance functions, its
     threshold value (where appropriate), any pairs of values to be overridden
     (for DFs 4-6), and a weight by which to scale its result.
