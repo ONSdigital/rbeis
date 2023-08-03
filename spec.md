@@ -4,7 +4,7 @@
 
 - **Support Area:** Editing and Imputation
 - **Method Theme:** Editing and Imputation
-- **Last reviewed:** 2023-07-25
+- **Last reviewed:** 2023-08-03
 
 ## 2 Terminology
 
@@ -12,7 +12,15 @@
 A bulleted list of technical terms specific to this method that are used in the specification
 -->
 
-TODO
+- **Auxiliary variable:** One of a set of variables that will be used to determine the similarity of potential donor records to records requiring imputation
+- **Distance:** A numerical measure of how similar two records are to each other
+- **Distance function:** One of six pre-defined functions used to calculate the distance between two records
+- **Donor pool:** The set of values from which records requiring imputation may draw.  The donor pool is the result of processing carried out on the potential donor pool.
+- **IGroup:** 'Imputation Group', records requiring imputation whose auxiliary variables have the same values.
+- **Imputation variable:** The variable for which values are being imputed.
+- **Impute:** To suggest likely values for missing data based on other existing data.
+- **Potential donor pool:** The set of potential donor records that will be processed into the donor pool for an IGroup.
+- **Potential donor record:** A record not requiring imputation that may, therefore, contribute the value of its imputation variable.
 
 ## 3 Summary
 
@@ -28,9 +36,8 @@ RBEIS is a method originally developed for imputing categorical data in relative
 A bulleted list of assumptions that your method makes about its inputs
 -->
 
-TODO
-- DFs expect (record, IGroup) ordering
-- DFs assume that categorical data is ordered, i.e. cat 1 is less than cat 2
+- Distance functions expect arguments to be in the order (record, IGroup)
+- Distance functions assume that categorical data is ordered, i.e. category 1 is somehow 'less' than category 2
 
 ## 5 Method input and output
 
@@ -109,9 +116,7 @@ myDF(2,3)
 Details about the require output, including (if applicable) the expected fields within each record and the formats in which they are required
 -->
 
-TODO: Uncomment
-
-<!--`impute` modifies its input DataFrame by adding a new column containing the imputed values for a given variable, named <code><em>&lt;variable&gt;</em>_imputed</code>.  If `in_place` is set to `False`, a new DataFrame containing this column is returned.-->
+`impute` modifies its input DataFrame by adding a new column containing the imputed values for a given variable, named <code><em>&lt;variable&gt;</em>_imputed</code>.  If `in_place` is set to `False`, a new DataFrame containing this column is returned.
 
 ### 5.3 Error handling
 
@@ -136,17 +141,12 @@ A detailed, formal, prose description of your method including, where appropriat
 -->
 
 1. Assign each record requiring imputation to an imputation group ("IGroup") based on the values of its auxiliary variables.
-1. For each record requiring imputation, calculate the distance between the values of its auxiliary variables and those of each IGroup.  Each auxiliary variable should have a distance function assigned to it, and may also be assigned a weight.  The total distance is calculated thus: $$\sum_{v \in A} w_{v}{f_{v}(v_{record},v_{IGroup})}$$Where $A$ is the set of auxiliary variables, $w_v$ is the weight assigned to the auxiliary variable $v$, $f_v$ is the distance function assigned to the auxiliary variable $v$, $v_{record}$ is the value of the auxiliary variable for the current record, and $v_{IGroup}$ is the value of the auxiliary variable for the current IGroup.
-1. Determine donors
-1. Impute
-
-- IGroup
-- Auxiliary variable
-- Distance
-- Donor pool
-- Donor
-- Impute
-- Distance function
+1. For each potential donor record (those not requiring imputation), calculate the distance between the values of its auxiliary variables and those of each IGroup.  Each auxiliary variable should have a distance function assigned to it, and may also be assigned a weight.  The total distance is calculated thus: $$\sum_{v \in A} w_{v}{f_{v}(v_{record},v_{IGroup})}$$where $A$ is the set of auxiliary variables, $w_v$ is the weight assigned to the auxiliary variable $v$, $f_v$ is the distance function assigned to the auxiliary variable $v$, $v_{record}$ is the value of the auxiliary variable for the current record, and $v_{IGroup}$ is the value of the auxiliary variable for the current IGroup.
+1. Calculate which IGroup or IGroups for which each potential donor record could be used for imputation.  This is done by finding the minimum distance between any potential donor and each IGroup, and assigning those potential donors to that IGroup.  An optional behaviour is to specify a factor to multiply the minimum distance by, below which to accept donors (as opposed to solely accepting donors with the minimum distance).  These assigned records constitute the 'potential donor pool' for each IGroup.
+1. Calculate the frequency distribution of the values of the imputation variable occurring within each IGroup's potential donor pool.  Convert these frequencies to the expected numbers of occurrences for a group with the same frequency distribution, but with a number of members equal to the size of the IGroup.  This is calculated thus: $$\frac{f_v}{n_{pool}}n_{IGroup}$$where $f_v$ is the frequency with which value $v$ occurs, $n_{pool}$ is the number of records in the potential donor pool, and $n_{IGroup}$ is the number of records in the IGroup.
+1. For each IGroup, insert into a final donor pool each potential value of the imputation variable a number of times equal to the integer part of its expected number of occurrences.
+1. For each IGroup, using the fractional parts of each expected value as probabilities, draw a value at random and insert it into the donor pool.  Remove that value, recalculate the relative probabilities of the remaining possible values, and repeat the step until the donor pool is the same size as the IGroup.
+1. For each IGroup, assign the values in the donor pool randomly to members of the IGroup.
 
 ## 7 Further information
 
