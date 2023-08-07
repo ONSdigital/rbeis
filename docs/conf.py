@@ -14,6 +14,19 @@
 # import sys
 # sys.path.insert(0, 'C:\\Users\\yeelep\\dev\\python\\rbeis\\rbeis')
 
+# -- Markdown docstrings (see https://stackoverflow.com/a/56428123) ----------
+
+import commonmark
+
+def docstring(app, what, name, obj, options, lines):
+    md  = '\n'.join(lines)
+    ast = commonmark.Parser().parse(md)
+    rst = commonmark.ReStructuredTextRenderer().render(ast)
+    lines.clear()
+    lines += rst.splitlines()
+
+def setup(app):
+    app.connect('autodoc-process-docstring', docstring)
 
 # -- Project information -----------------------------------------------------
 
@@ -39,6 +52,10 @@ extensions = [
     'sphinx.ext.todo',
     'myst_parser',
 ]
+
+extensions.append('autoapi.extension')
+autoapi_dirs = ['../rbeis']
+autoapi_options =  [ 'members', 'undoc-members', 'show-inheritance', 'show-module-summary', ]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

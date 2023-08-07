@@ -1,0 +1,28 @@
+:py:mod:`rbeis.spark`
+=====================
+
+.. py:module:: rbeis.spark
+
+.. autoapi-nested-parse::
+
+   
+   **N.B.:** Development of the PySpark implementation of RBEIS is currently on hiatus and will not resume until it is greenlit by the ONS.
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   rbeis.spark.impute
+
+
+
+.. py:function:: impute(*args)
+
+   
+   Not yet implemented; returns an ``Exception``.  See ``rbeis.spark`` documentation.

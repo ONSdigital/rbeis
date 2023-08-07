@@ -1,3 +1,7 @@
+"""
+RBEIS for Pandas.
+"""
+
 import numpy as np
 import pandas as pd
 import warnings
