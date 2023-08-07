@@ -6,6 +6,8 @@
 Welcome to RBEIS's documentation!
 =================================
 
+Lorem ipsum.
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
