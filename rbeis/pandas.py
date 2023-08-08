@@ -19,31 +19,22 @@ from rbeis import RBEISInputException, RBEISInputWarning, RBEISDistanceFunction
 
 def _check_missing_auxvars(data, aux_vars):
     """
-    _check_missing_auxvars(data, aux_vars)
+    Raise an [RBEISInputException](..#RBEISInputException) if the DataFrame contains any records for which any of the chosen auxiliary variables are missing.
 
+    - **data** ([pd.DataFrame](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html)): The dataset undergoing imputation
+    - **aux_vars** (str * [RBEISDistanceFunction](..#RBEISDistanceFunction) dict): A dictionary whose keys are strings corresponding to the names of auxiliary variables and whose values are the [RBEISDistanceFunctions](..#RBEISDistanceFunction) to be used to compare instances of each auxiliary variable.
 
-                                  data (pd.DataFrame): The dataset undergoing
-                                                       imputation
-          aux_vars (str * RBEISDistanceFunction dict): A dictionary whose keys
-                                                       are strings corresponding
-                                                       to the names of auxiliary
-                                                       variables and whose values
-                                                       are the
-                                                       RBEISDistanceFunctions to
-                                                       be used to compare
-                                                       instances of each
-                                                       auxiliary variable.
+    _Example usage:_
 
-    Raise an RBEISInputException if the DataFrame contains any records for which
-    any of the chosen auxiliary variables are missing.
-
-    e.g. _check_missing_auxvars(pd.read_csv("my_data.csv"),
-                                {"height": RBEISDistanceFunction(1,
-                                                                 weight = 5),
-                                 "length": RBEISDistanceFunction(5,
-                                                                 custom_map = {(2, 3): 0,
-                                                                               (8, 8): 0.25},
-                                                                 threshold = 2)})
+    ```python
+    _check_missing_auxvars(pd.read_csv("my_data.csv"),
+                                      {"height": RBEISDistanceFunction(1,
+                                                                       weight = 5),
+                                       "length": RBEISDistanceFunction(5,
+                                                                       custom_map = {(2, 3): 0,
+                                                                                     (8, 8): 0.25},
+                                                                       threshold = 2)})
+    ```
     """
     try:
         assert not (any([
@@ -61,18 +52,16 @@ def _check_missing_auxvars(data, aux_vars):
 
 def _add_impute_col(data, imp_var):
     """
-    _add_impute_col(data, imp_var)
+    Prepare the DataFrame by adding a boolean column `_impute` indicating whether or not a record is to be imputed.  A record will be marked for imputation if a value for the specified imputation variable is missing.  This function modifies the DataFrame in place, rather than returning a new DataFrame.
 
-    data (pd.DataFrame): The dataset undergoing imputation
-          imp_var (str): The name of the variable to be imputed
+    - **data** ([pd.DataFrame](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html)): The dataset undergoing imputation
+    - **imp_var** (str): The name of the variable to be imputed
 
-    Prepare the DataFrame by adding a boolean column '_impute' indicating
-    whether or not a record is to be imputed.  A record will be marked for
-    imputation if a value for the specified imputation variable is missing.
-    This function modifies the DataFrame in place, rather than returning a
-    new DataFrame.
+    _Example usage:_
 
-    e.g. _add_impute_col(pd.read_csv("my_data.csv"), "length")
+    ```python
+    _add_impute_col(pd.read_csv("my_data.csv"), "length")
+    ```
     """
     # Note that data["_impute"] = np.isnan(data[imp_var]) does not work when imp_var is non-numeric
     data["_impute"] = data.apply(
@@ -84,23 +73,21 @@ def _add_impute_col(data, imp_var):
 
 def _assign_igroups(data, aux_var_names):
     """
-    _assign_igroups(data, aux_var_names)
+    Add a column `IGroup` containing integers representing the IGroup that each recipient record is assigned to.  This function modifies the DataFrame in place, rather than returning a new DataFrame.
 
-         data (pd.DataFrame): The dataset undergoing imputation
-    aux_var_names (str list): The names of the chosen auxiliary variables
+    1. Add a column `_conc_aux` containing the string representation of the list of values corresponding to the record's auxiliary variables
+    1. Group by `_conc_aux` and extract group integers from the internal grouper object, creating a new column '_IGroup' containing these integers
+    1. Subtract 1 from each IGroup value, giving -1 for all non-recipient records and zero-indexing all others
+    1. Remove column `_conc_aux`
 
-    Add a column 'IGroup' containing integers representing the IGroup that each
-    recipient record is assigned to.  This function modifies the DataFrame in
-    place, rather than returning a new DataFrame.
-    1. Add a column '_conc_aux' containing the string representation of the list
-       of values corresponding to the record's auxiliary variables
-    2. Group by '_conc_aux' and extract group integers from the internal grouper
-       object, creating a new column '_IGroup' containing these integers
-    3. Subtract 1 from each IGroup value, giving -1 for all non-recipient
-       records and zero-indexing all others
-    4. Remove column '_conc_aux'
+    - **data** ([pd.DataFrame](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html)): The dataset undergoing imputation
+    - **aux_var_names** (str list): The names of the chosen auxiliary variables
 
-    e.g. _assign_igroups(myDataFrame, ["height", "width", "length"]
+    _Example usage:_
+
+    ```python
+    _assign_igroups(myDataFrame, ["height", "width", "length"]
+    ```
     """
     data["_conc_aux"] = data.apply(
         lambda r: str(list(map(lambda v: r[v], aux_var_names)))
@@ -114,15 +101,16 @@ def _assign_igroups(data, aux_var_names):
 
 def _get_igroup_aux_var(data, aux_var_name):
     """
-    _get_igroup_aux_var(data, aux_var_name)
+    Return a list containing each IGroup's value of a given auxiliary variable.  The value at index `i` corresponds to the value for IGroup `i`.
 
-    data (pd.DataFrame): The dataset undergoing imputation
-     aux_var_name (str): The name of the desired auxiliary variable
+    - **data** ([pd.DataFrame](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html)): The dataset undergoing imputation
+    - **aux_var_name** (str): The name of the desired auxiliary variable
 
-    Return a list containing each IGroup's value of a given auxiliary variable.
-    The value at index i corresponds to the value for IGroup i.
+    _Example usage:_
 
-    e.g. _get_igroup_aux_var(myDataFrame, "height") => [188, 154, 192, ...]
+    ```python
+    _get_igroup_aux_var(myDataFrame, "height") # => [188, 154, 192, ...]
+    ```
     """
     out = []
     for i in range(1 + data["_IGroup"].max()):
@@ -135,38 +123,26 @@ def _get_igroup_aux_var(data, aux_var_name):
 
 def _calc_distances(data, aux_vars):
     """
-    _calc_distances(data, aux_vars)
+    Add a column `_distances` containing lists of calculated distances of each record's auxiliary variables from those of its IGroup.  This function modifies the DataFrame in place, rather than returning a new DataFrame.
 
-                            data (pd.DataFrame): The dataset undergoing
-                                                 imputation
-    aux_vars (str * RBEISDistanceFunction dict): A dictionary whose keys are
-                                                 strings corresponding to the
-                                                 names of auxiliary variables
-                                                 and whose values are the
-                                                 RBEISDistanceFunctions to be
-                                                 used to compare instances of
-                                                 each auxiliary variable.
+    1. Create a list of dictionaries containing the values of each IGroup's auxiliary variables
+    1. Add a column `_dists_temp` containing, for each potential donor record, a list of dictionaries of calculated distances for each auxiliary variable
+    1. Add a column `_distances` containing, for each potential donor record, a list of calculated distances from its IGroup's auxiliary variables, taking into account the specified weights
+    1. Remove column `_dists_temp`
 
-    Add a column '_distances' containing lists of calculated distances of each
-    record's auxiliary variables from those of its IGroup.  This function
-    modifies the DataFrame in place, rather than returning a new DataFrame.
-    1. Create a list of dictionaries containing the values of each IGroup's
-       auxiliary variables
-    2. Add a column '_dists_temp' containing, for each potential donor record, a
-       list of dictionaries of calculated distances for each auxiliary variable
-    3. Add a column '_distances' containing, for each potential donor record, a
-       list of calculated distances from its IGroup's auxiliary variables,
-       taking into account the specified weights
-    4. Remove column '_dists_temp'
+    - **data** ([pd.DataFrame](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html)): The dataset undergoing imputation
+    - **aux_vars** (str * [RBEISDistanceFunction](..#RBEISDistanceFunction) dict): A dictionary whose keys are strings corresponding to the names of auxiliary variables and whose values are the [RBEISDistanceFunctions](..#RBEISDistanceFunction) to be used to compare instances of each auxiliary variable.
 
-    PLEASE NOTE that the argument order is assumed to be (record, IGroup).  This
-    is especially important when using custom maps with distance functions 4-6,
-    which *do not* assume that f(x,y) == f(y,x).
+    .. warning:: **PLEASE NOTE** that the argument order is assumed to be (record, IGroup).  This is especially important when using custom maps with distance functions 4-6, which *do not* assume that `f(x,y) == f(y,x)`.
 
-    e.g. _calc_distances(myDataFrame, {"length": RBEISDistanceFunction(2, threshold=1.5),
-                                       "genre": RBEISDistanceFunction(1, weight=8),
-                                       "rating": RBEISDistanceFunction(4, custom_map={(3,4): 0,
-                                                                                      (1,1): 10}})
+    _Example usage:_
+
+    ```python
+    _calc_distances(myDataFrame, {"length": RBEISDistanceFunction(2, threshold=1.5),
+                                   "genre": RBEISDistanceFunction(1, weight=8),
+                                  "rating": RBEISDistanceFunction(4, custom_map={(3,4): 0,
+                                                                                 (1,1): 10}})
+    ```
     """
     igroup_aux_vars = []
     vars_vals = list(
@@ -198,25 +174,20 @@ def _calc_distances(data, aux_vars):
 
 def _calc_donors(data, ratio=None):
     """
-    _calc_donors(data, ratio=None)
+    Add a column `donor` containing a list of IGroup numbers to which each record is a donor.  This function modifies the DataFrame in place, rather than returning a new DataFrame.
 
-    data (pd.DataFrame): The dataset undergoing imputation
-        ratio (numeric): [Optional] Instead of choosing the minimum distance,
-                         choose records less than or equal to ratio * the
-                         minimum distance.
+    1. Calculate the distances less than or equal to which a record may be accepted as a donor to each respective IGroup.
+    1. Zip each record's distances to the list of distances calculated in step 1, and identify where the record distances are less than or equal to the maximum required IGroup distances, giving a list of indices where this is the case.
 
-    Add a column 'donor' containing a list of IGroup numbers to which each
-    record is a donor.  This function modifies the DataFrame in place, rather
-    than returning a new DataFrame.
-    1. Calculate the distances less than or equal to which a record may be
-       accepted as a donor to each respective IGroup.
-    2. Zip each record's distances to the list of distances calculated in step
-       1, and identify where the record distances are less than or equal to the
-       maximum required IGroup distances, giving a list of indices where this is
-       the case.
+    - **data** ([pd.DataFrame](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html)): The dataset undergoing imputation
+    - **ratio** (numeric): [Optional] Instead of choosing the minimum distance, choose records less than or equal to ratio * the minimum distance.
 
-    e.g. _calc_donors(myDataFrame)
-         _calc_donors(myDataFrame, ratio=2.5)
+    _Example usages:_
+
+    ```python
+    _calc_donors(myDataFrame)
+    _calc_donors(myDataFrame, ratio=2.5)
+    ```
     """
     if ratio:
         try:
@@ -243,33 +214,34 @@ def _calc_donors(data, ratio=None):
 
 def _get_donors(data, igroup):
     """
-    _get_donors(data, igroup)
+    Return a list of indices corresponding to records in data that are donors to the specified IGroup.
 
-    data (pd.DataFrame): The dataset undergoing imputation
-           igroup (int): The IGroup whose donors are required
+    - **data** ([pd.DataFrame](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html)): The dataset undergoing imputation
+    - **igroup** (int): The IGroup whose donors are required
 
-    Return a list of indices corresponding to records in data that are donors to
-    the specified IGroup.
+    _Example usage:_
 
-    e.g. _get_donors(myDataFrame, 24) => [10, 14, 29, ...]
+    ```python
+    _get_donors(myDataFrame, 24) # => [10, 14, 29, ...]
+    ```
     """
     return list(map(lambda x: igroup in x, data["_donor"].values.tolist()))
 
 
 def _get_freq_dist(data, imp_var, possible_vals, igroup):
     """
-    _get_freq_dist(data, imp_var, possible_vals, igroup)
+    For a given IGroup, return a frequency distribution for each possible value of the variable to be imputed.  This takes the form of a list of the proportions of a given IGroup taken up by each possible value.
 
-        data (pd.DataFrame): The dataset undergoing imputation
-              imp_var (str): The name of the variable to be imputed
-    possible_vals ('a list): A list of all possible values that imp_var can take
-               igroup (int): The IGroup whose donors are required
+    - **data** ([pd.DataFrame](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html)): The dataset undergoing imputation
+    - **imp_var** (str): The name of the variable to be imputed
+    - **possible_vals** ('a list): A list of all possible values that `imp_var` can take
+    - **igroup** (int): The IGroup whose donors are required
 
-    For a given IGroup, return a frequency distribution for each possible value
-    of the variable to be imputed.  This takes the form of a list of the
-    proportions of a given IGroup taken up by each possible value.
+    _Example usage:_
 
-    e.g. _get_freq_fist(myDataFrame, "genre", ["jungle", "acid house", "UK garage"], 48) => [0.5, 0.3, 0.2]
+    ```python
+    _get_freq_fist(myDataFrame, "genre", ["jungle", "acid house", "UK garage"], 48) # => [0.5, 0.3, 0.2]
+    ```
     """
     pool = data[_get_donors(data, igroup)][imp_var].values.tolist()
     return list(
@@ -284,16 +256,17 @@ def _get_freq_dist(data, imp_var, possible_vals, igroup):
 
 def _freq_to_exp(data, freq_dist, igroup):
     """
-    _freq_to_exp(data, freq_dist, igroup)
+    Convert a frequency distribution to the expected numbers of occurrences for a given IGroup.
 
-          data (pd.DataFrame): The dataset undergoing imputation
-    freq_dist (Fraction list): The frequency distribution to convert
-                 igroup (int): The IGroup corresponding to freq_dist
+    - **data** ([pd.DataFrame](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html)): The dataset undergoing imputation
+    - **freq_dist** (Fraction list): The frequency distribution to convert
+    - **igroup** (int): The IGroup corresponding to `freq_dist`
 
-    Convert a frequency distribution to the expected numbers of occurrences for
-    a given IGroup.
+    _Example usage:_
 
-    e.g. _freq_to_exp(myDataFrame, [0.5, 0.3, 0.2], 48) => [100, 60, 40]
+    ```python
+    _freq_to_exp(myDataFrame, [0.5, 0.3, 0.2], 48) # => [100, 60, 40]
+    ```
     """
     igroup_size = len(data.query("_IGroup==" + str(igroup)).values.tolist())
     return list(map(lambda f: f * igroup_size, freq_dist))
@@ -301,27 +274,24 @@ def _freq_to_exp(data, freq_dist, igroup):
 
 def _impute_igroup(data, exp_dist, possible_vals, igroup):
     """
-    _impute_igroup(data, exp_dist, possible_vals, igroup)
-
-         data (pd.DataFrame): The dataset undergoing imputation
-    exp_dist (Fraction list): The expected values derived from the frequency
-                              distribution using _freq_to_exp
-     possible_vals ('a list): A list of all possible values that imp_var can take
-                igroup (int): The IGroup whose values are to be imputed
-
     Return a set of imputed values for the given IGroup:
-    1. For each of the possible values that the variable to be imputed can take,
-       insert a number of values equal to the integer part of the expected value
-       and subtract the integer part from the expected value
-    2. Convert the fractional parts of the expected values back into
-       probabilities
-    3. Using these probabilities, draw a value at random, remove that value from
-       the set of possible values to be imputed, and adjust the remaining
-       probabilities accordingly
-    4. Repeat step 3 until there are no more values still to impute
-    5. Randomise the order of the list of imputed values, then return it
 
-    e.g. _impute_igroup(myDataFrame, [100, 60, 40], ["jungle", "acid house", "UK garage"], 48)
+    1. For each of the possible values that the variable to be imputed can take, insert a number of values equal to the integer part of the expected value and subtract the integer part from the expected value
+    1. Convert the fractional parts of the expected values back into probabilities
+    1. Using these probabilities, draw a value at random, remove that value from the set of possible values to be imputed, and adjust the remaining probabilities accordingly
+    1. Repeat step 3 until there are no more values still to impute
+    1. Randomise the order of the list of imputed values, then return it
+
+    - **data** ([pd.DataFrame](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html)): The dataset undergoing imputation
+    - **exp_dist** (Fraction list): The expected values derived from the frequency distribution using _freq_to_exp
+    - **possible_vals** ('a list): A list of all possible values that imp_var can take
+    - **igroup** (int): The IGroup whose values are to be imputed
+
+    _Example usage:_
+
+    ```python
+    _impute_igroup(myDataFrame, [100, 60, 40], ["jungle", "acid house", "UK garage"], 48)
+    ```
     """
     out = []
     if all(map(lambda e: e == 0, exp_dist)):
@@ -363,65 +333,35 @@ def impute(
     keep_intermediates=False,
 ):
     """
-    impute(data, imp_var, possible_vals, aux_vars, ratio=None, in_place=True,
-           keep_intermediates=False)
+    Impute missing values for a given variable using the Rogers & Berriman Editing and Imputation System (RBEIS).  By default, this function modifies the existing DataFrame in place, rather than returning a new DataFrame, unless `in_place` is set to `False`.  A high-level overview of the approach is given here (for more detail, see the documentation for each of the private intermediate functions in this library):
 
-                            data (pd.DataFrame): The dataset undergoing
-                                                 imputation
-                                  imp_var (str): The name of the variable to be
-                                                 imputed
-                        possible_vals ('a list): A list of all possible values
-                                                 that imp_var can take
-    aux_vars (str * RBEISDistanceFunction dict): A dictionary whose keys are
-                                                 strings corresponding to the
-                                                 names of auxiliary variables
-                                                 and whose values are the
-                                                 RBEISDistanceFunctions to be
-                                                 used to compare instances of
-                                                 each auxiliary variable.
-                                ratio (numeric): [Optional] Instead of choosing
-                                                 the minimum distance, choose
-                                                 records less than or equal to
-                                                 ratio * the minimum distance.
-                                in_place (bool): [Optional, default True] If
-                                                 True, modify the original
-                                                 DataFrame in place.  If False,
-                                                 return a new (deep) copy of the
-                                                 DataFrame having undergone
-                                                 imputation.
-                      keep_intermediates (bool): [Optional, default False] If
-                                                 True, retain the intermediate
-                                                 columns created by this
-                                                 implementation of RBEIS in the
-                                                 process of imputation.  If
-                                                 False, remove them from the
-                                                 output.
-
-    Impute missing values for a given variable using the Rogers & Berriman
-    Editing and Imputation System (RBEIS).  By default, this function modifies
-    the existing DataFrame in place, rather than returning a new DataFrame,
-    unless in_place is set to False.  A high-level overview of the approach is
-    given here (for more detail, see the documentation for each of the
-    intermediate functions in this library):
     1. Identify values to be imputed
-    2. Assign imputation groups ("IGroups") based on a given set of auxiliary
-       variables
-    3. Calculate how similar the auxiliary variables of each IGroup are to those
-       of the potential donor records
-    4. Assign the most similar records to the donor pools of the corresponding
-       IGroups
-    5. Impute values for each IGroup
-    6. Insert imputed values into the original DataFrame
+    1. Assign imputation groups ("IGroups") based on a given set of auxiliary variables
+    1. Calculate how similar the auxiliary variables of each IGroup are to those of the potential donor records
+    1. Assign the most similar records to the donor pools of the corresponding IGroups
+    1. Impute values for each IGroup
+    1. Insert imputed values into the original DataFrame
 
-    e.g. impute(pd.read_csv("my_data.csv"),
-                "genre",
-                ["jungle", "acid house", "UK garage"],
-                {"artist": RBEISDistanceFunction(1, weight = 5),
-                 "bpm": RBEISDistanceFunction(5, custom_map = {(170, 180): 0, (140, 160): 100}, threshold = 5),
-                 "length": RBEISDistanceFunction(2, threshold = 1.25)},
-                ratio = 1.5,
-                in_place = False,
-                keep_intermediates = True)
+    - **data** ([pd.DataFrame](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html)): The dataset undergoing imputation
+    - **imp_var** (str): The name of the variable to be imputed
+    - **possible_vals** ('a list): A list of all possible values that imp_var can take
+    - **aux_vars** (str * [RBEISDistanceFunction](..#RBEISDistanceFunction) dict): A dictionary whose keys are strings corresponding to the names of auxiliary variables and whose values are the [RBEISDistanceFunctions](..#RBEISDistanceFunction) to be used to compare instances of each auxiliary variable.
+    - **ratio** (numeric): [Optional] Instead of choosing the minimum distance, choose records less than or equal to `ratio` &times; the minimum distance.
+    - **in_place** (bool): [Optional, default `True`] If `True`, modify the original DataFrame in place.  If `False`, return a new (deep) copy of the DataFrame having undergone imputation.
+    - **keep_intermediates** (bool): [Optional, default `False`] If `True`, retain the intermediate columns created by this implementation of RBEIS in the process of imputation.  If `False`, remove them from the output.
+
+    _Example usage:_
+    ```python
+    impute(pd.read_csv("my_data.csv"),
+           "genre",
+           ["jungle", "acid house", "UK garage"],
+           {"artist": RBEISDistanceFunction(1, weight = 5),
+               "bpm": RBEISDistanceFunction(5, custom_map = {(170, 180): 0, (140, 160): 100}, threshold = 5),
+            "length": RBEISDistanceFunction(2, threshold = 1.25)},
+           ratio = 1.5,
+           in_place = False,
+           keep_intermediates = True)
+    ```
     """
 
     # Input checks

@@ -5,7 +5,8 @@
 
 .. autoapi-nested-parse::
 
-   RBEIS is a method originally developed for imputing categorical data in relatively small social surveys with the intention of minimising conditional imputation variance. It is derived from CANCEIS, which is better suited to large datasets such as the Census.  This implementation of RBEIS works with [Pandas](https://pandas.pydata.org) DataFrames.
+   
+   RBEIS is a method originally developed for imputing categorical data in relatively small social surveys with the intention of minimising conditional imputation variance. It is derived from CANCEIS, which is better suited to large datasets such as the Census.  This implementation of RBEIS works with `Pandas <https://pandas.pydata.org>`_ DataFrames.
 
 
 Submodules
@@ -35,21 +36,39 @@ Classes
 
    Bases: :py:obj:`Exception`
 
-   Exception raised in the case of faulty input to `impute` that is not covered by a TypeError.
+   
+   Exception raised in the case of faulty input to ``impute`` that is not covered by a TypeError.
 .. py:exception:: RBEISInputWarning
 
    Bases: :py:obj:`UserWarning`
 
-   Warning raised in the case of redundant input to `impute`.
+   
+   Warning raised in the case of redundant input to ``impute``.
 .. py:class:: RBEISDistanceFunction(df, custom_map=None, threshold=None, weight=1.0)
 
-   Callable object encapsulating one of the six RBEIS distance functions, its
-   threshold value (where appropriate), any pairs of values to be overridden
-   (for DFs 4-6), and a weight by which to scale its result.
    
-   PLEASE NOTE that, in rbeis._calc_distances, the argument order is assumed to
-   be (record, IGroup).  This is especially important when defining custom maps
-   for DFs 4-6, which *do not* assume that f(x,y) == f(y,x).
+   Callable object encapsulating one of the six RBEIS distance functions, its threshold value (where appropriate), any pairs of values to be overridden (for DFs 4-6), and a weight by which to scale its result.
+   
+   * **df** (int): An integer from 1 to 6 corresponding to one of the standard RBEIS distance functions
+   * **custom_map** (('a * 'a) * numeric dict): [Optional] A dictionary mapping pairs (2-tuples) of values to distances (value pair as key, distance as value), overriding the underlying standard distance function.  Note that ``(x,y)`` → ``z`` does **not** imply that ``(y,x)`` → ``z``.  This is required for distance functions 4, 5 and 6.
+   * **threshold** (numeric): [Optional] A threshold value for distance functions 2, 3, 5 and 6.
+   * **weight** (numeric): [Optional] A weight value by which to scale the output of the distance function.
+   
+   .. warning:: PLEASE NOTE that, when RBEIS calculates distances, the argument order is assumed to be (record, IGroup).  This is especially important when defining custom maps for DFs 4-6, which *do not* assume that ``f(x,y) == f(y,x)``.
+   
+   *Example usage:*
+   
+   .. code:: python
+   
+       myDF = RBEISDistanceFunction(6,
+                                    custom_map = {(2, 3): 4, (8, 8): 0.25},
+                                    threshold = 3,
+                                    weight = 10)
+       myDF(2, 2) # => 0
+       myDF(2, 4) # => 5
+       myDF(2, 8) # => 10
+       myDF(2, 3) # => 40
+       myDF(8, 8) # => 2.5
    .. py:attribute:: f
       
    
@@ -60,45 +79,47 @@ Classes
       
    .. py:method:: _df1(x, y)
    
-      _df1(x, y)
       
-      x ('a): A data point for comparison
-      y ('a): A data point for comparison
+      Distance Function 1: return 1 if ``x`` and ``y`` are not equal, otherwise 0.  This function (and its derivative, DF4) can be used with any data types that are comparable using ``=``.
       
-      Distance Function 1: return 1 if x and y are not equal, otherwise 0.
-      This function (and its derivative, DF4) can be used with any data types
-      that are comparable using =.
+      * **x** ('a): A data point for comparison
+      * **y** ('a): A data point for comparison
       
-      e.g. _df1(2, 2) => 0
-           _df1(2, 4) => 1
+      *Example usages:*
+      
+      .. code:: python
+      
+          _df1(2, 2) # => 0
+          _df1(2, 4) # => 1
    .. py:method:: _df2(x, y, m=None)
    
-      _df2(x, y, m)
       
-      x (numeric): A data point for comparison
-      y (numeric): A data point for comparison
-      m (numeric): A threshold value
+      Distance Function 2: return 1 if the difference between ``x`` and ``y`` is greater than the threshold ``m``, otherwise 0.  This function (and its derivative, DF5) may only be used with numeric data.
       
-      Distance Function 2: return 1 if the difference between x and y is
-      greater than the threshold m, otherwise 0.  This function (and its
-      derivative, DF5) may only be used with numeric data.
+      * **x** (numeric): A data point for comparison
+      * **y** (numeric): A data point for comparison
+      * **m** (numeric): A threshold value
       
-      e.g. _df2(2, 2, 2) => 0
-           _df2(2, 3, 2) => 0
-           _df2(2, 8, 2) => 1
+      *Example usages:*
+      
+      .. code:: python
+      
+          _df2(2, 2, 2) # => 0
+          _df2(2, 3, 2) # => 0
+          _df2(2, 8, 2) # => 1
    .. py:method:: _df3(x, y, m=None)
    
-      _df3(x, y, m)
       
-      x (numeric): A data point for comparison
-      y (numeric): A data point for comparison
-      m (numeric): A threshold value
+      Distance Function 3: return 1 if the difference between ``x`` and ``y`` is greater than the threshold ``m``, otherwise return the difference between ``x`` and ``y``, divided by ``m + 1``.  This function (and its derivative, DF6) may only be used with numeric data.
       
-      Distance Function 3: return 1 if the difference between x and y is
-      greater than the threshold m, otherwise return the difference between x
-      and y, divided by m + 1.  This function (and its derivative, DF6) may
-      only be used with numeric data.
+      * **x** (numeric): A data point for comparison
+      * **y** (numeric): A data point for comparison
+      * **m** (numeric): A threshold value
       
-      e.g. _df3(2, 2, 3) => 0
-           _df3(2, 3, 3) => 0.25
-           _df3(2, 8, 3) => 1
+      *Example usages:*
+      
+      .. code:: python
+      
+          _df3(2, 2, 3) # => 0
+          _df3(2, 3, 3) # => 0.25
+          _df3(2, 8, 3) # => 1

@@ -60,48 +60,63 @@
 
 <div class="viewcode-block" id="RBEISDistanceFunction"><a class="viewcode-back" href="../../api/rbeis/#rbeis.RBEISDistanceFunction">[docs]</a><span class="k">class</span> <span class="nc">RBEISDistanceFunction</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Callable object encapsulating one of the six RBEIS distance functions, its</span>
-<span class="sd">    threshold value (where appropriate), any pairs of values to be overridden</span>
-<span class="sd">    (for DFs 4-6), and a weight by which to scale its result.</span>
+<span class="sd">    Callable object encapsulating one of the six RBEIS distance functions, its threshold value (where appropriate), any pairs of values to be overridden (for DFs 4-6), and a weight by which to scale its result.</span>
 
-<span class="sd">    PLEASE NOTE that, in rbeis._calc_distances, the argument order is assumed to</span>
-<span class="sd">    be (record, IGroup).  This is especially important when defining custom maps</span>
-<span class="sd">    for DFs 4-6, which *do not* assume that f(x,y) == f(y,x).</span>
+<span class="sd">    - **df** (int): An integer from 1 to 6 corresponding to one of the standard RBEIS distance functions</span>
+<span class="sd">    - **custom_map** ((&#39;a * &#39;a) * numeric dict): [Optional] A dictionary mapping pairs (2-tuples) of values to distances (value pair as key, distance as value), overriding the underlying standard distance function.  Note that `(x,y)` &amp;rarr; `z` does **not** imply that `(y,x)` &amp;rarr; `z`.  This is required for distance functions 4, 5 and 6.</span>
+<span class="sd">    - **threshold** (numeric): [Optional] A threshold value for distance functions 2, 3, 5 and 6.</span>
+<span class="sd">    - **weight** (numeric): [Optional] A weight value by which to scale the output of the distance function.</span>
+
+<span class="sd">    .. warning:: PLEASE NOTE that, when RBEIS calculates distances, the argument order is assumed to be (record, IGroup).  This is especially important when defining custom maps for DFs 4-6, which *do not* assume that `f(x,y) == f(y,x)`.</span>
+
+<span class="sd">    _Example usage:_</span>
+
+<span class="sd">    ```python</span>
+<span class="sd">    myDF = RBEISDistanceFunction(6,</span>
+<span class="sd">                                 custom_map = {(2, 3): 4, (8, 8): 0.25},</span>
+<span class="sd">                                 threshold = 3,</span>
+<span class="sd">                                 weight = 10)</span>
+<span class="sd">    myDF(2, 2) # =&gt; 0</span>
+<span class="sd">    myDF(2, 4) # =&gt; 5</span>
+<span class="sd">    myDF(2, 8) # =&gt; 10</span>
+<span class="sd">    myDF(2, 3) # =&gt; 40</span>
+<span class="sd">    myDF(8, 8) # =&gt; 2.5</span>
+<span class="sd">    ```</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># Standard distance functions 1-3 (4-6 are 1-3 with custom overrides)</span>
     <span class="c1"># Where x is the IGroup&#39;s value, y is the current record&#39;s value, and m is a threshold value</span>
 <div class="viewcode-block" id="RBEISDistanceFunction._df1"><a class="viewcode-back" href="../../api/rbeis/#rbeis.RBEISDistanceFunction._df1">[docs]</a>    <span class="k">def</span> <span class="nf">_df1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        _df1(x, y)</span>
+<span class="sd">        Distance Function 1: return 1 if `x` and `y` are not equal, otherwise 0.  This function (and its derivative, DF4) can be used with any data types that are comparable using `=`.</span>
 
-<span class="sd">        x (&#39;a): A data point for comparison</span>
-<span class="sd">        y (&#39;a): A data point for comparison</span>
+<span class="sd">        - **x** (&#39;a): A data point for comparison</span>
+<span class="sd">        - **y** (&#39;a): A data point for comparison</span>
 
-<span class="sd">        Distance Function 1: return 1 if x and y are not equal, otherwise 0.</span>
-<span class="sd">        This function (and its derivative, DF4) can be used with any data types</span>
-<span class="sd">        that are comparable using =.</span>
+<span class="sd">        _Example usages:_</span>
 
-<span class="sd">        e.g. _df1(2, 2) =&gt; 0</span>
-<span class="sd">             _df1(2, 4) =&gt; 1</span>
+<span class="sd">        ```python</span>
+<span class="sd">        _df1(2, 2) # =&gt; 0</span>
+<span class="sd">        _df1(2, 4) # =&gt; 1</span>
+<span class="sd">        ```</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">x</span> <span class="o">!=</span> <span class="n">y</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="RBEISDistanceFunction._df2"><a class="viewcode-back" href="../../api/rbeis/#rbeis.RBEISDistanceFunction._df2">[docs]</a>    <span class="k">def</span> <span class="nf">_df2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        _df2(x, y, m)</span>
+<span class="sd">        Distance Function 2: return 1 if the difference between `x` and `y` is greater than the threshold `m`, otherwise 0.  This function (and its derivative, DF5) may only be used with numeric data.</span>
 
-<span class="sd">        x (numeric): A data point for comparison</span>
-<span class="sd">        y (numeric): A data point for comparison</span>
-<span class="sd">        m (numeric): A threshold value</span>
+<span class="sd">        - **x** (numeric): A data point for comparison</span>
+<span class="sd">        - **y** (numeric): A data point for comparison</span>
+<span class="sd">        - **m** (numeric): A threshold value</span>
 
-<span class="sd">        Distance Function 2: return 1 if the difference between x and y is</span>
-<span class="sd">        greater than the threshold m, otherwise 0.  This function (and its</span>
-<span class="sd">        derivative, DF5) may only be used with numeric data.</span>
+<span class="sd">        _Example usages:_</span>
 
-<span class="sd">        e.g. _df2(2, 2, 2) =&gt; 0</span>
-<span class="sd">             _df2(2, 3, 2) =&gt; 0</span>
-<span class="sd">             _df2(2, 8, 2) =&gt; 1</span>
+<span class="sd">        ```python</span>
+<span class="sd">        _df2(2, 2, 2) # =&gt; 0</span>
+<span class="sd">        _df2(2, 3, 2) # =&gt; 0</span>
+<span class="sd">        _df2(2, 8, 2) # =&gt; 1</span>
+<span class="sd">        ```</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">Number</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">Number</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
@@ -116,20 +131,19 @@
 
 <div class="viewcode-block" id="RBEISDistanceFunction._df3"><a class="viewcode-back" href="../../api/rbeis/#rbeis.RBEISDistanceFunction._df3">[docs]</a>    <span class="k">def</span> <span class="nf">_df3</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        _df3(x, y, m)</span>
+<span class="sd">        Distance Function 3: return 1 if the difference between `x` and `y` is greater than the threshold `m`, otherwise return the difference between `x` and `y`, divided by `m + 1`.  This function (and its derivative, DF6) may only be used with numeric data.</span>
 
-<span class="sd">        x (numeric): A data point for comparison</span>
-<span class="sd">        y (numeric): A data point for comparison</span>
-<span class="sd">        m (numeric): A threshold value</span>
+<span class="sd">        - **x** (numeric): A data point for comparison</span>
+<span class="sd">        - **y** (numeric): A data point for comparison</span>
+<span class="sd">        - **m** (numeric): A threshold value</span>
 
-<span class="sd">        Distance Function 3: return 1 if the difference between x and y is</span>
-<span class="sd">        greater than the threshold m, otherwise return the difference between x</span>
-<span class="sd">        and y, divided by m + 1.  This function (and its derivative, DF6) may</span>
-<span class="sd">        only be used with numeric data.</span>
+<span class="sd">        _Example usages:_</span>
 
-<span class="sd">        e.g. _df3(2, 2, 3) =&gt; 0</span>
-<span class="sd">             _df3(2, 3, 3) =&gt; 0.25</span>
-<span class="sd">             _df3(2, 8, 3) =&gt; 1</span>
+<span class="sd">        ```python</span>
+<span class="sd">        _df3(2, 2, 3) # =&gt; 0</span>
+<span class="sd">        _df3(2, 3, 3) # =&gt; 0.25</span>
+<span class="sd">        _df3(2, 8, 3) # =&gt; 1</span>
+<span class="sd">        ```</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">Number</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">Number</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
@@ -142,43 +156,10 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="mf">1.0</span> <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">m</span> <span class="k">else</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">m</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span></div>
 
-    <span class="n">f</span> <span class="o">=</span> <span class="n">_df1</span>
+<div class="viewcode-block" id="RBEISDistanceFunction.f"><a class="viewcode-back" href="../../api/rbeis/#rbeis.RBEISDistanceFunction.f">[docs]</a>    <span class="n">f</span> <span class="o">=</span> <span class="n">_df1</span></div>
 <div class="viewcode-block" id="RBEISDistanceFunction.weight"><a class="viewcode-back" href="../../api/rbeis/#rbeis.RBEISDistanceFunction.weight">[docs]</a>    <span class="n">weight</span> <span class="o">=</span> <span class="mf">1.0</span></div>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">custom_map</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        RBEISDistanceFunction(df, custom_map=None, threshold=None, weight=1.0)</span>
-
-<span class="sd">                                     df (int): An integer from 1 to 6</span>
-<span class="sd">                                               corresponding to one of the</span>
-<span class="sd">                                               standard RBEIS distance functions</span>
-<span class="sd">        custom_map ((&#39;a * &#39;a) * numeric dict): [Optional] A dictionary mapping</span>
-<span class="sd">                                               pairs (2-tuples) of values to</span>
-<span class="sd">                                               distances (value pair as key,</span>
-<span class="sd">                                               distance as value), overriding</span>
-<span class="sd">                                               the underlying standard distance</span>
-<span class="sd">                                               function.  Note that (x,y) -&gt; z</span>
-<span class="sd">                                               does not imply that (y,x) -&gt; z.</span>
-<span class="sd">                                               This is required for distance</span>
-<span class="sd">                                               functions 4, 5 and 6.</span>
-<span class="sd">                          threshold (numeric): [Optional] A threshold value for</span>
-<span class="sd">                                               distance functions 2, 3, 5 and 6.</span>
-<span class="sd">                             weight (numeric): [Optional] A weight value by</span>
-<span class="sd">                                               which to scale the output of the</span>
-<span class="sd">                                               distance function</span>
-
-<span class="sd">        Initialise a new RBEISDistanceFunction object with the above parameters.</span>
-
-<span class="sd">        e.g. myDF = RBEISDistanceFunction(6,</span>
-<span class="sd">                                          custom_map = {(2, 3): 4, (8, 8): 0.25},</span>
-<span class="sd">                                          threshold = 3,</span>
-<span class="sd">                                          weight = 10)</span>
-<span class="sd">             myDF(2, 2) =&gt; 0</span>
-<span class="sd">             myDF(2, 4) =&gt; 5</span>
-<span class="sd">             myDF(2, 8) =&gt; 10</span>
-<span class="sd">             myDF(2, 3) =&gt; 40</span>
-<span class="sd">             myDF(8, 8) =&gt; 2.5</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">df</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">df</span> <span class="o">&gt;</span> <span class="mi">6</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">RBEISInputException</span><span class="p">(</span>

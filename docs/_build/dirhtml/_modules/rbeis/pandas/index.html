@@ -59,31 +59,22 @@
 
 <div class="viewcode-block" id="_check_missing_auxvars"><a class="viewcode-back" href="../../../api/rbeis/pandas/#rbeis.pandas._check_missing_auxvars">[docs]</a><span class="k">def</span> <span class="nf">_check_missing_auxvars</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">aux_vars</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    _check_missing_auxvars(data, aux_vars)</span>
+<span class="sd">    Raise an [RBEISInputException](..#RBEISInputException) if the DataFrame contains any records for which any of the chosen auxiliary variables are missing.</span>
 
+<span class="sd">    - **data** ([pd.DataFrame](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html)): The dataset undergoing imputation</span>
+<span class="sd">    - **aux_vars** (str * [RBEISDistanceFunction](..#RBEISDistanceFunction) dict): A dictionary whose keys are strings corresponding to the names of auxiliary variables and whose values are the [RBEISDistanceFunctions](..#RBEISDistanceFunction) to be used to compare instances of each auxiliary variable.</span>
 
-<span class="sd">                                  data (pd.DataFrame): The dataset undergoing</span>
-<span class="sd">                                                       imputation</span>
-<span class="sd">          aux_vars (str * RBEISDistanceFunction dict): A dictionary whose keys</span>
-<span class="sd">                                                       are strings corresponding</span>
-<span class="sd">                                                       to the names of auxiliary</span>
-<span class="sd">                                                       variables and whose values</span>
-<span class="sd">                                                       are the</span>
-<span class="sd">                                                       RBEISDistanceFunctions to</span>
-<span class="sd">                                                       be used to compare</span>
-<span class="sd">                                                       instances of each</span>
-<span class="sd">                                                       auxiliary variable.</span>
+<span class="sd">    _Example usage:_</span>
 
-<span class="sd">    Raise an RBEISInputException if the DataFrame contains any records for which</span>
-<span class="sd">    any of the chosen auxiliary variables are missing.</span>
-
-<span class="sd">    e.g. _check_missing_auxvars(pd.read_csv(&quot;my_data.csv&quot;),</span>
-<span class="sd">                                {&quot;height&quot;: RBEISDistanceFunction(1,</span>
-<span class="sd">                                                                 weight = 5),</span>
-<span class="sd">                                 &quot;length&quot;: RBEISDistanceFunction(5,</span>
-<span class="sd">                                                                 custom_map = {(2, 3): 0,</span>
-<span class="sd">                                                                               (8, 8): 0.25},</span>
-<span class="sd">                                                                 threshold = 2)})</span>
+<span class="sd">    ```python</span>
+<span class="sd">    _check_missing_auxvars(pd.read_csv(&quot;my_data.csv&quot;),</span>
+<span class="sd">                                      {&quot;height&quot;: RBEISDistanceFunction(1,</span>
+<span class="sd">                                                                       weight = 5),</span>
+<span class="sd">                                       &quot;length&quot;: RBEISDistanceFunction(5,</span>
+<span class="sd">                                                                       custom_map = {(2, 3): 0,</span>
+<span class="sd">                                                                                     (8, 8): 0.25},</span>
+<span class="sd">                                                                       threshold = 2)})</span>
+<span class="sd">    ```</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">assert</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">any</span><span class="p">([</span>
@@ -101,18 +92,16 @@
 
 <div class="viewcode-block" id="_add_impute_col"><a class="viewcode-back" href="../../../api/rbeis/pandas/#rbeis.pandas._add_impute_col">[docs]</a><span class="k">def</span> <span class="nf">_add_impute_col</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">imp_var</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    _add_impute_col(data, imp_var)</span>
+<span class="sd">    Prepare the DataFrame by adding a boolean column `_impute` indicating whether or not a record is to be imputed.  A record will be marked for imputation if a value for the specified imputation variable is missing.  This function modifies the DataFrame in place, rather than returning a new DataFrame.</span>
 
-<span class="sd">    data (pd.DataFrame): The dataset undergoing imputation</span>
-<span class="sd">          imp_var (str): The name of the variable to be imputed</span>
+<span class="sd">    - **data** ([pd.DataFrame](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html)): The dataset undergoing imputation</span>
+<span class="sd">    - **imp_var** (str): The name of the variable to be imputed</span>
 
-<span class="sd">    Prepare the DataFrame by adding a boolean column &#39;_impute&#39; indicating</span>
-<span class="sd">    whether or not a record is to be imputed.  A record will be marked for</span>
-<span class="sd">    imputation if a value for the specified imputation variable is missing.</span>
-<span class="sd">    This function modifies the DataFrame in place, rather than returning a</span>
-<span class="sd">    new DataFrame.</span>
+<span class="sd">    _Example usage:_</span>
 
-<span class="sd">    e.g. _add_impute_col(pd.read_csv(&quot;my_data.csv&quot;), &quot;length&quot;)</span>
+<span class="sd">    ```python</span>
+<span class="sd">    _add_impute_col(pd.read_csv(&quot;my_data.csv&quot;), &quot;length&quot;)</span>
+<span class="sd">    ```</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Note that data[&quot;_impute&quot;] = np.isnan(data[imp_var]) does not work when imp_var is non-numeric</span>
     <span class="n">data</span><span class="p">[</span><span class="s2">&quot;_impute&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
@@ -124,23 +113,21 @@
 
 <div class="viewcode-block" id="_assign_igroups"><a class="viewcode-back" href="../../../api/rbeis/pandas/#rbeis.pandas._assign_igroups">[docs]</a><span class="k">def</span> <span class="nf">_assign_igroups</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">aux_var_names</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    _assign_igroups(data, aux_var_names)</span>
+<span class="sd">    Add a column `IGroup` containing integers representing the IGroup that each recipient record is assigned to.  This function modifies the DataFrame in place, rather than returning a new DataFrame.</span>
 
-<span class="sd">         data (pd.DataFrame): The dataset undergoing imputation</span>
-<span class="sd">    aux_var_names (str list): The names of the chosen auxiliary variables</span>
+<span class="sd">    1. Add a column `_conc_aux` containing the string representation of the list of values corresponding to the record&#39;s auxiliary variables</span>
+<span class="sd">    1. Group by `_conc_aux` and extract group integers from the internal grouper object, creating a new column &#39;_IGroup&#39; containing these integers</span>
+<span class="sd">    1. Subtract 1 from each IGroup value, giving -1 for all non-recipient records and zero-indexing all others</span>
+<span class="sd">    1. Remove column `_conc_aux`</span>
 
-<span class="sd">    Add a column &#39;IGroup&#39; containing integers representing the IGroup that each</span>
-<span class="sd">    recipient record is assigned to.  This function modifies the DataFrame in</span>
-<span class="sd">    place, rather than returning a new DataFrame.</span>
-<span class="sd">    1. Add a column &#39;_conc_aux&#39; containing the string representation of the list</span>
-<span class="sd">       of values corresponding to the record&#39;s auxiliary variables</span>
-<span class="sd">    2. Group by &#39;_conc_aux&#39; and extract group integers from the internal grouper</span>
-<span class="sd">       object, creating a new column &#39;_IGroup&#39; containing these integers</span>
-<span class="sd">    3. Subtract 1 from each IGroup value, giving -1 for all non-recipient</span>
-<span class="sd">       records and zero-indexing all others</span>
-<span class="sd">    4. Remove column &#39;_conc_aux&#39;</span>
+<span class="sd">    - **data** ([pd.DataFrame](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html)): The dataset undergoing imputation</span>
+<span class="sd">    - **aux_var_names** (str list): The names of the chosen auxiliary variables</span>
 
-<span class="sd">    e.g. _assign_igroups(myDataFrame, [&quot;height&quot;, &quot;width&quot;, &quot;length&quot;]</span>
+<span class="sd">    _Example usage:_</span>
+
+<span class="sd">    ```python</span>
+<span class="sd">    _assign_igroups(myDataFrame, [&quot;height&quot;, &quot;width&quot;, &quot;length&quot;]</span>
+<span class="sd">    ```</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">data</span><span class="p">[</span><span class="s2">&quot;_conc_aux&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
         <span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">r</span><span class="p">[</span><span class="n">v</span><span class="p">],</span> <span class="n">aux_var_names</span><span class="p">)))</span>
@@ -154,15 +141,16 @@
 
 <div class="viewcode-block" id="_get_igroup_aux_var"><a class="viewcode-back" href="../../../api/rbeis/pandas/#rbeis.pandas._get_igroup_aux_var">[docs]</a><span class="k">def</span> <span class="nf">_get_igroup_aux_var</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">aux_var_name</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    _get_igroup_aux_var(data, aux_var_name)</span>
+<span class="sd">    Return a list containing each IGroup&#39;s value of a given auxiliary variable.  The value at index `i` corresponds to the value for IGroup `i`.</span>
 
-<span class="sd">    data (pd.DataFrame): The dataset undergoing imputation</span>
-<span class="sd">     aux_var_name (str): The name of the desired auxiliary variable</span>
+<span class="sd">    - **data** ([pd.DataFrame](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html)): The dataset undergoing imputation</span>
+<span class="sd">    - **aux_var_name** (str): The name of the desired auxiliary variable</span>
 
-<span class="sd">    Return a list containing each IGroup&#39;s value of a given auxiliary variable.</span>
-<span class="sd">    The value at index i corresponds to the value for IGroup i.</span>
+<span class="sd">    _Example usage:_</span>
 
-<span class="sd">    e.g. _get_igroup_aux_var(myDataFrame, &quot;height&quot;) =&gt; [188, 154, 192, ...]</span>
+<span class="sd">    ```python</span>
+<span class="sd">    _get_igroup_aux_var(myDataFrame, &quot;height&quot;) # =&gt; [188, 154, 192, ...]</span>
+<span class="sd">    ```</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;_IGroup&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()):</span>
@@ -175,38 +163,26 @@
 
 <div class="viewcode-block" id="_calc_distances"><a class="viewcode-back" href="../../../api/rbeis/pandas/#rbeis.pandas._calc_distances">[docs]</a><span class="k">def</span> <span class="nf">_calc_distances</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">aux_vars</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    _calc_distances(data, aux_vars)</span>
+<span class="sd">    Add a column `_distances` containing lists of calculated distances of each record&#39;s auxiliary variables from those of its IGroup.  This function modifies the DataFrame in place, rather than returning a new DataFrame.</span>
 
-<span class="sd">                            data (pd.DataFrame): The dataset undergoing</span>
-<span class="sd">                                                 imputation</span>
-<span class="sd">    aux_vars (str * RBEISDistanceFunction dict): A dictionary whose keys are</span>
-<span class="sd">                                                 strings corresponding to the</span>
-<span class="sd">                                                 names of auxiliary variables</span>
-<span class="sd">                                                 and whose values are the</span>
-<span class="sd">                                                 RBEISDistanceFunctions to be</span>
-<span class="sd">                                                 used to compare instances of</span>
-<span class="sd">                                                 each auxiliary variable.</span>
+<span class="sd">    1. Create a list of dictionaries containing the values of each IGroup&#39;s auxiliary variables</span>
+<span class="sd">    1. Add a column `_dists_temp` containing, for each potential donor record, a list of dictionaries of calculated distances for each auxiliary variable</span>
+<span class="sd">    1. Add a column `_distances` containing, for each potential donor record, a list of calculated distances from its IGroup&#39;s auxiliary variables, taking into account the specified weights</span>
+<span class="sd">    1. Remove column `_dists_temp`</span>
 
-<span class="sd">    Add a column &#39;_distances&#39; containing lists of calculated distances of each</span>
-<span class="sd">    record&#39;s auxiliary variables from those of its IGroup.  This function</span>
-<span class="sd">    modifies the DataFrame in place, rather than returning a new DataFrame.</span>
-<span class="sd">    1. Create a list of dictionaries containing the values of each IGroup&#39;s</span>
-<span class="sd">       auxiliary variables</span>
-<span class="sd">    2. Add a column &#39;_dists_temp&#39; containing, for each potential donor record, a</span>
-<span class="sd">       list of dictionaries of calculated distances for each auxiliary variable</span>
-<span class="sd">    3. Add a column &#39;_distances&#39; containing, for each potential donor record, a</span>
-<span class="sd">       list of calculated distances from its IGroup&#39;s auxiliary variables,</span>
-<span class="sd">       taking into account the specified weights</span>
-<span class="sd">    4. Remove column &#39;_dists_temp&#39;</span>
+<span class="sd">    - **data** ([pd.DataFrame](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html)): The dataset undergoing imputation</span>
+<span class="sd">    - **aux_vars** (str * [RBEISDistanceFunction](..#RBEISDistanceFunction) dict): A dictionary whose keys are strings corresponding to the names of auxiliary variables and whose values are the [RBEISDistanceFunctions](..#RBEISDistanceFunction) to be used to compare instances of each auxiliary variable.</span>
 
-<span class="sd">    PLEASE NOTE that the argument order is assumed to be (record, IGroup).  This</span>
-<span class="sd">    is especially important when using custom maps with distance functions 4-6,</span>
-<span class="sd">    which *do not* assume that f(x,y) == f(y,x).</span>
+<span class="sd">    .. warning:: **PLEASE NOTE** that the argument order is assumed to be (record, IGroup).  This is especially important when using custom maps with distance functions 4-6, which *do not* assume that `f(x,y) == f(y,x)`.</span>
 
-<span class="sd">    e.g. _calc_distances(myDataFrame, {&quot;length&quot;: RBEISDistanceFunction(2, threshold=1.5),</span>
-<span class="sd">                                       &quot;genre&quot;: RBEISDistanceFunction(1, weight=8),</span>
-<span class="sd">                                       &quot;rating&quot;: RBEISDistanceFunction(4, custom_map={(3,4): 0,</span>
-<span class="sd">                                                                                      (1,1): 10}})</span>
+<span class="sd">    _Example usage:_</span>
+
+<span class="sd">    ```python</span>
+<span class="sd">    _calc_distances(myDataFrame, {&quot;length&quot;: RBEISDistanceFunction(2, threshold=1.5),</span>
+<span class="sd">                                   &quot;genre&quot;: RBEISDistanceFunction(1, weight=8),</span>
+<span class="sd">                                  &quot;rating&quot;: RBEISDistanceFunction(4, custom_map={(3,4): 0,</span>
+<span class="sd">                                                                                 (1,1): 10}})</span>
+<span class="sd">    ```</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">igroup_aux_vars</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">vars_vals</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
@@ -238,25 +214,20 @@
 
 <div class="viewcode-block" id="_calc_donors"><a class="viewcode-back" href="../../../api/rbeis/pandas/#rbeis.pandas._calc_donors">[docs]</a><span class="k">def</span> <span class="nf">_calc_donors</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ratio</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    _calc_donors(data, ratio=None)</span>
+<span class="sd">    Add a column `donor` containing a list of IGroup numbers to which each record is a donor.  This function modifies the DataFrame in place, rather than returning a new DataFrame.</span>
 
-<span class="sd">    data (pd.DataFrame): The dataset undergoing imputation</span>
-<span class="sd">        ratio (numeric): [Optional] Instead of choosing the minimum distance,</span>
-<span class="sd">                         choose records less than or equal to ratio * the</span>
-<span class="sd">                         minimum distance.</span>
+<span class="sd">    1. Calculate the distances less than or equal to which a record may be accepted as a donor to each respective IGroup.</span>
+<span class="sd">    1. Zip each record&#39;s distances to the list of distances calculated in step 1, and identify where the record distances are less than or equal to the maximum required IGroup distances, giving a list of indices where this is the case.</span>
 
-<span class="sd">    Add a column &#39;donor&#39; containing a list of IGroup numbers to which each</span>
-<span class="sd">    record is a donor.  This function modifies the DataFrame in place, rather</span>
-<span class="sd">    than returning a new DataFrame.</span>
-<span class="sd">    1. Calculate the distances less than or equal to which a record may be</span>
-<span class="sd">       accepted as a donor to each respective IGroup.</span>
-<span class="sd">    2. Zip each record&#39;s distances to the list of distances calculated in step</span>
-<span class="sd">       1, and identify where the record distances are less than or equal to the</span>
-<span class="sd">       maximum required IGroup distances, giving a list of indices where this is</span>
-<span class="sd">       the case.</span>
+<span class="sd">    - **data** ([pd.DataFrame](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html)): The dataset undergoing imputation</span>
+<span class="sd">    - **ratio** (numeric): [Optional] Instead of choosing the minimum distance, choose records less than or equal to ratio * the minimum distance.</span>
 
-<span class="sd">    e.g. _calc_donors(myDataFrame)</span>
-<span class="sd">         _calc_donors(myDataFrame, ratio=2.5)</span>
+<span class="sd">    _Example usages:_</span>
+
+<span class="sd">    ```python</span>
+<span class="sd">    _calc_donors(myDataFrame)</span>
+<span class="sd">    _calc_donors(myDataFrame, ratio=2.5)</span>
+<span class="sd">    ```</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">ratio</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
@@ -283,33 +254,34 @@
 
 <div class="viewcode-block" id="_get_donors"><a class="viewcode-back" href="../../../api/rbeis/pandas/#rbeis.pandas._get_donors">[docs]</a><span class="k">def</span> <span class="nf">_get_donors</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">igroup</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    _get_donors(data, igroup)</span>
+<span class="sd">    Return a list of indices corresponding to records in data that are donors to the specified IGroup.</span>
 
-<span class="sd">    data (pd.DataFrame): The dataset undergoing imputation</span>
-<span class="sd">           igroup (int): The IGroup whose donors are required</span>
+<span class="sd">    - **data** ([pd.DataFrame](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html)): The dataset undergoing imputation</span>
+<span class="sd">    - **igroup** (int): The IGroup whose donors are required</span>
 
-<span class="sd">    Return a list of indices corresponding to records in data that are donors to</span>
-<span class="sd">    the specified IGroup.</span>
+<span class="sd">    _Example usage:_</span>
 
-<span class="sd">    e.g. _get_donors(myDataFrame, 24) =&gt; [10, 14, 29, ...]</span>
+<span class="sd">    ```python</span>
+<span class="sd">    _get_donors(myDataFrame, 24) # =&gt; [10, 14, 29, ...]</span>
+<span class="sd">    ```</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">igroup</span> <span class="ow">in</span> <span class="n">x</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;_donor&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()))</span></div>
 
 
 <div class="viewcode-block" id="_get_freq_dist"><a class="viewcode-back" href="../../../api/rbeis/pandas/#rbeis.pandas._get_freq_dist">[docs]</a><span class="k">def</span> <span class="nf">_get_freq_dist</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">imp_var</span><span class="p">,</span> <span class="n">possible_vals</span><span class="p">,</span> <span class="n">igroup</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    _get_freq_dist(data, imp_var, possible_vals, igroup)</span>
+<span class="sd">    For a given IGroup, return a frequency distribution for each possible value of the variable to be imputed.  This takes the form of a list of the proportions of a given IGroup taken up by each possible value.</span>
 
-<span class="sd">        data (pd.DataFrame): The dataset undergoing imputation</span>
-<span class="sd">              imp_var (str): The name of the variable to be imputed</span>
-<span class="sd">    possible_vals (&#39;a list): A list of all possible values that imp_var can take</span>
-<span class="sd">               igroup (int): The IGroup whose donors are required</span>
+<span class="sd">    - **data** ([pd.DataFrame](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html)): The dataset undergoing imputation</span>
+<span class="sd">    - **imp_var** (str): The name of the variable to be imputed</span>
+<span class="sd">    - **possible_vals** (&#39;a list): A list of all possible values that `imp_var` can take</span>
+<span class="sd">    - **igroup** (int): The IGroup whose donors are required</span>
 
-<span class="sd">    For a given IGroup, return a frequency distribution for each possible value</span>
-<span class="sd">    of the variable to be imputed.  This takes the form of a list of the</span>
-<span class="sd">    proportions of a given IGroup taken up by each possible value.</span>
+<span class="sd">    _Example usage:_</span>
 
-<span class="sd">    e.g. _get_freq_fist(myDataFrame, &quot;genre&quot;, [&quot;jungle&quot;, &quot;acid house&quot;, &quot;UK garage&quot;], 48) =&gt; [0.5, 0.3, 0.2]</span>
+<span class="sd">    ```python</span>
+<span class="sd">    _get_freq_fist(myDataFrame, &quot;genre&quot;, [&quot;jungle&quot;, &quot;acid house&quot;, &quot;UK garage&quot;], 48) # =&gt; [0.5, 0.3, 0.2]</span>
+<span class="sd">    ```</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">pool</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">_get_donors</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">igroup</span><span class="p">)][</span><span class="n">imp_var</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
     <span class="k">return</span> <span class="nb">list</span><span class="p">(</span>
@@ -324,16 +296,17 @@
 
 <div class="viewcode-block" id="_freq_to_exp"><a class="viewcode-back" href="../../../api/rbeis/pandas/#rbeis.pandas._freq_to_exp">[docs]</a><span class="k">def</span> <span class="nf">_freq_to_exp</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">freq_dist</span><span class="p">,</span> <span class="n">igroup</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    _freq_to_exp(data, freq_dist, igroup)</span>
+<span class="sd">    Convert a frequency distribution to the expected numbers of occurrences for a given IGroup.</span>
 
-<span class="sd">          data (pd.DataFrame): The dataset undergoing imputation</span>
-<span class="sd">    freq_dist (Fraction list): The frequency distribution to convert</span>
-<span class="sd">                 igroup (int): The IGroup corresponding to freq_dist</span>
+<span class="sd">    - **data** ([pd.DataFrame](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html)): The dataset undergoing imputation</span>
+<span class="sd">    - **freq_dist** (Fraction list): The frequency distribution to convert</span>
+<span class="sd">    - **igroup** (int): The IGroup corresponding to `freq_dist`</span>
 
-<span class="sd">    Convert a frequency distribution to the expected numbers of occurrences for</span>
-<span class="sd">    a given IGroup.</span>
+<span class="sd">    _Example usage:_</span>
 
-<span class="sd">    e.g. _freq_to_exp(myDataFrame, [0.5, 0.3, 0.2], 48) =&gt; [100, 60, 40]</span>
+<span class="sd">    ```python</span>
+<span class="sd">    _freq_to_exp(myDataFrame, [0.5, 0.3, 0.2], 48) # =&gt; [100, 60, 40]</span>
+<span class="sd">    ```</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">igroup_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;_IGroup==&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">igroup</span><span class="p">))</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
     <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">f</span><span class="p">:</span> <span class="n">f</span> <span class="o">*</span> <span class="n">igroup_size</span><span class="p">,</span> <span class="n">freq_dist</span><span class="p">))</span></div>
@@ -341,27 +314,24 @@
 
 <div class="viewcode-block" id="_impute_igroup"><a class="viewcode-back" href="../../../api/rbeis/pandas/#rbeis.pandas._impute_igroup">[docs]</a><span class="k">def</span> <span class="nf">_impute_igroup</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">exp_dist</span><span class="p">,</span> <span class="n">possible_vals</span><span class="p">,</span> <span class="n">igroup</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    _impute_igroup(data, exp_dist, possible_vals, igroup)</span>
-
-<span class="sd">         data (pd.DataFrame): The dataset undergoing imputation</span>
-<span class="sd">    exp_dist (Fraction list): The expected values derived from the frequency</span>
-<span class="sd">                              distribution using _freq_to_exp</span>
-<span class="sd">     possible_vals (&#39;a list): A list of all possible values that imp_var can take</span>
-<span class="sd">                igroup (int): The IGroup whose values are to be imputed</span>
-
 <span class="sd">    Return a set of imputed values for the given IGroup:</span>
-<span class="sd">    1. For each of the possible values that the variable to be imputed can take,</span>
-<span class="sd">       insert a number of values equal to the integer part of the expected value</span>
-<span class="sd">       and subtract the integer part from the expected value</span>
-<span class="sd">    2. Convert the fractional parts of the expected values back into</span>
-<span class="sd">       probabilities</span>
-<span class="sd">    3. Using these probabilities, draw a value at random, remove that value from</span>
-<span class="sd">       the set of possible values to be imputed, and adjust the remaining</span>
-<span class="sd">       probabilities accordingly</span>
-<span class="sd">    4. Repeat step 3 until there are no more values still to impute</span>
-<span class="sd">    5. Randomise the order of the list of imputed values, then return it</span>
 
-<span class="sd">    e.g. _impute_igroup(myDataFrame, [100, 60, 40], [&quot;jungle&quot;, &quot;acid house&quot;, &quot;UK garage&quot;], 48)</span>
+<span class="sd">    1. For each of the possible values that the variable to be imputed can take, insert a number of values equal to the integer part of the expected value and subtract the integer part from the expected value</span>
+<span class="sd">    1. Convert the fractional parts of the expected values back into probabilities</span>
+<span class="sd">    1. Using these probabilities, draw a value at random, remove that value from the set of possible values to be imputed, and adjust the remaining probabilities accordingly</span>
+<span class="sd">    1. Repeat step 3 until there are no more values still to impute</span>
+<span class="sd">    1. Randomise the order of the list of imputed values, then return it</span>
+
+<span class="sd">    - **data** ([pd.DataFrame](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html)): The dataset undergoing imputation</span>
+<span class="sd">    - **exp_dist** (Fraction list): The expected values derived from the frequency distribution using _freq_to_exp</span>
+<span class="sd">    - **possible_vals** (&#39;a list): A list of all possible values that imp_var can take</span>
+<span class="sd">    - **igroup** (int): The IGroup whose values are to be imputed</span>
+
+<span class="sd">    _Example usage:_</span>
+
+<span class="sd">    ```python</span>
+<span class="sd">    _impute_igroup(myDataFrame, [100, 60, 40], [&quot;jungle&quot;, &quot;acid house&quot;, &quot;UK garage&quot;], 48)</span>
+<span class="sd">    ```</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">e</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">exp_dist</span><span class="p">)):</span>
@@ -403,65 +373,35 @@
     <span class="n">keep_intermediates</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    impute(data, imp_var, possible_vals, aux_vars, ratio=None, in_place=True,</span>
-<span class="sd">           keep_intermediates=False)</span>
+<span class="sd">    Impute missing values for a given variable using the Rogers &amp; Berriman Editing and Imputation System (RBEIS).  By default, this function modifies the existing DataFrame in place, rather than returning a new DataFrame, unless `in_place` is set to `False`.  A high-level overview of the approach is given here (for more detail, see the documentation for each of the private intermediate functions in this library):</span>
 
-<span class="sd">                            data (pd.DataFrame): The dataset undergoing</span>
-<span class="sd">                                                 imputation</span>
-<span class="sd">                                  imp_var (str): The name of the variable to be</span>
-<span class="sd">                                                 imputed</span>
-<span class="sd">                        possible_vals (&#39;a list): A list of all possible values</span>
-<span class="sd">                                                 that imp_var can take</span>
-<span class="sd">    aux_vars (str * RBEISDistanceFunction dict): A dictionary whose keys are</span>
-<span class="sd">                                                 strings corresponding to the</span>
-<span class="sd">                                                 names of auxiliary variables</span>
-<span class="sd">                                                 and whose values are the</span>
-<span class="sd">                                                 RBEISDistanceFunctions to be</span>
-<span class="sd">                                                 used to compare instances of</span>
-<span class="sd">                                                 each auxiliary variable.</span>
-<span class="sd">                                ratio (numeric): [Optional] Instead of choosing</span>
-<span class="sd">                                                 the minimum distance, choose</span>
-<span class="sd">                                                 records less than or equal to</span>
-<span class="sd">                                                 ratio * the minimum distance.</span>
-<span class="sd">                                in_place (bool): [Optional, default True] If</span>
-<span class="sd">                                                 True, modify the original</span>
-<span class="sd">                                                 DataFrame in place.  If False,</span>
-<span class="sd">                                                 return a new (deep) copy of the</span>
-<span class="sd">                                                 DataFrame having undergone</span>
-<span class="sd">                                                 imputation.</span>
-<span class="sd">                      keep_intermediates (bool): [Optional, default False] If</span>
-<span class="sd">                                                 True, retain the intermediate</span>
-<span class="sd">                                                 columns created by this</span>
-<span class="sd">                                                 implementation of RBEIS in the</span>
-<span class="sd">                                                 process of imputation.  If</span>
-<span class="sd">                                                 False, remove them from the</span>
-<span class="sd">                                                 output.</span>
-
-<span class="sd">    Impute missing values for a given variable using the Rogers &amp; Berriman</span>
-<span class="sd">    Editing and Imputation System (RBEIS).  By default, this function modifies</span>
-<span class="sd">    the existing DataFrame in place, rather than returning a new DataFrame,</span>
-<span class="sd">    unless in_place is set to False.  A high-level overview of the approach is</span>
-<span class="sd">    given here (for more detail, see the documentation for each of the</span>
-<span class="sd">    intermediate functions in this library):</span>
 <span class="sd">    1. Identify values to be imputed</span>
-<span class="sd">    2. Assign imputation groups (&quot;IGroups&quot;) based on a given set of auxiliary</span>
-<span class="sd">       variables</span>
-<span class="sd">    3. Calculate how similar the auxiliary variables of each IGroup are to those</span>
-<span class="sd">       of the potential donor records</span>
-<span class="sd">    4. Assign the most similar records to the donor pools of the corresponding</span>
-<span class="sd">       IGroups</span>
-<span class="sd">    5. Impute values for each IGroup</span>
-<span class="sd">    6. Insert imputed values into the original DataFrame</span>
+<span class="sd">    1. Assign imputation groups (&quot;IGroups&quot;) based on a given set of auxiliary variables</span>
+<span class="sd">    1. Calculate how similar the auxiliary variables of each IGroup are to those of the potential donor records</span>
+<span class="sd">    1. Assign the most similar records to the donor pools of the corresponding IGroups</span>
+<span class="sd">    1. Impute values for each IGroup</span>
+<span class="sd">    1. Insert imputed values into the original DataFrame</span>
 
-<span class="sd">    e.g. impute(pd.read_csv(&quot;my_data.csv&quot;),</span>
-<span class="sd">                &quot;genre&quot;,</span>
-<span class="sd">                [&quot;jungle&quot;, &quot;acid house&quot;, &quot;UK garage&quot;],</span>
-<span class="sd">                {&quot;artist&quot;: RBEISDistanceFunction(1, weight = 5),</span>
-<span class="sd">                 &quot;bpm&quot;: RBEISDistanceFunction(5, custom_map = {(170, 180): 0, (140, 160): 100}, threshold = 5),</span>
-<span class="sd">                 &quot;length&quot;: RBEISDistanceFunction(2, threshold = 1.25)},</span>
-<span class="sd">                ratio = 1.5,</span>
-<span class="sd">                in_place = False,</span>
-<span class="sd">                keep_intermediates = True)</span>
+<span class="sd">    - **data** ([pd.DataFrame](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html)): The dataset undergoing imputation</span>
+<span class="sd">    - **imp_var** (str): The name of the variable to be imputed</span>
+<span class="sd">    - **possible_vals** (&#39;a list): A list of all possible values that imp_var can take</span>
+<span class="sd">    - **aux_vars** (str * [RBEISDistanceFunction](..#RBEISDistanceFunction) dict): A dictionary whose keys are strings corresponding to the names of auxiliary variables and whose values are the [RBEISDistanceFunctions](..#RBEISDistanceFunction) to be used to compare instances of each auxiliary variable.</span>
+<span class="sd">    - **ratio** (numeric): [Optional] Instead of choosing the minimum distance, choose records less than or equal to `ratio` &amp;times; the minimum distance.</span>
+<span class="sd">    - **in_place** (bool): [Optional, default `True`] If `True`, modify the original DataFrame in place.  If `False`, return a new (deep) copy of the DataFrame having undergone imputation.</span>
+<span class="sd">    - **keep_intermediates** (bool): [Optional, default `False`] If `True`, retain the intermediate columns created by this implementation of RBEIS in the process of imputation.  If `False`, remove them from the output.</span>
+
+<span class="sd">    _Example usage:_</span>
+<span class="sd">    ```python</span>
+<span class="sd">    impute(pd.read_csv(&quot;my_data.csv&quot;),</span>
+<span class="sd">           &quot;genre&quot;,</span>
+<span class="sd">           [&quot;jungle&quot;, &quot;acid house&quot;, &quot;UK garage&quot;],</span>
+<span class="sd">           {&quot;artist&quot;: RBEISDistanceFunction(1, weight = 5),</span>
+<span class="sd">               &quot;bpm&quot;: RBEISDistanceFunction(5, custom_map = {(170, 180): 0, (140, 160): 100}, threshold = 5),</span>
+<span class="sd">            &quot;length&quot;: RBEISDistanceFunction(2, threshold = 1.25)},</span>
+<span class="sd">           ratio = 1.5,</span>
+<span class="sd">           in_place = False,</span>
+<span class="sd">           keep_intermediates = True)</span>
+<span class="sd">    ```</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># Input checks</span>
