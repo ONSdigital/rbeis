@@ -5,7 +5,7 @@ RBEIS is a method originally developed for imputing categorical data in relative
 
 When production ready, RBEIS will be distributed through PyPI.  To install, simply call ``pip install rbeis``.
 
-Whilst still in the pre-release stage, the latest RBEIS wheel can be manually downloaded [from GitHub](https://github.com/y33les/rbeis/releases/latest).
+Whilst still in the pre-release stage, the latest RBEIS wheel can be manually downloaded `from GitHub <https://github.com/y33les/rbeis/releases/latest>`_.
 
 RBEIS is licensed under the `MIT License <https://mit-license.org/>`_.
 
