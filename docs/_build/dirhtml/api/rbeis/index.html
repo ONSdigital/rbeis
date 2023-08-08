@@ -37,7 +37,7 @@
             
   <div class="section" id="module-rbeis">
 <span id="rbeis"></span><h1><a class="reference internal" href="#module-rbeis" title="rbeis"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rbeis</span></code></a><a class="headerlink" href="#module-rbeis" title="Permalink to this headline">¶</a></h1>
-<p>RBEIS implementation; TODO: write this documentation</p>
+<p>RBEIS is a method originally developed for imputing categorical data in relatively small social surveys with the intention of minimising conditional imputation variance. It is derived from CANCEIS, which is better suited to large datasets such as the Census.  This implementation of RBEIS works with [Pandas](<a class="reference external" href="https://pandas.pydata.org">https://pandas.pydata.org</a>) DataFrames.</p>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
@@ -45,6 +45,54 @@
 <li class="toctree-l1"><a class="reference internal" href="pandas/"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rbeis.pandas</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="spark/"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rbeis.spark</span></code></a></li>
 </ul>
+</div>
+</div>
+<div class="section" id="package-contents">
+<h2>Package Contents<a class="headerlink" href="#package-contents" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="classes">
+<h3>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h3>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rbeis.RBEISDistanceFunction" title="rbeis.RBEISDistanceFunction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RBEISDistanceFunction</span></code></a></p></td>
+<td><p>Callable object encapsulating one of the six RBEIS distance functions, its</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py exception">
+<dt id="rbeis.RBEISInputException">
+<em class="property"><span class="pre">exception</span> </em><code class="sig-prename descclassname"><span class="pre">rbeis.</span></code><code class="sig-name descname"><span class="pre">RBEISInputException</span></code><a class="reference internal" href="../../_modules/rbeis/#RBEISInputException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rbeis.RBEISInputException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Exception raised in the case of faulty input to <cite>impute</cite> that is not covered by a TypeError.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="rbeis.RBEISInputWarning">
+<em class="property"><span class="pre">exception</span> </em><code class="sig-prename descclassname"><span class="pre">rbeis.</span></code><code class="sig-name descname"><span class="pre">RBEISInputWarning</span></code><a class="reference internal" href="../../_modules/rbeis/#RBEISInputWarning"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rbeis.RBEISInputWarning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">UserWarning</span></code></p>
+<p>Warning raised in the case of redundant input to <cite>impute</cite>.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="rbeis.RBEISDistanceFunction">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">rbeis.</span></code><code class="sig-name descname"><span class="pre">RBEISDistanceFunction</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/rbeis/#RBEISDistanceFunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rbeis.RBEISDistanceFunction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callable object encapsulating one of the six RBEIS distance functions, its
+threshold value (where appropriate), any pairs of values to be overridden
+(for DFs 4-6), and a weight by which to scale its result.</p>
+<p>PLEASE NOTE that, in rbeis._calc_distances, the argument order is assumed to
+be (record, IGroup).  This is especially important when defining custom maps
+for DFs 4-6, which <em>do not</em> assume that f(x,y) == f(y,x).
+.. py:attribute:: f</p>
+<dl class="py attribute">
+<dt id="rbeis.RBEISDistanceFunction.weight">
+<code class="sig-name descname"><span class="pre">weight</span></code><em class="property"> <span class="pre">=</span> <span class="pre">1.0</span></em><a class="reference internal" href="../../_modules/rbeis/#RBEISDistanceFunction.weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rbeis.RBEISDistanceFunction.weight" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
 </div>
 </div>
@@ -60,6 +108,18 @@
   <ul>
 <li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rbeis</span></code></a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#package-contents">Package Contents</a><ul>
+<li><a class="reference internal" href="#classes">Classes</a><ul>
+<li><a class="reference internal" href="#rbeis.RBEISInputException">RBEISInputException</a></li>
+<li><a class="reference internal" href="#rbeis.RBEISInputWarning">RBEISInputWarning</a></li>
+<li><a class="reference internal" href="#rbeis.RBEISDistanceFunction">RBEISDistanceFunction</a><ul>
+<li><a class="reference internal" href="#rbeis.RBEISDistanceFunction.weight">weight</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

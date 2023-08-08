@@ -1,9 +1,11 @@
-# Welcome to RBEIS's documentation!
+# Rogers and Berriman Editing and Imputation System (RBEIS)
 
-Lorem ipsum.
+RBEIS is a method originally developed for imputing categorical data in relatively small social surveys with the intention of minimising conditional imputation variance. It is derived from CANCEIS, which is better suited to large datasets such as the Census.  This implementation of RBEIS works with [Pandas](https://pandas.pydata.org) DataFrames.
 
-- [Method specification](https://y33les.github.io/rbeis/spec/)
-- [User notes](https://y33les.github.io/rbeis/notes/)
+RBEIS is distributed through PyPI.  To install, simply call `pip install rbeis`.
+
+- [Index](https://y33les.github.io/rbeis/genindex/)
+- [Search page](https://y33les.github.io/rbeis/search/)
 
 # API Reference
 
@@ -11,5 +13,7 @@ Lorem ipsum.
     - [`rbeis.pandas`](https://y33les.github.io/rbeis/api/rbeis/pandas/)
     - [`rbeis.spark`](https://y33les.github.io/rbeis/api/rbeis/spark/)
 
-- [Index](https://y33les.github.io/rbeis/genindex/)
-- [Search page](https://y33les.github.io/rbeis/search/)
+# Key documents
+
+- [Method specification](https://y33les.github.io/rbeis/spec/)
+- [User notes](https://y33les.github.io/rbeis/notes/)

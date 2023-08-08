@@ -5,20 +5,11 @@
 
 .. autoapi-nested-parse::
 
-   
-   RBEIS for Pandas.
+   RBEIS implementation using Pandas DataFrames
 
 
 Module Contents
 ---------------
-
-Classes
-~~~~~~~
-
-.. autoapisummary::
-
-   rbeis.pandas.RBEISDistanceFunction
-
 
 
 Functions
@@ -30,43 +21,10 @@ Functions
 
 
 
-.. py:exception:: RBEISInputException
-
-   Bases: :py:obj:`Exception`
-
-   
-   Exception raised in the case of faulty input to ``impute`` that is not covered by a TypeError.
-.. py:exception:: RBEISInputWarning
-
-   Bases: :py:obj:`UserWarning`
-
-   
-   Warning raised in the case of redundant input to ``impute``.
-.. py:class:: RBEISDistanceFunction(df, custom_map=None, threshold=None, weight=1.0)
-
-   
-   Callable object encapsulating one of the six RBEIS distance functions, its
-   threshold value (where appropriate), any pairs of values to be overridden
-   (for DFs 4-6), and a weight by which to scale its result.
-   
-   PLEASE NOTE that, in rbeis._calc_distances, the argument order is assumed to
-   be (record, IGroup).  This is especially important when defining custom maps
-   for DFs 4-6, which *do not* assume that f(x,y) == f(y,x).
-   .. py:attribute:: f
-      
-   
-      
-   .. py:attribute:: weight
-      :annotation: = 1.0
-   
-      
 .. py:function:: impute(data, imp_var, possible_vals, aux_vars, ratio=None, in_place=True, keep_intermediates=False)
 
-   
    impute(data, imp_var, possible_vals, aux_vars, ratio=None, in_place=True,
-   keep_intermediates=False)
-   
-   .. code::
+          keep_intermediates=False)
    
                            data (pd.DataFrame): The dataset undergoing
                                                 imputation
@@ -74,31 +32,30 @@ Functions
                                                 imputed
                        possible_vals ('a list): A list of all possible values
                                                 that imp_var can take
-   
    aux_vars (str * RBEISDistanceFunction dict): A dictionary whose keys are
-   strings corresponding to the
-   names of auxiliary variables
-   and whose values are the
-   RBEISDistanceFunctions to be
-   used to compare instances of
-   each auxiliary variable.
-   ratio (numeric): [Optional] Instead of choosing
-   the minimum distance, choose
-   records less than or equal to
-   ratio * the minimum distance.
-   in_place (bool): [Optional, default True] If
-   True, modify the original
-   DataFrame in place.  If False,
-   return a new (deep) copy of the
-   DataFrame having undergone
-   imputation.
-   keep_intermediates (bool): [Optional, default False] If
-   True, retain the intermediate
-   columns created by this
-   implementation of RBEIS in the
-   process of imputation.  If
-   False, remove them from the
-   output.
+                                                strings corresponding to the
+                                                names of auxiliary variables
+                                                and whose values are the
+                                                RBEISDistanceFunctions to be
+                                                used to compare instances of
+                                                each auxiliary variable.
+                               ratio (numeric): [Optional] Instead of choosing
+                                                the minimum distance, choose
+                                                records less than or equal to
+                                                ratio * the minimum distance.
+                               in_place (bool): [Optional, default True] If
+                                                True, modify the original
+                                                DataFrame in place.  If False,
+                                                return a new (deep) copy of the
+                                                DataFrame having undergone
+                                                imputation.
+                     keep_intermediates (bool): [Optional, default False] If
+                                                True, retain the intermediate
+                                                columns created by this
+                                                implementation of RBEIS in the
+                                                process of imputation.  If
+                                                False, remove them from the
+                                                output.
    
    Impute missing values for a given variable using the Rogers & Berriman
    Editing and Imputation System (RBEIS).  By default, this function modifies
@@ -106,23 +63,22 @@ Functions
    unless in_place is set to False.  A high-level overview of the approach is
    given here (for more detail, see the documentation for each of the
    intermediate functions in this library):
-   
-   #. Identify values to be imputed
-   #. Assign imputation groups ("IGroups") based on a given set of auxiliary
-   variables
-   #. Calculate how similar the auxiliary variables of each IGroup are to those
-   of the potential donor records
-   #. Assign the most similar records to the donor pools of the corresponding
-   IGroups
-   #. Impute values for each IGroup
-   #. Insert imputed values into the original DataFrame
+   1. Identify values to be imputed
+   2. Assign imputation groups ("IGroups") based on a given set of auxiliary
+      variables
+   3. Calculate how similar the auxiliary variables of each IGroup are to those
+      of the potential donor records
+   4. Assign the most similar records to the donor pools of the corresponding
+      IGroups
+   5. Impute values for each IGroup
+   6. Insert imputed values into the original DataFrame
    
    e.g. impute(pd.read_csv("my_data.csv"),
-   "genre",
-   ["jungle", "acid house", "UK garage"],
-   {"artist": RBEISDistanceFunction(1, weight = 5),
-   "bpm": RBEISDistanceFunction(5, custom_map = {(170, 180): 0, (140, 160): 100}, threshold = 5),
-   "length": RBEISDistanceFunction(2, threshold = 1.25)},
-   ratio = 1.5,
-   in_place = False,
-   keep_intermediates = True)
+               "genre",
+               ["jungle", "acid house", "UK garage"],
+               {"artist": RBEISDistanceFunction(1, weight = 5),
+                "bpm": RBEISDistanceFunction(5, custom_map = {(170, 180): 0, (140, 160): 100}, threshold = 5),
+                "length": RBEISDistanceFunction(2, threshold = 1.25)},
+               ratio = 1.5,
+               in_place = False,
+               keep_intermediates = True)

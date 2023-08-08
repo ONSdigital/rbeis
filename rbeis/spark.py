@@ -1,4 +1,6 @@
 """
+RBEIS implementation using PySpark
+
 **N.B.:** Development of the PySpark implementation of RBEIS is currently on hiatus and will not resume until it is greenlit by the ONS.
 """
 

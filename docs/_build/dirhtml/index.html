@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Welcome to RBEIS’s documentation! &#8212; rbeis 0.0.1 documentation</title>
+    <title>Rogers and Berriman Editing and Imputation System (RBEIS) &#8212; rbeis 0.0.1 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
@@ -26,7 +26,7 @@
           <a href="py-modindex/" title="Python Module Index"
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="#">rbeis 0.0.1 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Welcome to RBEIS’s documentation!</a></li> 
+        <li class="nav-item nav-item-this"><a href="">Rogers and Berriman Editing and Imputation System (RBEIS)</a></li> 
       </ul>
     </div>  
 
@@ -35,25 +35,68 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="welcome-to-rbeis-s-documentation">
-<h1>Welcome to RBEIS’s documentation!<a class="headerlink" href="#welcome-to-rbeis-s-documentation" title="Permalink to this headline">¶</a></h1>
-<p>Lorem ipsum.</p>
+  <div class="section" id="rogers-and-berriman-editing-and-imputation-system-rbeis">
+<h1>Rogers and Berriman Editing and Imputation System (RBEIS)<a class="headerlink" href="#rogers-and-berriman-editing-and-imputation-system-rbeis" title="Permalink to this headline">¶</a></h1>
+<p>RBEIS is a method originally developed for imputing categorical data in relatively small social surveys with the intention of minimising conditional imputation variance. It is derived from CANCEIS, which is better suited to large datasets such as the Census.  This implementation of RBEIS works with <a class="reference external" href="https://pandas.pydata.org">Pandas</a> DataFrames.</p>
+<p>RBEIS is distributed through PyPI.  To install, simply call <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">rbeis</span></code>.</p>
 <ul class="simple">
-<li><p><a class="reference external" href="https://y33les.github.io/rbeis/spec/">Method specification</a></p></li>
-<li><p><a class="reference external" href="https://y33les.github.io/rbeis/notes/">User notes</a></p></li>
+<li><p><a class="reference internal" href="genindex/"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="search/"><span class="std std-ref">Search Page</span></a></p></li>
 </ul>
 </div>
 <div class="section" id="api-reference">
 <h1>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li><p><a class="reference external" href="https://y33les.github.io/rbeis/api/rbeis/"><code class="docutils literal notranslate"><span class="pre">rbeis</span></code></a></p>
+<div class="toctree-wrapper compound">
 <ul>
-<li><p><a class="reference external" href="https://y33les.github.io/rbeis/api/rbeis/pandas/"><code class="docutils literal notranslate"><span class="pre">rbeis.pandas</span></code></a></p></li>
-<li><p><a class="reference external" href="https://y33les.github.io/rbeis/api/rbeis/spark/"><code class="docutils literal notranslate"><span class="pre">rbeis.spark</span></code></a></p></li>
+<li class="toctree-l1"><a class="reference internal" href="api/">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/rbeis/"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rbeis</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/rbeis/#submodules">Submodules</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/rbeis/pandas/"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rbeis.pandas</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="api/rbeis/pandas/#module-contents">Module Contents</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="api/rbeis/pandas/#functions">Functions</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="api/rbeis/pandas/#rbeis.pandas.impute">impute</a></li>
 </ul>
 </li>
-<li><p><a class="reference external" href="https://y33les.github.io/rbeis/genindex/">Index</a></p></li>
-<li><p><a class="reference external" href="https://y33les.github.io/rbeis/search/">Search page</a></p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="api/rbeis/spark/"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rbeis.spark</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="api/rbeis/spark/#module-contents">Module Contents</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="api/rbeis/spark/#functions">Functions</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="api/rbeis/spark/#rbeis.spark.impute">impute</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/rbeis/#package-contents">Package Contents</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/rbeis/#classes">Classes</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="api/rbeis/#rbeis.RBEISInputException">RBEISInputException</a></li>
+<li class="toctree-l5"><a class="reference internal" href="api/rbeis/#rbeis.RBEISInputWarning">RBEISInputWarning</a></li>
+<li class="toctree-l5"><a class="reference internal" href="api/rbeis/#rbeis.RBEISDistanceFunction">RBEISDistanceFunction</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="api/rbeis/#rbeis.RBEISDistanceFunction.weight">weight</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="key-documents">
+<h1>Key documents<a class="headerlink" href="#key-documents" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="spec/">Method specification</a></p></li>
+<li><p><a class="reference external" href="notes/">User notes</a></p></li>
 </ul>
 </div>
 
@@ -66,14 +109,15 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="#">Table of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Welcome to RBEIS’s documentation!</a></li>
+<li><a class="reference internal" href="#">Rogers and Berriman Editing and Imputation System (RBEIS)</a></li>
 <li><a class="reference internal" href="#api-reference">API Reference</a></li>
+<li><a class="reference internal" href="#key-documents">Key documents</a></li>
 </ul>
 
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/index.md.txt"
+      <li><a href="_sources/index.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -101,7 +145,7 @@
           <a href="py-modindex/" title="Python Module Index"
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="#">rbeis 0.0.1 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Welcome to RBEIS’s documentation!</a></li> 
+        <li class="nav-item nav-item-this"><a href="">Rogers and Berriman Editing and Imputation System (RBEIS)</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
