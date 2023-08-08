@@ -48,11 +48,301 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rbeis.pandas._check_missing_auxvars" title="rbeis.pandas._check_missing_auxvars"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_check_missing_auxvars</span></code></a>(data, aux_vars)</p></td>
+<td><p>_check_missing_auxvars(data, aux_vars)</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#rbeis.pandas._add_impute_col" title="rbeis.pandas._add_impute_col"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_add_impute_col</span></code></a>(data, imp_var)</p></td>
+<td><p>_add_impute_col(data, imp_var)</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rbeis.pandas._assign_igroups" title="rbeis.pandas._assign_igroups"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_assign_igroups</span></code></a>(data, aux_var_names)</p></td>
+<td><p>_assign_igroups(data, aux_var_names)</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#rbeis.pandas._get_igroup_aux_var" title="rbeis.pandas._get_igroup_aux_var"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_get_igroup_aux_var</span></code></a>(data, aux_var_name)</p></td>
+<td><p>_get_igroup_aux_var(data, aux_var_name)</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rbeis.pandas._calc_distances" title="rbeis.pandas._calc_distances"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_calc_distances</span></code></a>(data, aux_vars)</p></td>
+<td><p>_calc_distances(data, aux_vars)</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#rbeis.pandas._calc_donors" title="rbeis.pandas._calc_donors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_calc_donors</span></code></a>(data[, ratio])</p></td>
+<td><p>_calc_donors(data, ratio=None)</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rbeis.pandas._get_donors" title="rbeis.pandas._get_donors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_get_donors</span></code></a>(data, igroup)</p></td>
+<td><p>_get_donors(data, igroup)</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#rbeis.pandas._get_freq_dist" title="rbeis.pandas._get_freq_dist"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_get_freq_dist</span></code></a>(data, imp_var, possible_vals, igroup)</p></td>
+<td><p>_get_freq_dist(data, imp_var, possible_vals, igroup)</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rbeis.pandas._freq_to_exp" title="rbeis.pandas._freq_to_exp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_freq_to_exp</span></code></a>(data, freq_dist, igroup)</p></td>
+<td><p>_freq_to_exp(data, freq_dist, igroup)</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#rbeis.pandas._impute_igroup" title="rbeis.pandas._impute_igroup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_impute_igroup</span></code></a>(data, exp_dist, possible_vals, igroup)</p></td>
+<td><p>_impute_igroup(data, exp_dist, possible_vals, igroup)</p></td>
+</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#rbeis.pandas.impute" title="rbeis.pandas.impute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">impute</span></code></a>(data, imp_var, possible_vals, aux_vars[, …])</p></td>
 <td><p>impute(data, imp_var, possible_vals, aux_vars, ratio=None, in_place=True,</p></td>
 </tr>
 </tbody>
 </table>
+<dl class="py function">
+<dt id="rbeis.pandas._check_missing_auxvars">
+<code class="sig-prename descclassname"><span class="pre">rbeis.pandas.</span></code><code class="sig-name descname"><span class="pre">_check_missing_auxvars</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aux_vars</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/rbeis/pandas/#_check_missing_auxvars"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rbeis.pandas._check_missing_auxvars" title="Permalink to this definition">¶</a></dt>
+<dd><p>_check_missing_auxvars(data, aux_vars)</p>
+<blockquote>
+<div><blockquote>
+<div><dl class="simple">
+<dt>data (pd.DataFrame): The dataset undergoing</dt><dd><p>imputation</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="simple">
+<dt>aux_vars (str * RBEISDistanceFunction dict): A dictionary whose keys</dt><dd><p>are strings corresponding
+to the names of auxiliary
+variables and whose values
+are the
+RBEISDistanceFunctions to
+be used to compare
+instances of each
+auxiliary variable.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Raise an RBEISInputException if the DataFrame contains any records for which
+any of the chosen auxiliary variables are missing.</p>
+<dl>
+<dt>e.g. _check_missing_auxvars(pd.read_csv(“my_data.csv”),</dt><dd><dl>
+<dt>{“height”: RBEISDistanceFunction(1,</dt><dd><blockquote>
+<div><p>weight = 5),</p>
+</div></blockquote>
+<dl>
+<dt>“length”: RBEISDistanceFunction(5,</dt><dd><dl class="simple">
+<dt>custom_map = {(2, 3): 0,</dt><dd><p>(8, 8): 0.25},</p>
+</dd>
+</dl>
+<p>threshold = 2)})</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="rbeis.pandas._add_impute_col">
+<code class="sig-prename descclassname"><span class="pre">rbeis.pandas.</span></code><code class="sig-name descname"><span class="pre">_add_impute_col</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imp_var</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/rbeis/pandas/#_add_impute_col"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rbeis.pandas._add_impute_col" title="Permalink to this definition">¶</a></dt>
+<dd><p>_add_impute_col(data, imp_var)</p>
+<dl class="simple">
+<dt>data (pd.DataFrame): The dataset undergoing imputation</dt><dd><p>imp_var (str): The name of the variable to be imputed</p>
+</dd>
+</dl>
+<p>Prepare the DataFrame by adding a boolean column ‘_impute’ indicating
+whether or not a record is to be imputed.  A record will be marked for
+imputation if a value for the specified imputation variable is missing.
+This function modifies the DataFrame in place, rather than returning a
+new DataFrame.</p>
+<p>e.g. _add_impute_col(pd.read_csv(“my_data.csv”), “length”)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="rbeis.pandas._assign_igroups">
+<code class="sig-prename descclassname"><span class="pre">rbeis.pandas.</span></code><code class="sig-name descname"><span class="pre">_assign_igroups</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aux_var_names</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/rbeis/pandas/#_assign_igroups"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rbeis.pandas._assign_igroups" title="Permalink to this definition">¶</a></dt>
+<dd><p>_assign_igroups(data, aux_var_names)</p>
+<blockquote>
+<div><p>data (pd.DataFrame): The dataset undergoing imputation</p>
+</div></blockquote>
+<p>aux_var_names (str list): The names of the chosen auxiliary variables</p>
+<p>Add a column ‘IGroup’ containing integers representing the IGroup that each
+recipient record is assigned to.  This function modifies the DataFrame in
+place, rather than returning a new DataFrame.
+1. Add a column ‘_conc_aux’ containing the string representation of the list</p>
+<blockquote>
+<div><p>of values corresponding to the record’s auxiliary variables</p>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p>Group by ‘_conc_aux’ and extract group integers from the internal grouper
+object, creating a new column ‘_IGroup’ containing these integers</p></li>
+<li><p>Subtract 1 from each IGroup value, giving -1 for all non-recipient
+records and zero-indexing all others</p></li>
+<li><p>Remove column ‘_conc_aux’</p></li>
+</ol>
+<p>e.g. _assign_igroups(myDataFrame, [“height”, “width”, “length”]</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="rbeis.pandas._get_igroup_aux_var">
+<code class="sig-prename descclassname"><span class="pre">rbeis.pandas.</span></code><code class="sig-name descname"><span class="pre">_get_igroup_aux_var</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aux_var_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/rbeis/pandas/#_get_igroup_aux_var"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rbeis.pandas._get_igroup_aux_var" title="Permalink to this definition">¶</a></dt>
+<dd><p>_get_igroup_aux_var(data, aux_var_name)</p>
+<dl class="simple">
+<dt>data (pd.DataFrame): The dataset undergoing imputation</dt><dd><p>aux_var_name (str): The name of the desired auxiliary variable</p>
+</dd>
+</dl>
+<p>Return a list containing each IGroup’s value of a given auxiliary variable.
+The value at index i corresponds to the value for IGroup i.</p>
+<p>e.g. _get_igroup_aux_var(myDataFrame, “height”) =&gt; [188, 154, 192, …]</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="rbeis.pandas._calc_distances">
+<code class="sig-prename descclassname"><span class="pre">rbeis.pandas.</span></code><code class="sig-name descname"><span class="pre">_calc_distances</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aux_vars</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/rbeis/pandas/#_calc_distances"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rbeis.pandas._calc_distances" title="Permalink to this definition">¶</a></dt>
+<dd><p>_calc_distances(data, aux_vars)</p>
+<blockquote>
+<div><dl class="simple">
+<dt>data (pd.DataFrame): The dataset undergoing</dt><dd><p>imputation</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="simple">
+<dt>aux_vars (str * RBEISDistanceFunction dict): A dictionary whose keys are</dt><dd><p>strings corresponding to the
+names of auxiliary variables
+and whose values are the
+RBEISDistanceFunctions to be
+used to compare instances of
+each auxiliary variable.</p>
+</dd>
+</dl>
+<p>Add a column ‘_distances’ containing lists of calculated distances of each
+record’s auxiliary variables from those of its IGroup.  This function
+modifies the DataFrame in place, rather than returning a new DataFrame.
+1. Create a list of dictionaries containing the values of each IGroup’s</p>
+<blockquote>
+<div><p>auxiliary variables</p>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p>Add a column ‘_dists_temp’ containing, for each potential donor record, a
+list of dictionaries of calculated distances for each auxiliary variable</p></li>
+<li><p>Add a column ‘_distances’ containing, for each potential donor record, a
+list of calculated distances from its IGroup’s auxiliary variables,
+taking into account the specified weights</p></li>
+<li><p>Remove column ‘_dists_temp’</p></li>
+</ol>
+<p>PLEASE NOTE that the argument order is assumed to be (record, IGroup).  This
+is especially important when using custom maps with distance functions 4-6,
+which <em>do not</em> assume that f(x,y) == f(y,x).</p>
+<dl>
+<dt>e.g. _calc_distances(myDataFrame, {“length”: RBEISDistanceFunction(2, threshold=1.5),</dt><dd><p>“genre”: RBEISDistanceFunction(1, weight=8),
+“rating”: RBEISDistanceFunction(4, custom_map={(3,4): 0,</p>
+<blockquote>
+<div><p>(1,1): 10}})</p>
+</div></blockquote>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="rbeis.pandas._calc_donors">
+<code class="sig-prename descclassname"><span class="pre">rbeis.pandas.</span></code><code class="sig-name descname"><span class="pre">_calc_donors</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/rbeis/pandas/#_calc_donors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rbeis.pandas._calc_donors" title="Permalink to this definition">¶</a></dt>
+<dd><p>_calc_donors(data, ratio=None)</p>
+<dl class="simple">
+<dt>data (pd.DataFrame): The dataset undergoing imputation</dt><dd><dl class="simple">
+<dt>ratio (numeric): [Optional] Instead of choosing the minimum distance,</dt><dd><p>choose records less than or equal to ratio * the
+minimum distance.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>Add a column ‘donor’ containing a list of IGroup numbers to which each
+record is a donor.  This function modifies the DataFrame in place, rather
+than returning a new DataFrame.
+1. Calculate the distances less than or equal to which a record may be</p>
+<blockquote>
+<div><p>accepted as a donor to each respective IGroup.</p>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p>Zip each record’s distances to the list of distances calculated in step
+1, and identify where the record distances are less than or equal to the
+maximum required IGroup distances, giving a list of indices where this is
+the case.</p></li>
+</ol>
+<dl class="simple">
+<dt>e.g. _calc_donors(myDataFrame)</dt><dd><p>_calc_donors(myDataFrame, ratio=2.5)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="rbeis.pandas._get_donors">
+<code class="sig-prename descclassname"><span class="pre">rbeis.pandas.</span></code><code class="sig-name descname"><span class="pre">_get_donors</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">igroup</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/rbeis/pandas/#_get_donors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rbeis.pandas._get_donors" title="Permalink to this definition">¶</a></dt>
+<dd><p>_get_donors(data, igroup)</p>
+<dl class="simple">
+<dt>data (pd.DataFrame): The dataset undergoing imputation</dt><dd><p>igroup (int): The IGroup whose donors are required</p>
+</dd>
+</dl>
+<p>Return a list of indices corresponding to records in data that are donors to
+the specified IGroup.</p>
+<p>e.g. _get_donors(myDataFrame, 24) =&gt; [10, 14, 29, …]</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="rbeis.pandas._get_freq_dist">
+<code class="sig-prename descclassname"><span class="pre">rbeis.pandas.</span></code><code class="sig-name descname"><span class="pre">_get_freq_dist</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imp_var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">possible_vals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">igroup</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/rbeis/pandas/#_get_freq_dist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rbeis.pandas._get_freq_dist" title="Permalink to this definition">¶</a></dt>
+<dd><p>_get_freq_dist(data, imp_var, possible_vals, igroup)</p>
+<blockquote>
+<div><dl class="simple">
+<dt>data (pd.DataFrame): The dataset undergoing imputation</dt><dd><p>imp_var (str): The name of the variable to be imputed</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="simple">
+<dt>possible_vals (‘a list): A list of all possible values that imp_var can take</dt><dd><p>igroup (int): The IGroup whose donors are required</p>
+</dd>
+</dl>
+<p>For a given IGroup, return a frequency distribution for each possible value
+of the variable to be imputed.  This takes the form of a list of the
+proportions of a given IGroup taken up by each possible value.</p>
+<p>e.g. _get_freq_fist(myDataFrame, “genre”, [“jungle”, “acid house”, “UK garage”], 48) =&gt; [0.5, 0.3, 0.2]</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="rbeis.pandas._freq_to_exp">
+<code class="sig-prename descclassname"><span class="pre">rbeis.pandas.</span></code><code class="sig-name descname"><span class="pre">_freq_to_exp</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq_dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">igroup</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/rbeis/pandas/#_freq_to_exp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rbeis.pandas._freq_to_exp" title="Permalink to this definition">¶</a></dt>
+<dd><p>_freq_to_exp(data, freq_dist, igroup)</p>
+<blockquote>
+<div><p>data (pd.DataFrame): The dataset undergoing imputation</p>
+</div></blockquote>
+<dl class="simple">
+<dt>freq_dist (Fraction list): The frequency distribution to convert</dt><dd><p>igroup (int): The IGroup corresponding to freq_dist</p>
+</dd>
+</dl>
+<p>Convert a frequency distribution to the expected numbers of occurrences for
+a given IGroup.</p>
+<p>e.g. _freq_to_exp(myDataFrame, [0.5, 0.3, 0.2], 48) =&gt; [100, 60, 40]</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="rbeis.pandas._impute_igroup">
+<code class="sig-prename descclassname"><span class="pre">rbeis.pandas.</span></code><code class="sig-name descname"><span class="pre">_impute_igroup</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exp_dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">possible_vals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">igroup</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/rbeis/pandas/#_impute_igroup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rbeis.pandas._impute_igroup" title="Permalink to this definition">¶</a></dt>
+<dd><p>_impute_igroup(data, exp_dist, possible_vals, igroup)</p>
+<blockquote>
+<div><p>data (pd.DataFrame): The dataset undergoing imputation</p>
+</div></blockquote>
+<dl>
+<dt>exp_dist (Fraction list): The expected values derived from the frequency</dt><dd><blockquote>
+<div><p>distribution using _freq_to_exp</p>
+</div></blockquote>
+<dl class="simple">
+<dt>possible_vals (‘a list): A list of all possible values that imp_var can take</dt><dd><p>igroup (int): The IGroup whose values are to be imputed</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>Return a set of imputed values for the given IGroup:
+1. For each of the possible values that the variable to be imputed can take,</p>
+<blockquote>
+<div><p>insert a number of values equal to the integer part of the expected value
+and subtract the integer part from the expected value</p>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p>Convert the fractional parts of the expected values back into
+probabilities</p></li>
+<li><p>Using these probabilities, draw a value at random, remove that value from
+the set of possible values to be imputed, and adjust the remaining
+probabilities accordingly</p></li>
+<li><p>Repeat step 3 until there are no more values still to impute</p></li>
+<li><p>Randomise the order of the list of imputed values, then return it</p></li>
+</ol>
+<p>e.g. _impute_igroup(myDataFrame, [100, 60, 40], [“jungle”, “acid house”, “UK garage”], 48)</p>
+</dd></dl>
+
 <dl class="py function">
 <dt id="rbeis.pandas.impute">
 <code class="sig-prename descclassname"><span class="pre">rbeis.pandas.</span></code><code class="sig-name descname"><span class="pre">impute</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imp_var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">possible_vals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aux_vars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_place</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_intermediates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/rbeis/pandas/#impute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rbeis.pandas.impute" title="Permalink to this definition">¶</a></dt>
@@ -160,6 +450,16 @@ keep_intermediates = True)</p>
 <li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rbeis.pandas</span></code></a><ul>
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
 <li><a class="reference internal" href="#functions">Functions</a><ul>
+<li><a class="reference internal" href="#rbeis.pandas._check_missing_auxvars">_check_missing_auxvars</a></li>
+<li><a class="reference internal" href="#rbeis.pandas._add_impute_col">_add_impute_col</a></li>
+<li><a class="reference internal" href="#rbeis.pandas._assign_igroups">_assign_igroups</a></li>
+<li><a class="reference internal" href="#rbeis.pandas._get_igroup_aux_var">_get_igroup_aux_var</a></li>
+<li><a class="reference internal" href="#rbeis.pandas._calc_distances">_calc_distances</a></li>
+<li><a class="reference internal" href="#rbeis.pandas._calc_donors">_calc_donors</a></li>
+<li><a class="reference internal" href="#rbeis.pandas._get_donors">_get_donors</a></li>
+<li><a class="reference internal" href="#rbeis.pandas._get_freq_dist">_get_freq_dist</a></li>
+<li><a class="reference internal" href="#rbeis.pandas._freq_to_exp">_freq_to_exp</a></li>
+<li><a class="reference internal" href="#rbeis.pandas._impute_igroup">_impute_igroup</a></li>
 <li><a class="reference internal" href="#rbeis.pandas.impute">impute</a></li>
 </ul>
 </li>
