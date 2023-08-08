@@ -1,4 +1,4 @@
-# Rogers and Berriman Editing and Imputation System (RBEIS)
+# Method specification
 
 ## 1 Meta
 

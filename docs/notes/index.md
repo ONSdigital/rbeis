@@ -1,4 +1,4 @@
-# Example usage
+# User notes
 
 > _**N.B.:** This guide assumes familiarity with the RBEIS algorithm.  If you are not familiar with how RBEIS works, please consult the methodological specification._
 
