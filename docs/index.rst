@@ -5,6 +5,8 @@ RBEIS is a method originally developed for imputing categorical data in relative
 
 RBEIS is distributed through PyPI.  To install, simply call ``pip install rbeis``.
 
+RBEIS is licensed under the `MIT License <https://mit-license.org/>`_.
+
 * :ref:`genindex`
 * :ref:`search`
 
