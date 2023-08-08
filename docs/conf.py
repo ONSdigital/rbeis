@@ -56,6 +56,7 @@ extensions = [
 extensions.append('autoapi.extension')
 autoapi_dirs = ['../rbeis']
 autoapi_options =  [ 'members', 'undoc-members', 'show-inheritance', 'show-module-summary', ]
+autoapi_root = 'api'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
