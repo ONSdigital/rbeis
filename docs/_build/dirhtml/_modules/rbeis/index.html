@@ -86,7 +86,7 @@
 
     <span class="c1"># Standard distance functions 1-3 (4-6 are 1-3 with custom overrides)</span>
     <span class="c1"># Where x is the IGroup&#39;s value, y is the current record&#39;s value, and m is a threshold value</span>
-<div class="viewcode-block" id="RBEISDistanceFunction._df1"><a class="viewcode-back" href="../../api/rbeis/#rbeis.RBEISDistanceFunction._df1">[docs]</a>    <span class="k">def</span> <span class="nf">_df1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_df1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Distance Function 1: return 1 if `x` and `y` are not equal, otherwise 0.  This function (and its derivative, DF4) can be used with any data types that are comparable using `=`.</span>
 
@@ -100,9 +100,9 @@
 <span class="sd">        _df1(2, 4) # =&gt; 1</span>
 <span class="sd">        ```</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">x</span> <span class="o">!=</span> <span class="n">y</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">x</span> <span class="o">!=</span> <span class="n">y</span><span class="p">)</span>
 
-<div class="viewcode-block" id="RBEISDistanceFunction._df2"><a class="viewcode-back" href="../../api/rbeis/#rbeis.RBEISDistanceFunction._df2">[docs]</a>    <span class="k">def</span> <span class="nf">_df2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_df2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Distance Function 2: return 1 if the difference between `x` and `y` is greater than the threshold `m`, otherwise 0.  This function (and its derivative, DF5) may only be used with numeric data.</span>
 
@@ -127,9 +127,9 @@
                 <span class="s2">&quot;You have provided a non-numeric threshold value to distance function 2, 3, 5 or 6&quot;</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">m</span><span class="p">)</span></div>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">m</span><span class="p">)</span>
 
-<div class="viewcode-block" id="RBEISDistanceFunction._df3"><a class="viewcode-back" href="../../api/rbeis/#rbeis.RBEISDistanceFunction._df3">[docs]</a>    <span class="k">def</span> <span class="nf">_df3</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_df3</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Distance Function 3: return 1 if the difference between `x` and `y` is greater than the threshold `m`, otherwise return the difference between `x` and `y`, divided by `m + 1`.  This function (and its derivative, DF6) may only be used with numeric data.</span>
 
@@ -154,7 +154,7 @@
                 <span class="s2">&quot;You have provided a non-numeric threshold value to distance function 2, 3, 5 or 6&quot;</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="mf">1.0</span> <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">m</span> <span class="k">else</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">m</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span></div>
+            <span class="k">return</span> <span class="mf">1.0</span> <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">m</span> <span class="k">else</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">m</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span>
 
 <div class="viewcode-block" id="RBEISDistanceFunction.f"><a class="viewcode-back" href="../../api/rbeis/#rbeis.RBEISDistanceFunction.f">[docs]</a>    <span class="n">f</span> <span class="o">=</span> <span class="n">_df1</span></div>
 <div class="viewcode-block" id="RBEISDistanceFunction.weight"><a class="viewcode-back" href="../../api/rbeis/#rbeis.RBEISDistanceFunction.weight">[docs]</a>    <span class="n">weight</span> <span class="o">=</span> <span class="mf">1.0</span></div>

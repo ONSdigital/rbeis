@@ -57,7 +57,7 @@
 
 
 
-<div class="viewcode-block" id="_check_missing_auxvars"><a class="viewcode-back" href="../../../api/rbeis/pandas/#rbeis.pandas._check_missing_auxvars">[docs]</a><span class="k">def</span> <span class="nf">_check_missing_auxvars</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">aux_vars</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_check_missing_auxvars</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">aux_vars</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Raise an [RBEISInputException](..#RBEISInputException) if the DataFrame contains any records for which any of the chosen auxiliary variables are missing.</span>
 
@@ -86,11 +86,11 @@
         <span class="p">]))</span>
     <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">RBEISInputException</span><span class="p">(</span>
-            <span class="s2">&quot;Your dataset includes records for which the given auxiliary variables are missing&quot;</span></div>
+            <span class="s2">&quot;Your dataset includes records for which the given auxiliary variables are missing&quot;</span>
         <span class="p">)</span>
 
 
-<div class="viewcode-block" id="_add_impute_col"><a class="viewcode-back" href="../../../api/rbeis/pandas/#rbeis.pandas._add_impute_col">[docs]</a><span class="k">def</span> <span class="nf">_add_impute_col</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">imp_var</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_add_impute_col</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">imp_var</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Prepare the DataFrame by adding a boolean column `_impute` indicating whether or not a record is to be imputed.  A record will be marked for imputation if a value for the specified imputation variable is missing.  This function modifies the DataFrame in place, rather than returning a new DataFrame.</span>
 
@@ -107,11 +107,11 @@
     <span class="n">data</span><span class="p">[</span><span class="s2">&quot;_impute&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
         <span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="n">imp_var</span><span class="p">])</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="n">imp_var</span><span class="p">],</span> <span class="n">Number</span><span class="p">)</span> <span class="k">else</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span></div>
+        <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="p">)</span>
 
 
-<div class="viewcode-block" id="_assign_igroups"><a class="viewcode-back" href="../../../api/rbeis/pandas/#rbeis.pandas._assign_igroups">[docs]</a><span class="k">def</span> <span class="nf">_assign_igroups</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">aux_var_names</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_assign_igroups</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">aux_var_names</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Add a column `IGroup` containing integers representing the IGroup that each recipient record is assigned to.  This function modifies the DataFrame in place, rather than returning a new DataFrame.</span>
 
@@ -136,10 +136,10 @@
     <span class="p">)</span>
     <span class="n">data</span><span class="p">[</span><span class="s2">&quot;_IGroup&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;_conc_aux&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">grouper</span><span class="o">.</span><span class="n">group_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">data</span><span class="p">[</span><span class="s2">&quot;_IGroup&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span><span class="p">[</span><span class="s2">&quot;_IGroup&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="k">del</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;_conc_aux&quot;</span><span class="p">]</span></div>
+    <span class="k">del</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;_conc_aux&quot;</span><span class="p">]</span>
 
 
-<div class="viewcode-block" id="_get_igroup_aux_var"><a class="viewcode-back" href="../../../api/rbeis/pandas/#rbeis.pandas._get_igroup_aux_var">[docs]</a><span class="k">def</span> <span class="nf">_get_igroup_aux_var</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">aux_var_name</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_get_igroup_aux_var</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">aux_var_name</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return a list containing each IGroup&#39;s value of a given auxiliary variable.  The value at index `i` corresponds to the value for IGroup `i`.</span>
 
@@ -158,10 +158,10 @@
             <span class="s2">&quot;_IGroup&quot;</span><span class="p">,</span> <span class="n">aux_var_name</span>
         <span class="p">]]</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;_IGroup == &quot;</span> <span class="o">+</span>
                                    <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))[</span><span class="n">aux_var_name</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
-    <span class="k">return</span> <span class="n">out</span></div>
+    <span class="k">return</span> <span class="n">out</span>
 
 
-<div class="viewcode-block" id="_calc_distances"><a class="viewcode-back" href="../../../api/rbeis/pandas/#rbeis.pandas._calc_distances">[docs]</a><span class="k">def</span> <span class="nf">_calc_distances</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">aux_vars</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_calc_distances</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">aux_vars</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Add a column `_distances` containing lists of calculated distances of each record&#39;s auxiliary variables from those of its IGroup.  This function modifies the DataFrame in place, rather than returning a new DataFrame.</span>
 
@@ -209,10 +209,10 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s2">&quot;_impute&quot;</span><span class="p">])</span> <span class="k">else</span> <span class="p">[],</span>
         <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="k">del</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;_dists_temp&quot;</span><span class="p">]</span></div>
+    <span class="k">del</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;_dists_temp&quot;</span><span class="p">]</span>
 
 
-<div class="viewcode-block" id="_calc_donors"><a class="viewcode-back" href="../../../api/rbeis/pandas/#rbeis.pandas._calc_donors">[docs]</a><span class="k">def</span> <span class="nf">_calc_donors</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ratio</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_calc_donors</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ratio</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Add a column `donor` containing a list of IGroup numbers to which each record is a donor.  This function modifies the DataFrame in place, rather than returning a new DataFrame.</span>
 
@@ -248,11 +248,11 @@
                 <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
                     <span class="nb">zip</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s2">&quot;_distances&quot;</span><span class="p">],</span> <span class="n">max_donor_dists</span><span class="p">))))[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s2">&quot;_impute&quot;</span><span class="p">])</span> <span class="k">else</span> <span class="p">[],</span>
-        <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span></div>
+        <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="p">)</span>  <span class="c1"># TODO: What if we have multiple minima?  Do we just choose the first, or choose one randomly?</span>
 
 
-<div class="viewcode-block" id="_get_donors"><a class="viewcode-back" href="../../../api/rbeis/pandas/#rbeis.pandas._get_donors">[docs]</a><span class="k">def</span> <span class="nf">_get_donors</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">igroup</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_get_donors</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">igroup</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return a list of indices corresponding to records in data that are donors to the specified IGroup.</span>
 
@@ -265,10 +265,10 @@
 <span class="sd">    _get_donors(myDataFrame, 24) # =&gt; [10, 14, 29, ...]</span>
 <span class="sd">    ```</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">igroup</span> <span class="ow">in</span> <span class="n">x</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;_donor&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()))</span></div>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">igroup</span> <span class="ow">in</span> <span class="n">x</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;_donor&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()))</span>
 
 
-<div class="viewcode-block" id="_get_freq_dist"><a class="viewcode-back" href="../../../api/rbeis/pandas/#rbeis.pandas._get_freq_dist">[docs]</a><span class="k">def</span> <span class="nf">_get_freq_dist</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">imp_var</span><span class="p">,</span> <span class="n">possible_vals</span><span class="p">,</span> <span class="n">igroup</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_get_freq_dist</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">imp_var</span><span class="p">,</span> <span class="n">possible_vals</span><span class="p">,</span> <span class="n">igroup</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    For a given IGroup, return a frequency distribution for each possible value of the variable to be imputed.  This takes the form of a list of the proportions of a given IGroup taken up by each possible value.</span>
 
@@ -289,12 +289,12 @@
             <span class="k">lambda</span> <span class="n">n</span><span class="p">:</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">Fraction</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">pool</span><span class="p">)),</span>
             <span class="nb">map</span><span class="p">(</span>
                 <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">len</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">pool</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">v</span><span class="p">]),</span>
-                <span class="n">possible_vals</span><span class="p">,</span></div>
+                <span class="n">possible_vals</span><span class="p">,</span>
             <span class="p">),</span>
         <span class="p">))</span>
 
 
-<div class="viewcode-block" id="_freq_to_exp"><a class="viewcode-back" href="../../../api/rbeis/pandas/#rbeis.pandas._freq_to_exp">[docs]</a><span class="k">def</span> <span class="nf">_freq_to_exp</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">freq_dist</span><span class="p">,</span> <span class="n">igroup</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_freq_to_exp</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">freq_dist</span><span class="p">,</span> <span class="n">igroup</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convert a frequency distribution to the expected numbers of occurrences for a given IGroup.</span>
 
@@ -309,10 +309,10 @@
 <span class="sd">    ```</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">igroup_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;_IGroup==&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">igroup</span><span class="p">))</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
-    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">f</span><span class="p">:</span> <span class="n">f</span> <span class="o">*</span> <span class="n">igroup_size</span><span class="p">,</span> <span class="n">freq_dist</span><span class="p">))</span></div>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">f</span><span class="p">:</span> <span class="n">f</span> <span class="o">*</span> <span class="n">igroup_size</span><span class="p">,</span> <span class="n">freq_dist</span><span class="p">))</span>
 
 
-<div class="viewcode-block" id="_impute_igroup"><a class="viewcode-back" href="../../../api/rbeis/pandas/#rbeis.pandas._impute_igroup">[docs]</a><span class="k">def</span> <span class="nf">_impute_igroup</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">exp_dist</span><span class="p">,</span> <span class="n">possible_vals</span><span class="p">,</span> <span class="n">igroup</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_impute_igroup</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">exp_dist</span><span class="p">,</span> <span class="n">possible_vals</span><span class="p">,</span> <span class="n">igroup</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return a set of imputed values for the given IGroup:</span>
 
@@ -360,7 +360,7 @@
         <span class="c1"># TODO: check that number of imputed values for each possible value is</span>
         <span class="c1">#       either int(exp) or int(exp)+1</span>
     <span class="n">shuffle</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">out</span></div>
+    <span class="k">return</span> <span class="n">out</span>
 
 
 <div class="viewcode-block" id="impute"><a class="viewcode-back" href="../../../api/rbeis/pandas/#rbeis.pandas.impute">[docs]</a><span class="k">def</span> <span class="nf">impute</span><span class="p">(</span>

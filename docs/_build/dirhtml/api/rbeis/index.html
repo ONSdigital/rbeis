@@ -112,55 +112,6 @@
 <code class="sig-name descname"><span class="pre">weight</span></code><em class="property"> <span class="pre">=</span> <span class="pre">1.0</span></em><a class="reference internal" href="../../_modules/rbeis/#RBEISDistanceFunction.weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rbeis.RBEISDistanceFunction.weight" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py method">
-<dt id="rbeis.RBEISDistanceFunction._df1">
-<code class="sig-name descname"><span class="pre">_df1</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/rbeis/#RBEISDistanceFunction._df1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rbeis.RBEISDistanceFunction._df1" title="Permalink to this definition">¶</a></dt>
-<dd><p>Distance Function 1: return 1 if <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code> are not equal, otherwise 0.  This function (and its derivative, DF4) can be used with any data types that are comparable using <code class="docutils literal notranslate"><span class="pre">=</span></code>.</p>
-<ul class="simple">
-<li><p><strong>x</strong> (‘a): A data point for comparison</p></li>
-<li><p><strong>y</strong> (‘a): A data point for comparison</p></li>
-</ul>
-<p><em>Example usages:</em></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">_df1</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="c1"># =&gt; 0</span>
-<span class="n">_df1</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="c1"># =&gt; 1</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py method">
-<dt id="rbeis.RBEISDistanceFunction._df2">
-<code class="sig-name descname"><span class="pre">_df2</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/rbeis/#RBEISDistanceFunction._df2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rbeis.RBEISDistanceFunction._df2" title="Permalink to this definition">¶</a></dt>
-<dd><p>Distance Function 2: return 1 if the difference between <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code> is greater than the threshold <code class="docutils literal notranslate"><span class="pre">m</span></code>, otherwise 0.  This function (and its derivative, DF5) may only be used with numeric data.</p>
-<ul class="simple">
-<li><p><strong>x</strong> (numeric): A data point for comparison</p></li>
-<li><p><strong>y</strong> (numeric): A data point for comparison</p></li>
-<li><p><strong>m</strong> (numeric): A threshold value</p></li>
-</ul>
-<p><em>Example usages:</em></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">_df2</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="c1"># =&gt; 0</span>
-<span class="n">_df2</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="c1"># =&gt; 0</span>
-<span class="n">_df2</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="c1"># =&gt; 1</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py method">
-<dt id="rbeis.RBEISDistanceFunction._df3">
-<code class="sig-name descname"><span class="pre">_df3</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/rbeis/#RBEISDistanceFunction._df3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rbeis.RBEISDistanceFunction._df3" title="Permalink to this definition">¶</a></dt>
-<dd><p>Distance Function 3: return 1 if the difference between <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code> is greater than the threshold <code class="docutils literal notranslate"><span class="pre">m</span></code>, otherwise return the difference between <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code>, divided by <code class="docutils literal notranslate"><span class="pre">m</span> <span class="pre">+</span> <span class="pre">1</span></code>.  This function (and its derivative, DF6) may only be used with numeric data.</p>
-<ul class="simple">
-<li><p><strong>x</strong> (numeric): A data point for comparison</p></li>
-<li><p><strong>y</strong> (numeric): A data point for comparison</p></li>
-<li><p><strong>m</strong> (numeric): A threshold value</p></li>
-</ul>
-<p><em>Example usages:</em></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">_df3</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="c1"># =&gt; 0</span>
-<span class="n">_df3</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="c1"># =&gt; 0.25</span>
-<span class="n">_df3</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="c1"># =&gt; 1</span>
-</pre></div>
-</div>
-</dd></dl>
-
 </dd></dl>
 
 </div>
@@ -185,9 +136,6 @@
 <li><a class="reference internal" href="#rbeis.RBEISDistanceFunction">RBEISDistanceFunction</a><ul>
 <li><a class="reference internal" href="#rbeis.RBEISDistanceFunction.f">f</a></li>
 <li><a class="reference internal" href="#rbeis.RBEISDistanceFunction.weight">weight</a></li>
-<li><a class="reference internal" href="#rbeis.RBEISDistanceFunction._df1">_df1</a></li>
-<li><a class="reference internal" href="#rbeis.RBEISDistanceFunction._df2">_df2</a></li>
-<li><a class="reference internal" href="#rbeis.RBEISDistanceFunction._df3">_df3</a></li>
 </ul>
 </li>
 </ul>
