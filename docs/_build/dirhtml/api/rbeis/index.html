@@ -83,10 +83,14 @@
 <p>RBEISDistanceFunctions have two public attributes: <strong>f</strong>, a two-argument function that computes the distance between two values, and <strong>weight</strong>, a numeric value by which the output of <strong>f</strong> is scaled (default value 1.0).</p>
 <ul class="simple">
 <li><p><strong>df</strong> (int): An integer from 1 to 6 corresponding to one of the standard RBEIS distance functions</p></li>
-<li><p><strong>custom_map</strong> ((‘a * ‘a) * numeric dict): [Optional] A dictionary mapping pairs (2-tuples) of values to distances (value pair as key, distance as value), overriding the underlying standard distance function.  Note that <code class="docutils literal notranslate"><span class="pre">(x,y)</span></code> → <code class="docutils literal notranslate"><span class="pre">z</span></code> does <strong>not</strong> imply that <code class="docutils literal notranslate"><span class="pre">(y,x)</span></code> → <code class="docutils literal notranslate"><span class="pre">z</span></code>.  This is required for distance functions 4, 5 and 6.</p></li>
+<li><p><strong>custom_map</strong> ((‘a * ‘a) * numeric dict): [Optional] A dictionary mapping pairs (2-tuples) of values to distances (value pair as key, distance as value), overriding the underlying standard distance function.</p></li>
 <li><p><strong>threshold</strong> (numeric): [Optional] A threshold value for distance functions 2, 3, 5 and 6.</p></li>
 <li><p><strong>weight</strong> (numeric): [Optional] A weight value by which to scale the output of the distance function.</p></li>
 </ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When using a custom map, please note that <code class="docutils literal notranslate"><span class="pre">(x,y)</span></code> → <code class="docutils literal notranslate"><span class="pre">z</span></code> does <strong>not</strong> imply that <code class="docutils literal notranslate"><span class="pre">(y,x)</span></code> → <code class="docutils literal notranslate"><span class="pre">z</span></code>.  This is required for distance functions 4, 5 and 6.</p>
+</div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>PLEASE NOTE that, when RBEIS calculates distances, the argument order is assumed to be (record, IGroup).  This is especially important when defining custom maps for DFs 4-6, which <em>do not</em> assume that <code class="docutils literal notranslate"><span class="pre">f(x,y)</span> <span class="pre">==</span> <span class="pre">f(y,x)</span></code>.</p>

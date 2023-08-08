@@ -26,9 +26,11 @@ class RBEISDistanceFunction:
     RBEISDistanceFunctions have two public attributes: **f**, a two-argument function that computes the distance between two values, and **weight**, a numeric value by which the output of **f** is scaled (default value 1.0).
 
     - **df** (int): An integer from 1 to 6 corresponding to one of the standard RBEIS distance functions
-    - **custom_map** (('a * 'a) * numeric dict): [Optional] A dictionary mapping pairs (2-tuples) of values to distances (value pair as key, distance as value), overriding the underlying standard distance function.  Note that `(x,y)` &rarr; `z` does **not** imply that `(y,x)` &rarr; `z`.  This is required for distance functions 4, 5 and 6.
+    - **custom_map** (('a * 'a) * numeric dict): [Optional] A dictionary mapping pairs (2-tuples) of values to distances (value pair as key, distance as value), overriding the underlying standard distance function.
     - **threshold** (numeric): [Optional] A threshold value for distance functions 2, 3, 5 and 6.
     - **weight** (numeric): [Optional] A weight value by which to scale the output of the distance function.
+
+    .. note:: When using a custom map, please note that `(x,y)` &rarr; `z` does **not** imply that `(y,x)` &rarr; `z`.  This is required for distance functions 4, 5 and 6.
 
     .. warning:: PLEASE NOTE that, when RBEIS calculates distances, the argument order is assumed to be (record, IGroup).  This is especially important when defining custom maps for DFs 4-6, which *do not* assume that `f(x,y) == f(y,x)`.
 
