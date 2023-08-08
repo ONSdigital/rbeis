@@ -80,6 +80,7 @@
 <dt id="rbeis.RBEISDistanceFunction">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">rbeis.</span></code><code class="sig-name descname"><span class="pre">RBEISDistanceFunction</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/rbeis/#RBEISDistanceFunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rbeis.RBEISDistanceFunction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Callable object encapsulating one of the six RBEIS distance functions, its threshold value (where appropriate), any pairs of values to be overridden (for DFs 4-6), and a weight by which to scale its result.</p>
+<p>RBEISDistanceFunctions have two public attributes: <strong>f</strong>, a two-argument function that computes the distance between two values, and <strong>weight</strong>, a numeric value by which the output of <strong>f</strong> is scaled (default value 1.0).</p>
 <ul class="simple">
 <li><p><strong>df</strong> (int): An integer from 1 to 6 corresponding to one of the standard RBEIS distance functions</p></li>
 <li><p><strong>custom_map</strong> ((‘a * ‘a) * numeric dict): [Optional] A dictionary mapping pairs (2-tuples) of values to distances (value pair as key, distance as value), overriding the underlying standard distance function.  Note that <code class="docutils literal notranslate"><span class="pre">(x,y)</span></code> → <code class="docutils literal notranslate"><span class="pre">z</span></code> does <strong>not</strong> imply that <code class="docutils literal notranslate"><span class="pre">(y,x)</span></code> → <code class="docutils literal notranslate"><span class="pre">z</span></code>.  This is required for distance functions 4, 5 and 6.</p></li>
@@ -102,16 +103,6 @@
 <span class="n">myDF</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span> <span class="c1"># =&gt; 2.5</span>
 </pre></div>
 </div>
-<dl class="py attribute">
-<dt id="rbeis.RBEISDistanceFunction.f">
-<code class="sig-name descname"><span class="pre">f</span></code><a class="reference internal" href="../../_modules/rbeis/#RBEISDistanceFunction.f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rbeis.RBEISDistanceFunction.f" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="rbeis.RBEISDistanceFunction.weight">
-<code class="sig-name descname"><span class="pre">weight</span></code><em class="property"> <span class="pre">=</span> <span class="pre">1.0</span></em><a class="reference internal" href="../../_modules/rbeis/#RBEISDistanceFunction.weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rbeis.RBEISDistanceFunction.weight" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 </div>
@@ -133,11 +124,7 @@
 <li><a class="reference internal" href="#classes">Classes</a><ul>
 <li><a class="reference internal" href="#rbeis.RBEISInputException">RBEISInputException</a></li>
 <li><a class="reference internal" href="#rbeis.RBEISInputWarning">RBEISInputWarning</a></li>
-<li><a class="reference internal" href="#rbeis.RBEISDistanceFunction">RBEISDistanceFunction</a><ul>
-<li><a class="reference internal" href="#rbeis.RBEISDistanceFunction.f">f</a></li>
-<li><a class="reference internal" href="#rbeis.RBEISDistanceFunction.weight">weight</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#rbeis.RBEISDistanceFunction">RBEISDistanceFunction</a></li>
 </ul>
 </li>
 </ul>

@@ -22,6 +22,8 @@ class RBEISInputWarning(UserWarning):
 class RBEISDistanceFunction:
     """
     Callable object encapsulating one of the six RBEIS distance functions, its threshold value (where appropriate), any pairs of values to be overridden (for DFs 4-6), and a weight by which to scale its result.
+    
+    RBEISDistanceFunctions have two public attributes: **f**, a two-argument function that computes the distance between two values, and **weight**, a numeric value by which the output of **f** is scaled (default value 1.0).
 
     - **df** (int): An integer from 1 to 6 corresponding to one of the standard RBEIS distance functions
     - **custom_map** (('a * 'a) * numeric dict): [Optional] A dictionary mapping pairs (2-tuples) of values to distances (value pair as key, distance as value), overriding the underlying standard distance function.  Note that `(x,y)` &rarr; `z` does **not** imply that `(y,x)` &rarr; `z`.  This is required for distance functions 4, 5 and 6.
