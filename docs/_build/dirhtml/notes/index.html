@@ -1,0 +1,156 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Example usage &#8212; rbeis 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex/" />
+    <link rel="search" title="Search" href="../search/" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex/" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex/" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../">rbeis 0.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Example usage</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="example-usage">
+<h1>Example usage<a class="headerlink" href="#example-usage" title="Permalink to this headline">¶</a></h1>
+<blockquote>
+<div><p><em><strong>N.B.:</strong> This guide assumes familiarity with the RBEIS algorithm.  If you are not familiar with how RBEIS works, please consult the methodological specification.</em></p>
+</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">impute</span></code> is the function that runs RBEIS on a Pandas DataFrame.  It takes four required positional arguments, and has several optional keyword arguments.  An example call to <code class="docutils literal notranslate"><span class="pre">impute</span></code> follows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rbeis.pandas</span> <span class="kn">import</span> <span class="n">impute</span><span class="p">,</span> <span class="n">RBEISDistanceFunction</span>
+<span class="n">impute</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;my_data.csv&quot;</span><span class="p">),</span>
+       <span class="s2">&quot;genre&quot;</span><span class="p">,</span>
+       <span class="p">[</span><span class="s2">&quot;jungle&quot;</span><span class="p">,</span> <span class="s2">&quot;acid house&quot;</span><span class="p">,</span> <span class="s2">&quot;UK garage&quot;</span><span class="p">],</span>
+       <span class="p">{</span><span class="s2">&quot;artist&quot;</span><span class="p">:</span> <span class="n">RBEISDistanceFunction</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">weight</span> <span class="o">=</span> <span class="mi">5</span><span class="p">),</span>
+        <span class="s2">&quot;bpm&quot;</span><span class="p">:</span> <span class="n">RBEISDistanceFunction</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">custom_map</span> <span class="o">=</span> <span class="p">{(</span><span class="mi">170</span><span class="p">,</span> <span class="mi">180</span><span class="p">):</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="mi">140</span><span class="p">,</span> <span class="mi">160</span><span class="p">):</span> <span class="mi">100</span><span class="p">},</span> <span class="n">threshold</span> <span class="o">=</span> <span class="mi">5</span><span class="p">),</span>
+        <span class="s2">&quot;length&quot;</span><span class="p">:</span> <span class="n">RBEISDistanceFunction</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">threshold</span> <span class="o">=</span> <span class="mf">1.25</span><span class="p">)},</span>
+       <span class="n">ratio</span> <span class="o">=</span> <span class="mf">1.5</span><span class="p">,</span>
+       <span class="n">in_place</span> <span class="o">=</span> <span class="bp">False</span><span class="p">,</span>
+       <span class="n">keep_intermediates</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The first positional argument is a Pandas DataFrame, the dataset upon which to perform imputation.</p>
+<p>The second is a string corresponding to the variable to be imputed.  This should match the name of one of the columns in the DataFrame.</p>
+<p>The third is a list of possible values that the imputation variable can take.  In the above example, the imputation variable <code class="docutils literal notranslate"><span class="pre">&quot;genre&quot;</span></code> can take possible values from the list <code class="docutils literal notranslate"><span class="pre">[&quot;jungle&quot;,</span> <span class="pre">&quot;acid</span> <span class="pre">house&quot;,</span> <span class="pre">&quot;UK</span> <span class="pre">garage&quot;]</span></code>.</p>
+<p>The fourth positional argument represents the auxiliar variables that will be used in the imputation.  This is a dictionary whose keys are strings corresponding to the columns in the DataFrame to be used as auxiliary variables.  Its values are <code class="docutils literal notranslate"><span class="pre">RBEISDistanceFunction</span></code> objects representing the functions to be used to compare values within each auxiliary variable.  The <code class="docutils literal notranslate"><span class="pre">RBEISDistanceFunction</span></code> object is explained in greater depth below.</p>
+<p>The three optional keyword arguments available to <code class="docutils literal notranslate"><span class="pre">impute</span></code> are <code class="docutils literal notranslate"><span class="pre">ratio</span></code>, <code class="docutils literal notranslate"><span class="pre">in_place</span></code> and <code class="docutils literal notranslate"><span class="pre">keep_intermediates</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">ratio</span></code> is a numeric argument that allows RBEIS to accept donors with distances greater than the minimum.  If set, it allows RBEIS to accept values less than or equal to the value of <code class="docutils literal notranslate"><span class="pre">ratio</span></code> multiplied by the minimum distance.  It should be set to a number greater than 1, as values less than 1 would result in RBEIS looking for distances less than the minimum.  If a value less than 1 is given, an <code class="docutils literal notranslate"><span class="pre">RBEISInputException</span></code> will be thrown.  <code class="docutils literal notranslate"><span class="pre">ratio</span></code> has no default value, reverting to the original RBEIS behaviour of choosing only the minimum distance if it is not specified.</p>
+<p><code class="docutils literal notranslate"><span class="pre">in_place</span></code> is a Boolean argument (default <code class="docutils literal notranslate"><span class="pre">True</span></code>) which instructs <code class="docutils literal notranslate"><span class="pre">impute</span></code> to overwrite the original DataFrame with the results of the imputation.  If <code class="docutils literal notranslate"><span class="pre">in_place</span></code> is <code class="docutils literal notranslate"><span class="pre">False</span></code>, <code class="docutils literal notranslate"><span class="pre">impute</span></code> returns a new DataFrame with the imputed data included.</p>
+<p><code class="docutils literal notranslate"><span class="pre">keep_intermediates</span></code> is a Boolean argument (default <code class="docutils literal notranslate"><span class="pre">False</span></code>) which instructs <code class="docutils literal notranslate"><span class="pre">impute</span></code> not to delete the temporary columns it creates in the process of imputation.  Its primary use is for debugging.</p>
+<div class="section" id="distance-functions">
+<h2>Distance functions<a class="headerlink" href="#distance-functions" title="Permalink to this headline">¶</a></h2>
+<p>Distance functions are encapsulated in <code class="docutils literal notranslate"><span class="pre">RBEISDistanceFunction</span></code> objects, which specify which of the six RBEIS distance functions to use and contain any required threshold values, custom mappings and weights.  They can be constructed in several ways:</p>
+<ol class="simple">
+<li><p>Standard distance function: <code class="docutils literal notranslate"><span class="pre">RBEISDistanceFunction(1)</span></code></p>
+<ul class="simple">
+<li><p>This creates a distance function exactly as in the RBEIS specification.  In this case, this is the RBEIS distance function 1.</p></li>
+</ul>
+</li>
+<li><p>Weighted distance function: <code class="docutils literal notranslate"><span class="pre">RBEISDistanceFunction(1,</span> <span class="pre">weight</span> <span class="pre">=</span> <span class="pre">2)</span></code></p>
+<ul class="simple">
+<li><p>This creates a distance function with its output scaled by a given factor.  In this case, this is the RBEIS distance function 1 with its output scaled by a factor of 2.</p></li>
+</ul>
+</li>
+<li><p>Distance function with threshold: <code class="docutils literal notranslate"><span class="pre">RBEISDistanceFunction(3,</span> <span class="pre">threshold</span> <span class="pre">=</span> <span class="pre">5)</span></code></p>
+<ul class="simple">
+<li><p>This creates one of the RBEIS distance functions (2, 3, 5 or 6) that requires a threshold value.  In this case, we create RBEIS distance function 3 with a threshold value of 5.</p></li>
+</ul>
+</li>
+<li><p>Distance function with overrides: <code class="docutils literal notranslate"><span class="pre">RBEISDistanceFunction(4,</span> <span class="pre">custom_map</span> <span class="pre">=</span> <span class="pre">{(1,</span> <span class="pre">2):</span> <span class="pre">10,</span> <span class="pre">(2,</span> <span class="pre">1):</span> <span class="pre">200})</span></code></p>
+<ul class="simple">
+<li><p>This creates one of the RBEIS distance functions (4, 5, or 6) that overrides certain pairs of values.  These overrides are represented as a dictionary whose keys are the pair of values to be overridden and whose values are the distances to return when those pairs of values are passed to the <code class="docutils literal notranslate"><span class="pre">RBEISDistanceFunction</span></code>.  Note that argument order matters here; in the example above the function as applied to <code class="docutils literal notranslate"><span class="pre">(1,</span> <span class="pre">2)</span></code> returns a distance of 10, whereas the function applied to the <code class="docutils literal notranslate"><span class="pre">(2,</span> <span class="pre">1)</span></code> returns a distance of 200.</p></li>
+</ul>
+</li>
+</ol>
+<p>The keyword arguments <code class="docutils literal notranslate"><span class="pre">weight</span></code>, <code class="docutils literal notranslate"><span class="pre">threshold</span></code> and <code class="docutils literal notranslate"><span class="pre">custom_map</span></code> can be used in combination with each other when necessary.  In the following example, RBEIS distance function 6 is constructed with its requisite threshold and overrides.  It is also given a <code class="docutils literal notranslate"><span class="pre">weight</span></code> of 4.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">RBEISDistanceFunction</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="n">custom_map</span> <span class="o">=</span> <span class="p">{(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="mi">10</span><span class="p">,</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span> <span class="mi">400</span><span class="p">},</span> <span class="n">threshold</span> <span class="o">=</span> <span class="mf">2.5</span><span class="p">,</span> <span class="n">weight</span> <span class="o">=</span> <span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>It is possible to provide redundant arguments, for example providing a threshold value to distance function 1.  These will not be used, and a warning will be displayed upon creation.</p>
+<p><code class="docutils literal notranslate"><span class="pre">RBEISDistanceFunction</span></code>s are callable, meaning that they can be used as any other function:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">myDF</span> <span class="o">=</span> <span class="n">RBEISDistanceFunction</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="n">custom_map</span> <span class="o">=</span> <span class="p">{(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="mi">10</span><span class="p">,</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span> <span class="mi">400</span><span class="p">},</span> <span class="n">threshold</span> <span class="o">=</span> <span class="mf">2.5</span><span class="p">,</span> <span class="n">weight</span> <span class="o">=</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">myDF</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Example usage</a><ul>
+<li><a class="reference internal" href="#distance-functions">Distance functions</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/notes/index.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search/" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex/" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex/" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../">rbeis 0.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Example usage</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023, Phil Yeeles.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.4.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,268 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rogers and Berriman Editing and Imputation System (RBEIS) &#8212; rbeis 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex/" />
+    <link rel="search" title="Search" href="../search/" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex/" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex/" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../">rbeis 0.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Rogers and Berriman Editing and Imputation System (RBEIS)</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="rogers-and-berriman-editing-and-imputation-system-rbeis">
+<h1>Rogers and Berriman Editing and Imputation System (RBEIS)<a class="headerlink" href="#rogers-and-berriman-editing-and-imputation-system-rbeis" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="meta">
+<h2>1 Meta<a class="headerlink" href="#meta" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><strong>Support Area:</strong> Editing and Imputation</p></li>
+<li><p><strong>Method Theme:</strong> Editing and Imputation</p></li>
+<li><p><strong>Last reviewed:</strong> 2023-08-03</p></li>
+</ul>
+</div>
+<div class="section" id="terminology">
+<h2>2 Terminology<a class="headerlink" href="#terminology" title="Permalink to this headline">¶</a></h2>
+<!--
+A bulleted list of technical terms specific to this method that are used in the specification
+-->
+<ul class="simple">
+<li><p><strong>Auxiliary variable:</strong> One of a set of variables that will be used to determine the similarity of potential donor records to records requiring imputation</p></li>
+<li><p><strong>Distance:</strong> A numerical measure of how similar two records are to each other</p></li>
+<li><p><strong>Distance function:</strong> One of six pre-defined functions used to calculate the distance between two records</p></li>
+<li><p><strong>Donor pool:</strong> The set of values from which records requiring imputation may draw.  The donor pool is the result of processing carried out on the potential donor pool.</p></li>
+<li><p><strong>IGroup:</strong> ‘Imputation Group’, records requiring imputation whose auxiliary variables have the same values.</p></li>
+<li><p><strong>Imputation variable:</strong> The variable for which values are being imputed.</p></li>
+<li><p><strong>Impute:</strong> To suggest likely values for missing data based on other existing data.</p></li>
+<li><p><strong>Potential donor pool:</strong> The set of potential donor records that will be processed into the donor pool for an IGroup.</p></li>
+<li><p><strong>Potential donor record:</strong> A record not requiring imputation that may, therefore, contribute the value of its imputation variable.</p></li>
+</ul>
+</div>
+<div class="section" id="summary">
+<h2>3 Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<!--
+A brief (~100 words) summary of what your method does, how it achieves it, and what kinds of data it expects to receive and produce.  These will each be explored in greater depth in later sections, so make sure not to go into too much detail here
+-->
+<p>RBEIS is a method originally developed for imputing categorical data in relatively small social surveys with the intention of minimising conditional imputation variance.  It is derived from CANCEIS, which is better suited to large datasets such as the Census.  RBEIS differs from CANCEIS by constructing donor pools for each IGroup, rather than for each record.  These donor pools are then further processed to be the same size as the IGroup.  This implementation of RBEIS expects a Pandas DataFrame as input.</p>
+</div>
+<div class="section" id="assumptions">
+<h2>4 Assumptions<a class="headerlink" href="#assumptions" title="Permalink to this headline">¶</a></h2>
+<!--
+A bulleted list of assumptions that your method makes about its inputs
+-->
+<ul class="simple">
+<li><p>Distance functions expect arguments to be in the order (record, IGroup)</p></li>
+<li><p>Distance functions assume that categorical data is ordered, i.e. category 1 is somehow ‘less’ than category 2</p></li>
+</ul>
+</div>
+<div class="section" id="method-input-and-output">
+<h2>5 Method input and output<a class="headerlink" href="#method-input-and-output" title="Permalink to this headline">¶</a></h2>
+<!--
+A section detailing the kinds of data that your method expects to receive as input and produce as output, along with any related information (e.g. “fields must not contain null values”)
+-->
+<div class="section" id="input-records">
+<h3>5.1 Input records<a class="headerlink" href="#input-records" title="Permalink to this headline">¶</a></h3>
+<!--
+Details about the expected input, including (if applicable) the expected fields within each record and the formats in which they are expected
+-->
+<p><code class="docutils literal notranslate"><span class="pre">impute</span></code> is the function that runs RBEIS on a Pandas DataFrame.  It takes four required positional arguments, and has several optional keyword arguments.  An example call to <code class="docutils literal notranslate"><span class="pre">impute</span></code> follows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rbeis.pandas</span> <span class="kn">import</span> <span class="n">impute</span><span class="p">,</span> <span class="n">RBEISDistanceFunction</span>
+<span class="n">impute</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;my_data.csv&quot;</span><span class="p">),</span>
+       <span class="s2">&quot;genre&quot;</span><span class="p">,</span>
+       <span class="p">[</span><span class="s2">&quot;jungle&quot;</span><span class="p">,</span> <span class="s2">&quot;acid house&quot;</span><span class="p">,</span> <span class="s2">&quot;UK garage&quot;</span><span class="p">],</span>
+       <span class="p">{</span><span class="s2">&quot;artist&quot;</span><span class="p">:</span> <span class="n">RBEISDistanceFunction</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">weight</span> <span class="o">=</span> <span class="mi">5</span><span class="p">),</span>
+        <span class="s2">&quot;bpm&quot;</span><span class="p">:</span> <span class="n">RBEISDistanceFunction</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">custom_map</span> <span class="o">=</span> <span class="p">{(</span><span class="mi">170</span><span class="p">,</span> <span class="mi">180</span><span class="p">):</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="mi">140</span><span class="p">,</span> <span class="mi">160</span><span class="p">):</span> <span class="mi">100</span><span class="p">},</span> <span class="n">threshold</span> <span class="o">=</span> <span class="mi">5</span><span class="p">),</span>
+        <span class="s2">&quot;length&quot;</span><span class="p">:</span> <span class="n">RBEISDistanceFunction</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">threshold</span> <span class="o">=</span> <span class="mf">1.25</span><span class="p">)},</span>
+       <span class="n">ratio</span> <span class="o">=</span> <span class="mf">1.5</span><span class="p">,</span>
+       <span class="n">in_place</span> <span class="o">=</span> <span class="bp">False</span><span class="p">,</span>
+       <span class="n">keep_intermediates</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The first positional argument is a Pandas DataFrame, the dataset upon which to perform imputation.</p>
+<p>The second is a string corresponding to the variable to be imputed.  This should match the name of one of the columns in the DataFrame.</p>
+<p>The third is a list of possible values that the imputation variable can take.  In the above example, the imputation variable <code class="docutils literal notranslate"><span class="pre">&quot;genre&quot;</span></code> can take possible values from the list <code class="docutils literal notranslate"><span class="pre">[&quot;jungle&quot;,</span> <span class="pre">&quot;acid</span> <span class="pre">house&quot;,</span> <span class="pre">&quot;UK</span> <span class="pre">garage&quot;]</span></code>.</p>
+<p>The fourth positional argument represents the auxiliar variables that will be used in the imputation.  This is a dictionary whose keys are strings corresponding to the columns in the DataFrame to be used as auxiliary variables.  Its values are <code class="docutils literal notranslate"><span class="pre">RBEISDistanceFunction</span></code> objects representing the functions to be used to compare values within each auxiliary variable.  The <code class="docutils literal notranslate"><span class="pre">RBEISDistanceFunction</span></code> object is explained in greater depth below.</p>
+<p>The three optional keyword arguments available to <code class="docutils literal notranslate"><span class="pre">impute</span></code> are <code class="docutils literal notranslate"><span class="pre">ratio</span></code>, <code class="docutils literal notranslate"><span class="pre">in_place</span></code> and <code class="docutils literal notranslate"><span class="pre">keep_intermediates</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">ratio</span></code> is a numeric argument that allows RBEIS to accept donors with distances greater than the minimum.  If set, it allows RBEIS to accept values less than or equal to the value of <code class="docutils literal notranslate"><span class="pre">ratio</span></code> multiplied by the minimum distance.  It should be set to a number greater than 1, as values less than 1 would result in RBEIS looking for distances less than the minimum.  If a value less than 1 is given, an <code class="docutils literal notranslate"><span class="pre">RBEISInputException</span></code> will be thrown.  <code class="docutils literal notranslate"><span class="pre">ratio</span></code> has no default value, reverting to the original RBEIS behaviour of choosing only the minimum distance if it is not specified.</p>
+<p><code class="docutils literal notranslate"><span class="pre">in_place</span></code> is a Boolean argument (default <code class="docutils literal notranslate"><span class="pre">True</span></code>) which instructs <code class="docutils literal notranslate"><span class="pre">impute</span></code> to overwrite the original DataFrame with the results of the imputation.  If <code class="docutils literal notranslate"><span class="pre">in_place</span></code> is <code class="docutils literal notranslate"><span class="pre">False</span></code>, <code class="docutils literal notranslate"><span class="pre">impute</span></code> returns a new DataFrame with the imputed data included.</p>
+<p><code class="docutils literal notranslate"><span class="pre">keep_intermediates</span></code> is a Boolean argument (default <code class="docutils literal notranslate"><span class="pre">False</span></code>) which instructs <code class="docutils literal notranslate"><span class="pre">impute</span></code> not to delete the temporary columns it creates in the process of imputation.  Its primary use is for debugging.</p>
+</div>
+</div>
+<div class="section" id="distance-functions">
+<h2>Distance functions<a class="headerlink" href="#distance-functions" title="Permalink to this headline">¶</a></h2>
+<p>Distance functions are encapsulated in <code class="docutils literal notranslate"><span class="pre">RBEISDistanceFunction</span></code> objects, which specify which of the six RBEIS distance functions to use and contain any required threshold values, custom mappings and weights.  They can be constructed in several ways:</p>
+<ol class="simple">
+<li><p>Standard distance function: <code class="docutils literal notranslate"><span class="pre">RBEISDistanceFunction(1)</span></code></p>
+<ul class="simple">
+<li><p>This creates a distance function exactly as in the RBEIS specification.  In this case, this is the RBEIS distance function 1.</p></li>
+</ul>
+</li>
+<li><p>Weighted distance function: <code class="docutils literal notranslate"><span class="pre">RBEISDistanceFunction(1,</span> <span class="pre">weight</span> <span class="pre">=</span> <span class="pre">2)</span></code></p>
+<ul class="simple">
+<li><p>This creates a distance function with its output scaled by a given factor.  In this case, this is the RBEIS distance function 1 with its output scaled by a factor of 2.</p></li>
+</ul>
+</li>
+<li><p>Distance function with threshold: <code class="docutils literal notranslate"><span class="pre">RBEISDistanceFunction(3,</span> <span class="pre">threshold</span> <span class="pre">=</span> <span class="pre">5)</span></code></p>
+<ul class="simple">
+<li><p>This creates one of the RBEIS distance functions (2, 3, 5 or 6) that requires a threshold value.  In this case, we create RBEIS distance function 3 with a threshold value of 5.</p></li>
+</ul>
+</li>
+<li><p>Distance function with overrides: <code class="docutils literal notranslate"><span class="pre">RBEISDistanceFunction(4,</span> <span class="pre">custom_map</span> <span class="pre">=</span> <span class="pre">{(1,</span> <span class="pre">2):</span> <span class="pre">10,</span> <span class="pre">(2,</span> <span class="pre">1):</span> <span class="pre">200})</span></code></p>
+<ul class="simple">
+<li><p>This creates one of the RBEIS distance functions (4, 5, or 6) that overrides certain pairs of values.  These overrides are represented as a dictionary whose keys are the pair of values to be overridden and whose values are the distances to return when those pairs of values are passed to the <code class="docutils literal notranslate"><span class="pre">RBEISDistanceFunction</span></code>.  Note that argument order matters here; in the example above the function as applied to <code class="docutils literal notranslate"><span class="pre">(1,</span> <span class="pre">2)</span></code> returns a distance of 10, whereas the function applied to the <code class="docutils literal notranslate"><span class="pre">(2,</span> <span class="pre">1)</span></code> returns a distance of 200.</p></li>
+</ul>
+</li>
+</ol>
+<p>The keyword arguments <code class="docutils literal notranslate"><span class="pre">weight</span></code>, <code class="docutils literal notranslate"><span class="pre">threshold</span></code> and <code class="docutils literal notranslate"><span class="pre">custom_map</span></code> can be used in combination with each other when necessary.  In the following example, RBEIS distance function 6 is constructed with its requisite threshold and overrides.  It is also given a <code class="docutils literal notranslate"><span class="pre">weight</span></code> of 4.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">RBEISDistanceFunction</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="n">custom_map</span> <span class="o">=</span> <span class="p">{(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="mi">10</span><span class="p">,</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span> <span class="mi">400</span><span class="p">},</span> <span class="n">threshold</span> <span class="o">=</span> <span class="mf">2.5</span><span class="p">,</span> <span class="n">weight</span> <span class="o">=</span> <span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>It is possible to provide redundant arguments, for example providing a threshold value to distance function 1.  These will not be used, and a warning will be displayed upon creation.</p>
+<p><code class="docutils literal notranslate"><span class="pre">RBEISDistanceFunction</span></code>s are callable, meaning that they can be used as any other function:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">myDF</span> <span class="o">=</span> <span class="n">RBEISDistanceFunction</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="n">custom_map</span> <span class="o">=</span> <span class="p">{(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="mi">10</span><span class="p">,</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span> <span class="mi">400</span><span class="p">},</span> <span class="n">threshold</span> <span class="o">=</span> <span class="mf">2.5</span><span class="p">,</span> <span class="n">weight</span> <span class="o">=</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">myDF</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="output-records">
+<h3>5.2 Output records<a class="headerlink" href="#output-records" title="Permalink to this headline">¶</a></h3>
+<!--
+Details about the require output, including (if applicable) the expected fields within each record and the formats in which they are required
+-->
+<p><code class="docutils literal notranslate"><span class="pre">impute</span></code> modifies its input DataFrame by adding a new column containing the imputed values for a given variable, named <code><em>&lt;variable&gt;</em>_imputed</code>.  If <code class="docutils literal notranslate"><span class="pre">in_place</span></code> is set to <code class="docutils literal notranslate"><span class="pre">False</span></code>, a new DataFrame containing this column is returned.</p>
+</div>
+<div class="section" id="error-handling">
+<h3>5.3 Error handling<a class="headerlink" href="#error-handling" title="Permalink to this headline">¶</a></h3>
+<!--
+Details about what the method should do in the event of various classes of errors
+-->
+<p>RBEIS performs extensive checks on its inputs.  Where checks find incompatible or nonsensical inputs, an exception is raised and <code class="docutils literal notranslate"><span class="pre">impute</span></code> is terminated.  <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>s are raised when inputs of inappropriate type are supplied. <code class="docutils literal notranslate"><span class="pre">RBEISInputException</span></code>s are raised where inputs do not make sense for RBEIS (e.g. choosing distance function 7 when RBEIS only provides six) or where required data is missing.  Where checks find unnecessary inputs (for example redundant optional arguments), a warning of class <code class="docutils literal notranslate"><span class="pre">RBEISInputWarning</span></code> is raised.</p>
+</div>
+<div class="section" id="metadata">
+<h3>5.4 Metadata<a class="headerlink" href="#metadata" title="Permalink to this headline">¶</a></h3>
+<!--
+Details about what other metadata should be provided by the method, e.g. the number of times a donor was used in imputation
+-->
+<p>Currently, RBEIS collects no metadata by default.  If <code class="docutils literal notranslate"><span class="pre">keep_intermediates</span></code> is set to <code class="docutils literal notranslate"><span class="pre">True</span></code>, the temporary values calculated by the <code class="docutils literal notranslate"><span class="pre">impute</span></code> function are able to be inspected post-imputation.  These values are IGroup assignments, calculated distances and records to which each record may be a donor.</p>
+</div>
+</div>
+<div class="section" id="method">
+<h2>6 Method<a class="headerlink" href="#method" title="Permalink to this headline">¶</a></h2>
+<!--
+A detailed, formal, prose description of your method including, where appropriate, the underlying mathematics.  This section is best broken up into multiple subsections, especially for more complex methods
+-->
+<ol class="simple">
+<li><p>Assign each record requiring imputation to an imputation group (“IGroup”) based on the values of its auxiliary variables.</p></li>
+<li><p>For each potential donor record (those not requiring imputation), calculate the distance between the values of its auxiliary variables and those of each IGroup.  Each auxiliary variable should have a distance function assigned to it, and may also be assigned a weight.  The total distance is calculated thus: <span class="math notranslate nohighlight">\($\sum_{v \in A} w_{v}{f_{v}(v_{record},v_{IGroup})}\)</span>$where <span class="math notranslate nohighlight">\(A\)</span> is the set of auxiliary variables, <span class="math notranslate nohighlight">\(w_v\)</span> is the weight assigned to the auxiliary variable <span class="math notranslate nohighlight">\(v\)</span>, <span class="math notranslate nohighlight">\(f_v\)</span> is the distance function assigned to the auxiliary variable <span class="math notranslate nohighlight">\(v\)</span>, <span class="math notranslate nohighlight">\(v_{record}\)</span> is the value of the auxiliary variable for the current record, and <span class="math notranslate nohighlight">\(v_{IGroup}\)</span> is the value of the auxiliary variable for the current IGroup.</p></li>
+<li><p>Calculate which IGroup or IGroups for which each potential donor record could be used for imputation.  This is done by finding the minimum distance between any potential donor and each IGroup, and assigning those potential donors to that IGroup.  An optional behaviour is to specify a factor to multiply the minimum distance by, below which to accept donors (as opposed to solely accepting donors with the minimum distance).  These assigned records constitute the ‘potential donor pool’ for each IGroup.</p></li>
+<li><p>Calculate the frequency distribution of the values of the imputation variable occurring within each IGroup’s potential donor pool.  Convert these frequencies to the expected numbers of occurrences for a group with the same frequency distribution, but with a number of members equal to the size of the IGroup.  This is calculated thus: <span class="math notranslate nohighlight">\($\frac{f_v}{n_{pool}}n_{IGroup}\)</span>$where <span class="math notranslate nohighlight">\(f_v\)</span> is the frequency with which value <span class="math notranslate nohighlight">\(v\)</span> occurs, <span class="math notranslate nohighlight">\(n_{pool}\)</span> is the number of records in the potential donor pool, and <span class="math notranslate nohighlight">\(n_{IGroup}\)</span> is the number of records in the IGroup.</p></li>
+<li><p>For each IGroup, insert into a final donor pool each potential value of the imputation variable a number of times equal to the integer part of its expected number of occurrences.</p></li>
+<li><p>For each IGroup, using the fractional parts of each expected value as probabilities, draw a value at random and insert it into the donor pool.  Remove that value, recalculate the relative probabilities of the remaining possible values, and repeat the step until the donor pool is the same size as the IGroup.</p></li>
+<li><p>For each IGroup, assign the values in the donor pool randomly to members of the IGroup.</p></li>
+</ol>
+</div>
+<div class="section" id="further-information">
+<h2>7 Further information<a class="headerlink" href="#further-information" title="Permalink to this headline">¶</a></h2>
+<!--
+If appropriate, a bulleted list of links to external documents that provide further information about the method
+-->
+<ul class="simple">
+<li><p><a class="reference external" href="https://web.archive.org/web/20230725125247/https://unece.org/fileadmin/DAM/stats/documents/ece/ces/ge.58/2020/mtg1/SDE2020_T1-A_UK_Leather_Presentation.pdf">Presentation to UNECE, September 2020</a></p></li>
+</ul>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Rogers and Berriman Editing and Imputation System (RBEIS)</a><ul>
+<li><a class="reference internal" href="#meta">1 Meta</a></li>
+<li><a class="reference internal" href="#terminology">2 Terminology</a></li>
+<li><a class="reference internal" href="#summary">3 Summary</a></li>
+<li><a class="reference internal" href="#assumptions">4 Assumptions</a></li>
+<li><a class="reference internal" href="#method-input-and-output">5 Method input and output</a><ul>
+<li><a class="reference internal" href="#input-records">5.1 Input records</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#distance-functions">Distance functions</a><ul>
+<li><a class="reference internal" href="#output-records">5.2 Output records</a></li>
+<li><a class="reference internal" href="#error-handling">5.3 Error handling</a></li>
+<li><a class="reference internal" href="#metadata">5.4 Metadata</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#method">6 Method</a></li>
+<li><a class="reference internal" href="#further-information">7 Further information</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/spec/index.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search/" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex/" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex/" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../">rbeis 0.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Rogers and Berriman Editing and Imputation System (RBEIS)</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023, Phil Yeeles.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.4.
+    </div>
+  </body>
+</html>

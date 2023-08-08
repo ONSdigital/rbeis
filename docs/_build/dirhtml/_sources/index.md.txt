@@ -2,6 +2,9 @@
 
 Lorem ipsum.
 
+- [Method specification](https://y33les.github.io/rbeis/spec/)
+- [User notes](https://y33les.github.io/rbeis/notes/)
+
 # API Reference
 
 - [`rbeis`](https://y33les.github.io/rbeis/api/rbeis/)
