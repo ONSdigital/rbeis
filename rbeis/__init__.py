@@ -1,10 +1,11 @@
 """
 RBEIS is a method originally developed for imputing categorical data in relatively small social surveys with the intention of minimising conditional imputation variance. It is derived from CANCEIS, which is better suited to large datasets such as the Census.  This implementation of RBEIS works with [Pandas](https://pandas.pydata.org) DataFrames.
 """
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 import warnings
 from functools import partial
+from numbers import Number
 
 class RBEISInputException(Exception):
     """
