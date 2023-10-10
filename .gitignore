@@ -7,3 +7,5 @@ i.csv
 impspec_notes*
 hfswas.py
 tests/newtest.py
+newtest.py
+newtest_data.csv
