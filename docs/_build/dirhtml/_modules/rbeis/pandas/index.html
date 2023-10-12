@@ -54,6 +54,7 @@
 <span class="kn">from</span> <span class="nn">ast</span> <span class="k">import</span> <span class="n">literal_eval</span>
 <span class="kn">from</span> <span class="nn">re</span> <span class="k">import</span> <span class="n">sub</span>
 <span class="kn">from</span> <span class="nn">rbeis</span> <span class="k">import</span> <span class="n">RBEISInputException</span><span class="p">,</span> <span class="n">RBEISInputWarning</span><span class="p">,</span> <span class="n">RBEISDistanceFunction</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="k">import</span> <span class="n">isnan</span>
 
 
 
@@ -80,7 +81,7 @@
         <span class="k">assert</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">any</span><span class="p">([</span>
             <span class="nb">any</span><span class="p">(</span>
                 <span class="nb">map</span><span class="p">(</span>
-                    <span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">i</span><span class="p">),</span>
+                    <span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="ow">and</span> <span class="n">isnan</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="c1"># np.isnan(i),</span>
                     <span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
                 <span class="p">))</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">aux_vars</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
         <span class="p">]))</span>
@@ -105,7 +106,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Note that data[&quot;_impute&quot;] = np.isnan(data[imp_var]) does not work when imp_var is non-numeric</span>
     <span class="n">data</span><span class="p">[</span><span class="s2">&quot;_impute&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
-        <span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="n">imp_var</span><span class="p">])</span>
+        <span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">isnan</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="n">imp_var</span><span class="p">])</span> <span class="c1"># np.isnan(r[imp_var])</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="n">imp_var</span><span class="p">],</span> <span class="n">Number</span><span class="p">)</span> <span class="k">else</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="p">)</span>
@@ -411,7 +412,7 @@
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Imputation variable name must be a string&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">possible_vals</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Possible values must be contained in a list&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">all</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">possible_vals</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">v</span><span class="p">),</span><span class="n">data</span><span class="p">[</span><span class="n">imp_var</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())))):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">all</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">possible_vals</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="n">Number</span><span class="p">)</span> <span class="ow">and</span> <span class="n">isnan</span><span class="p">(</span><span class="n">v</span><span class="p">)),</span><span class="n">data</span><span class="p">[</span><span class="n">imp_var</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())))):</span> <span class="c1"># np.isnan(v),data[imp_var].unique())))):</span>
         <span class="k">raise</span> <span class="n">RBEISInputException</span><span class="p">(</span><span class="s2">&quot;The column to undergo imputation contains values that are not included in possible_vals&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">aux_vars</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>

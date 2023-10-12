@@ -14,6 +14,7 @@ from copy import deepcopy
 from ast import literal_eval
 from re import sub
 from rbeis import RBEISInputException, RBEISInputWarning, RBEISDistanceFunction
+from math import isnan
 
 
 
@@ -40,7 +41,7 @@ def _check_missing_auxvars(data, aux_vars):
         assert not (any([
             any(
                 map(
-                    lambda i: isinstance(i, float) and np.isnan(i),
+                    lambda i: isinstance(i, float) and isnan(i), # np.isnan(i),
                     data[k].tolist(),
                 )) for k in aux_vars.keys()
         ]))
@@ -65,7 +66,7 @@ def _add_impute_col(data, imp_var):
     """
     # Note that data["_impute"] = np.isnan(data[imp_var]) does not work when imp_var is non-numeric
     data["_impute"] = data.apply(
-        lambda r: np.isnan(r[imp_var])
+        lambda r: isnan(r[imp_var]) # np.isnan(r[imp_var])
         if isinstance(r[imp_var], Number) else False,
         axis=1,
     )
@@ -371,7 +372,7 @@ def impute(
         raise TypeError("Imputation variable name must be a string")
     if not (isinstance(possible_vals, list)):
         raise TypeError("Possible values must be contained in a list")
-    if not (all(list(map(lambda v: v in possible_vals or np.isnan(v),data[imp_var].unique())))):
+    if not (all(list(map(lambda v: v in possible_vals or (isinstance(v,Number) and isnan(v)),data[imp_var].unique())))): # np.isnan(v),data[imp_var].unique())))):
         raise RBEISInputException("The column to undergo imputation contains values that are not included in possible_vals")
     if not (isinstance(aux_vars, dict)):
         raise TypeError(
