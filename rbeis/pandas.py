@@ -372,7 +372,8 @@ def impute(
         raise TypeError("Imputation variable name must be a string")
     if not (isinstance(possible_vals, list)):
         raise TypeError("Possible values must be contained in a list")
-    if not (all(list(map(lambda v: v in possible_vals or (isinstance(v,Number) and isnan(v)),data[imp_var].unique())))): # np.isnan(v),data[imp_var].unique())))):
+    # FIXME: This fails on reticulate (but not vanilla Python)
+    if not (all(list(map(lambda v: (v in possible_vals) or (isinstance(v,Number) and isnan(v)),data[imp_var].unique())))): # np.isnan(v),data[imp_var].unique())))):
         raise RBEISInputException("The column to undergo imputation contains values that are not included in possible_vals")
     if not (isinstance(aux_vars, dict)):
         raise TypeError(
