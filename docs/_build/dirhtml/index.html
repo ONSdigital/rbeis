@@ -38,13 +38,21 @@
   <div class="section" id="rogers-and-berriman-editing-and-imputation-system-rbeis">
 <h1>Rogers and Berriman Editing and Imputation System (RBEIS)<a class="headerlink" href="#rogers-and-berriman-editing-and-imputation-system-rbeis" title="Permalink to this headline">¶</a></h1>
 <p>RBEIS is a method originally developed for imputing categorical data in relatively small social surveys with the intention of minimising conditional imputation variance. It is derived from CANCEIS, which is better suited to large datasets such as the Census.  This implementation of RBEIS works with <a class="reference external" href="https://pandas.pydata.org">Pandas</a> DataFrames.</p>
-<p>When production ready, RBEIS will be distributed through PyPI.  To install, simply call <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">rbeis</span></code>.</p>
-<p>Whilst still in the pre-release stage, the latest RBEIS wheel can be manually downloaded <a class="reference external" href="https://github.com/y33les/rbeis/releases/latest">from GitHub</a>.</p>
+<p>RBEIS consists of a package <code class="docutils literal notranslate"><span class="pre">rbeis</span></code>, containing classes used by all implementations of RBEIS, and subpackages <code class="docutils literal notranslate"><span class="pre">rbeis.*</span></code>, containing implementations of the <code class="docutils literal notranslate"><span class="pre">impute</span></code> method using various backends.  Currently, only <code class="docutils literal notranslate"><span class="pre">rbeis.pandas</span></code> has a complete implementation, although future support is planned for PySpark in the <code class="docutils literal notranslate"><span class="pre">rbeis.spark</span></code> package.</p>
+<p>To run an imputation, you will need to import <code class="docutils literal notranslate"><span class="pre">impute</span></code> and <code class="docutils literal notranslate"><span class="pre">RBEISDistanceFunction</span></code> by calling <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">rbeis.pandas</span> <span class="pre">import</span> <span class="pre">impute</span></code> (using the Pandas backend) and <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">rbeis</span> <span class="pre">import</span> <span class="pre">RBEISDistanceFunction</span></code>.</p>
+<div class="section" id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
+<p>RBEIS was developed in an environment requiring support for Python 3.6.8, pandas 0.20.3 and numpy 1.13.1.  It may work with newer versions of these packages, but this is untested.</p>
+</div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>RBEIS does not yet have approval to be published through PyPI.  When this is given, it will be able to be installed easily using <code class="docutils literal notranslate"><span class="pre">pip</span></code>.  In the meantime, whilst still in the pre-release stage, the latest RBEIS wheel can be manually downloaded <a class="reference external" href="https://github.com/y33les/rbeis/releases/latest">from GitHub</a> and installed by calling <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">/path/to/wheel</span></code>.</p>
 <p>RBEIS is licensed under the <a class="reference external" href="https://mit-license.org/">MIT License</a>.</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex/"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="search/"><span class="std std-ref">Search Page</span></a></p></li>
 </ul>
+</div>
 </div>
 <div class="section" id="api-reference">
 <h1>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h1>
@@ -128,7 +136,11 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="#">Table of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Rogers and Berriman Editing and Imputation System (RBEIS)</a></li>
+<li><a class="reference internal" href="#">Rogers and Berriman Editing and Imputation System (RBEIS)</a><ul>
+<li><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#api-reference">API Reference</a></li>
 <li><a class="reference internal" href="#key-documents">Key documents</a></li>
 </ul>
