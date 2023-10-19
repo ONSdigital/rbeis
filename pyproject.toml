@@ -1,5 +1,5 @@
 [build-system]
-requires = ["flit_core >=3.2,<4"]
+requires = ["flit_core ==3.2"]
 build-backend = "flit_core.buildapi"
 
 [project]
@@ -9,16 +9,16 @@ readme = "README.md"
 license = {file = "LICENSE"}
 classifiers = ["License :: OSI Approved :: MIT License"]
 dynamic = ["version", "description"]
-dependencies = ["pandas >= 0.20.3",
-                "numpy >= 1.13.1"]
+dependencies = ["pandas == 0.20.3",
+                "numpy == 1.13.1"]
 
 [project.optional-dependencies]
-test = ["pytest >= 3.2.1",
-         "pytest-cov >= 2.3.1"]
-doc = ["sphinx >= 3.5.4",
-        "myst-parser >= 0.11.2",
-	"commonmark >= 0.9.1",
-	"sphinx-autoapi >= 2.0.0"]
+test = ["pytest == 3.2.1",
+         "pytest-cov == 2.3.1"]
+doc = ["sphinx == 3.5.4",
+        "myst-parser == 0.11.2",
+	"commonmark == 0.9.1",
+	"sphinx-autoapi == 2.0.0"]
 
 [project.urls]
 Home = "https://yeel.es/rbeis"
