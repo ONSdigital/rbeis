@@ -16,7 +16,6 @@ Submodules
    :maxdepth: 1
 
    pandas/index.rst
-   rpandas/index.rst
    spark/index.rst
 
 
