@@ -1,7 +1,7 @@
 """
 RBEIS is a method originally developed for imputing categorical data in relatively small social surveys with the intention of minimising conditional imputation variance. It is derived from CANCEIS, which is better suited to large datasets such as the Census.  This implementation of RBEIS works with [Pandas](https://pandas.pydata.org) DataFrames.
 """
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 
 import warnings
 from functools import partial
@@ -148,6 +148,10 @@ class RBEISDistanceFunction:
         if df >= 4:
             try:
                 assert custom_map
+                if not (isinstance(custom_map,dict)):
+                    raise TypeError(
+                        "Distance function overrides must be expressed in a dictionary whose keys are tuples representing pairs of values"
+                            )
                 if not (all(
                         map(lambda x: isinstance(x, tuple),
                             custom_map.keys()))):
