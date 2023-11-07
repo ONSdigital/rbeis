@@ -175,6 +175,12 @@ class RBEISDistanceFunction:
             )
         if not (isinstance(weight, Number)):
             raise TypeError("You have supplied a weight that is not numeric")
+        else:
+            try:
+                if not weight >= 0:
+                    raise RBEISInputException("Weights must be real numbers that are greater than or equal to 0.")
+            except TypeError:
+                raise RBEISInputException("Weights must be real numbers that are greater than or equal to 0.")
         if df == 1:
             self.f = self._df1
         elif df == 2:
