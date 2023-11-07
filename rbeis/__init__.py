@@ -126,6 +126,13 @@ class RBEISDistanceFunction:
     weight = 1.0
 
     def __init__(self, df, custom_map=None, threshold=None, weight=1.0):
+        if not (isinstance(weight, Number)):
+            raise TypeError("You have supplied a weight that is not numeric")
+        try:
+            if not weight >= 0:
+                raise RBEISInputException("Weights must be real numbers that are greater than or equal to 0.")
+        except TypeError:
+            raise RBEISInputException("Weights must be real numbers that are greater than or equal to 0.")
         self.weight = float(weight)
         if df < 1 or df > 6:
             raise RBEISInputException(
@@ -173,14 +180,6 @@ class RBEISDistanceFunction:
                 "You have supplied custom mappings for a distance function that does not use them",
                 RBEISInputWarning,
             )
-        if not (isinstance(weight, Number)):
-            raise TypeError("You have supplied a weight that is not numeric")
-        else:
-            try:
-                if not weight >= 0:
-                    raise RBEISInputException("Weights must be real numbers that are greater than or equal to 0.")
-            except TypeError:
-                raise RBEISInputException("Weights must be real numbers that are greater than or equal to 0.")
         if df == 1:
             self.f = self._df1
         elif df == 2:
