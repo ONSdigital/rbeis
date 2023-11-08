@@ -10,7 +10,8 @@ license = {file = "LICENSE"}
 classifiers = ["License :: OSI Approved :: MIT License"]
 dynamic = ["version", "description"]
 dependencies = ["pandas == 0.20.3",
-                "numpy == 1.13.1"]
+                "numpy == 1.13.1",
+		"wheel == 0.29.0"]
 
 [project.optional-dependencies]
 test = ["pytest == 3.2.1",

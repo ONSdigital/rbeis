@@ -9,6 +9,7 @@ RBEIS is a method originally developed for imputing categorical data in relative
 - Python 3.6.8
 - pandas 0.20.3
 - numpy 1.13.1
+- wheel 0.29.0
 
 _(untested on newer versions; this is the environment in which RBEIS originally had to be developed)_
 
