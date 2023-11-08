@@ -22,10 +22,10 @@ Functions
 
 
 
-.. py:function:: impute(data, imp_var, possible_vals, aux_vars, ratio=None, in_place=True, keep_intermediates=False)
+.. py:function:: impute(data, imp_var, possible_vals, aux_vars, ratio=None, keep_intermediates=False)
 
    
-   Impute missing values for a given variable using the Rogers & Berriman Editing and Imputation System (RBEIS).  By default, this function modifies the existing DataFrame in place, rather than returning a new DataFrame, unless ``in_place`` is set to ``False``.  A high-level overview of the approach is given here (for more detail, see the documentation for each of the private intermediate functions in this library):
+   Impute missing values for a given variable using the Rogers & Berriman Editing and Imputation System (RBEIS).  This function modifies the existing DataFrame in place, rather than returning a new DataFrame.  A high-level overview of the approach is given here (for more detail, see the documentation for each of the private intermediate functions in this library):
    
    #. Identify values to be imputed
    #. Assign imputation groups ("IGroups") based on a given set of auxiliary variables
@@ -39,7 +39,6 @@ Functions
    * **possible_vals** ('a list): A list of all possible values that imp_var can take
    * **aux_vars** (str * `RBEISDistanceFunction <..#RBEISDistanceFunction>`_ dict): A dictionary whose keys are strings corresponding to the names of auxiliary variables and whose values are the `RBEISDistanceFunctions <..#RBEISDistanceFunction>`_ to be used to compare instances of each auxiliary variable.
    * **ratio** (numeric): [Optional] Instead of choosing the minimum distance, choose records less than or equal to ``ratio`` × the minimum distance.
-   * **in_place** (bool): [Optional, default ``True``] If ``True``, modify the original DataFrame in place.  If ``False``, return a new (deep) copy of the DataFrame having undergone imputation.
    * **keep_intermediates** (bool): [Optional, default ``False``] If ``True``, retain the intermediate columns created by this implementation of RBEIS in the process of imputation.  If ``False``, remove them from the output.
    
    *Example usage:*
@@ -53,5 +52,6 @@ Functions
                   "bpm": RBEISDistanceFunction(5, custom_map = {(170, 180): 0, (140, 160): 100}, threshold = 5),
                "length": RBEISDistanceFunction(2, threshold = 1.25)},
               ratio = 1.5,
-              in_place = False,
               keep_intermediates = True)
+   
+   .. warning:: **PLEASE NOTE** that ``impute`` is destructive, and will modify the input DataFrame in place.  If you need to retain the unimputed version, make a `deep copy <https://docs.python.org/3/library/copy.html#copy.deepcopy>`_ first.

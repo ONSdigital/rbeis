@@ -17,6 +17,115 @@ from rbeis import RBEISInputException, RBEISInputWarning, RBEISDistanceFunction
 from math import isnan
 
 
+def impute(
+    data,
+    imp_var,
+    possible_vals,
+    aux_vars,
+    ratio=None,
+    keep_intermediates=False,
+):
+    """
+    Impute missing values for a given variable using the Rogers & Berriman Editing and Imputation System (RBEIS).  This function modifies the existing DataFrame in place, rather than returning a new DataFrame.  A high-level overview of the approach is given here (for more detail, see the documentation for each of the private intermediate functions in this library):
+
+    1. Identify values to be imputed
+    1. Assign imputation groups ("IGroups") based on a given set of auxiliary variables
+    1. Calculate how similar the auxiliary variables of each IGroup are to those of the potential donor records
+    1. Assign the most similar records to the donor pools of the corresponding IGroups
+    1. Impute values for each IGroup
+    1. Insert imputed values into the original DataFrame
+
+    - **data** ([pd.DataFrame](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html)): The dataset undergoing imputation
+    - **imp_var** (str): The name of the variable to be imputed
+    - **possible_vals** ('a list): A list of all possible values that imp_var can take
+    - **aux_vars** (str * [RBEISDistanceFunction](..#RBEISDistanceFunction) dict): A dictionary whose keys are strings corresponding to the names of auxiliary variables and whose values are the [RBEISDistanceFunctions](..#RBEISDistanceFunction) to be used to compare instances of each auxiliary variable.
+    - **ratio** (numeric): [Optional] Instead of choosing the minimum distance, choose records less than or equal to `ratio` &times; the minimum distance.
+    - **keep_intermediates** (bool): [Optional, default `False`] If `True`, retain the intermediate columns created by this implementation of RBEIS in the process of imputation.  If `False`, remove them from the output.
+
+    _Example usage:_
+    ```python
+    impute(pd.read_csv("my_data.csv"),
+           "genre",
+           ["jungle", "acid house", "UK garage"],
+           {"artist": RBEISDistanceFunction(1, weight = 5),
+               "bpm": RBEISDistanceFunction(5, custom_map = {(170, 180): 0, (140, 160): 100}, threshold = 5),
+            "length": RBEISDistanceFunction(2, threshold = 1.25)},
+           ratio = 1.5,
+           keep_intermediates = True)
+    ```
+
+    .. warning:: **PLEASE NOTE** that `impute` is destructive, and will modify the input DataFrame in place.  If you need to retain the unimputed version, make a [deep copy](https://docs.python.org/3/library/copy.html#copy.deepcopy) first.
+    """
+
+    # Input checks
+    if not (isinstance(data, pd.DataFrame)):
+        raise TypeError("Dataset must be a Pandas DataFrame")
+    if not (isinstance(imp_var, str)):
+        raise TypeError("Imputation variable name must be a string")
+    if not (isinstance(possible_vals, list)):
+        raise TypeError("Possible values must be contained in a list")
+    # FIXME: This fails on reticulate (but not vanilla Python)
+    if not (all(list(map(lambda v: (v in possible_vals) or (isinstance(v,Number) and isnan(v)),data[imp_var].unique())))): # np.isnan(v),data[imp_var].unique())))):
+        raise RBEISInputException("The column to undergo imputation contains values that are not included in possible_vals")
+    if not (isinstance(aux_vars, dict)):
+        raise TypeError(
+            "aux_vars must be a dictionary whose keys are strings representing auxiliary vvariables and whose values are RBEISDistanceFunctions"
+        )
+    if not (all(map(lambda x: isinstance(x, str), aux_vars.keys()))):
+        raise TypeError(
+            "aux_vars must be a dictionary whose keys are strings containing auxiliary variable names"
+        )
+    if not (all(
+            map(lambda x: isinstance(x, RBEISDistanceFunction),
+                aux_vars.values()))):
+        raise TypeError(
+            "aux_vars must be a dictionary whose values are RBEISDistanceFunctions"
+        )
+    try:
+        assert ratio
+        if not (isinstance(ratio, Number)):
+            raise TypeError("The ratio must be numeric")
+        if ratio < 1:
+            raise RBEISInputException("The ratio must be greater than 1")
+    except AssertionError:
+        pass
+    try:
+        assert keep_intermediates
+        if not (isinstance(keep_intermediates, bool)):
+            raise TypeError("keep_intermediates must be either True or False")
+    except AssertionError:
+        pass
+
+    # Imputation
+    _check_missing_auxvars(data, aux_vars)
+    _add_impute_col(data, imp_var)
+    _assign_igroups(data, aux_vars.keys())
+    _calc_distances(data, aux_vars)
+    _calc_donors(data, ratio=ratio)
+    imputed_vals = list(
+        map(
+            lambda i: _impute_igroup(
+                data,
+                _freq_to_exp(
+                    data, _get_freq_dist(data, imp_var, possible_vals, i), i),
+                possible_vals,
+                i,
+            ),
+            range(1 + data["_IGroup"].max()),
+        ))
+    data[imp_var + "_imputed"] = data.apply(
+        lambda r: (imputed_vals[r["_IGroup"]].pop(0)
+                   if imputed_vals[r["_IGroup"]] != [] else r[imp_var])
+        if r["_impute"] else r[imp_var],
+        axis=1,
+    )
+    assert all(map(lambda l: l == [], imputed_vals))
+    if not (keep_intermediates):
+        del data["_impute"]
+        del data["_IGroup"]
+        del data["_distances"]
+        del data["_donor"]
+
 
 def _check_missing_auxvars(data, aux_vars):
     """
@@ -322,127 +431,3 @@ def _impute_igroup(data, exp_dist, possible_vals, igroup):
         #       either int(exp) or int(exp)+1
     shuffle(out)
     return out
-
-
-def impute(
-    data,
-    imp_var,
-    possible_vals,
-    aux_vars,
-    ratio=None,
-    in_place=True,
-    keep_intermediates=False,
-):
-    """
-    Impute missing values for a given variable using the Rogers & Berriman Editing and Imputation System (RBEIS).  By default, this function modifies the existing DataFrame in place, rather than returning a new DataFrame, unless `in_place` is set to `False`.  A high-level overview of the approach is given here (for more detail, see the documentation for each of the private intermediate functions in this library):
-
-    1. Identify values to be imputed
-    1. Assign imputation groups ("IGroups") based on a given set of auxiliary variables
-    1. Calculate how similar the auxiliary variables of each IGroup are to those of the potential donor records
-    1. Assign the most similar records to the donor pools of the corresponding IGroups
-    1. Impute values for each IGroup
-    1. Insert imputed values into the original DataFrame
-
-    - **data** ([pd.DataFrame](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html)): The dataset undergoing imputation
-    - **imp_var** (str): The name of the variable to be imputed
-    - **possible_vals** ('a list): A list of all possible values that imp_var can take
-    - **aux_vars** (str * [RBEISDistanceFunction](..#RBEISDistanceFunction) dict): A dictionary whose keys are strings corresponding to the names of auxiliary variables and whose values are the [RBEISDistanceFunctions](..#RBEISDistanceFunction) to be used to compare instances of each auxiliary variable.
-    - **ratio** (numeric): [Optional] Instead of choosing the minimum distance, choose records less than or equal to `ratio` &times; the minimum distance.
-    - **in_place** (bool): [Optional, default `True`] If `True`, modify the original DataFrame in place.  If `False`, return a new (deep) copy of the DataFrame having undergone imputation.
-    - **keep_intermediates** (bool): [Optional, default `False`] If `True`, retain the intermediate columns created by this implementation of RBEIS in the process of imputation.  If `False`, remove them from the output.
-
-    _Example usage:_
-    ```python
-    impute(pd.read_csv("my_data.csv"),
-           "genre",
-           ["jungle", "acid house", "UK garage"],
-           {"artist": RBEISDistanceFunction(1, weight = 5),
-               "bpm": RBEISDistanceFunction(5, custom_map = {(170, 180): 0, (140, 160): 100}, threshold = 5),
-            "length": RBEISDistanceFunction(2, threshold = 1.25)},
-           ratio = 1.5,
-           in_place = False,
-           keep_intermediates = True)
-    ```
-    """
-
-    # Input checks
-    if not (isinstance(data, pd.DataFrame)):
-        raise TypeError("Dataset must be a Pandas DataFrame")
-    if not (isinstance(imp_var, str)):
-        raise TypeError("Imputation variable name must be a string")
-    if not (isinstance(possible_vals, list)):
-        raise TypeError("Possible values must be contained in a list")
-    # FIXME: This fails on reticulate (but not vanilla Python)
-    if not (all(list(map(lambda v: (v in possible_vals) or (isinstance(v,Number) and isnan(v)),data[imp_var].unique())))): # np.isnan(v),data[imp_var].unique())))):
-        raise RBEISInputException("The column to undergo imputation contains values that are not included in possible_vals")
-    if not (isinstance(aux_vars, dict)):
-        raise TypeError(
-            "aux_vars must be a dictionary whose keys are strings representing auxiliary vvariables and whose values are RBEISDistanceFunctions"
-        )
-    if not (all(map(lambda x: isinstance(x, str), aux_vars.keys()))):
-        raise TypeError(
-            "aux_vars must be a dictionary whose keys are strings containing auxiliary variable names"
-        )
-    if not (all(
-            map(lambda x: isinstance(x, RBEISDistanceFunction),
-                aux_vars.values()))):
-        raise TypeError(
-            "aux_vars must be a dictionary whose values are RBEISDistanceFunctions"
-        )
-    try:
-        assert ratio
-        if not (isinstance(ratio, Number)):
-            raise TypeError("The ratio must be numeric")
-        if ratio < 1:
-            raise RBEISInputException("The ratio must be greater than 1")
-    except AssertionError:
-        pass
-    try:
-        assert in_place
-        if not (isinstance(in_place, bool)):
-            raise TypeError("in_place must be either True or False")
-    except AssertionError:
-        pass
-    try:
-        assert keep_intermediates
-        if not (isinstance(keep_intermediates, bool)):
-            raise TypeError("keep_intermediates must be either True or False")
-    except AssertionError:
-        pass
-
-    # Imputation
-    if not (in_place):
-        data_old = deepcopy(data)
-    _check_missing_auxvars(data, aux_vars)
-    _add_impute_col(data, imp_var)
-    _assign_igroups(data, aux_vars.keys())
-    _calc_distances(data, aux_vars)
-    _calc_donors(data, ratio=ratio)
-    imputed_vals = list(
-        map(
-            lambda i: _impute_igroup(
-                data,
-                _freq_to_exp(
-                    data, _get_freq_dist(data, imp_var, possible_vals, i), i),
-                possible_vals,
-                i,
-            ),
-            range(1 + data["_IGroup"].max()),
-        ))
-    data[imp_var + "_imputed"] = data.apply(
-        lambda r: (imputed_vals[r["_IGroup"]].pop(0)
-                   if imputed_vals[r["_IGroup"]] != [] else r[imp_var])
-        if r["_impute"] else r[imp_var],
-        axis=1,
-    )
-    assert all(map(lambda l: l == [], imputed_vals))
-    if not (keep_intermediates):
-        del data["_impute"]
-        del data["_IGroup"]
-        del data["_distances"]
-        del data["_donor"]
-    if not (in_place):
-        data_new = deepcopy(data)
-        data = deepcopy(data_old)
-        del data_old
-        return data_new

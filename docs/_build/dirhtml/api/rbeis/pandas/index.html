@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>rbeis.pandas &#8212; rbeis 0.1.0 documentation</title>
+    <title>rbeis.pandas &#8212; rbeis 0.2.0 documentation</title>
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
@@ -25,7 +25,7 @@
         <li class="right" >
           <a href="../../../py-modindex/" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../">rbeis 0.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../">rbeis 0.2.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href=""><code class="xref py py-mod docutils literal notranslate"><span class="pre">rbeis.pandas</span></code></a></li> 
       </ul>
     </div>  
@@ -49,14 +49,14 @@
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#rbeis.pandas.impute" title="rbeis.pandas.impute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">impute</span></code></a>(data, imp_var, possible_vals, aux_vars[, …])</p></td>
-<td><p>Impute missing values for a given variable using the Rogers &amp; Berriman Editing and Imputation System (RBEIS).  By default, this function modifies the existing DataFrame in place, rather than returning a new DataFrame, unless <code class="docutils literal notranslate"><span class="pre">in_place</span></code> is set to <code class="docutils literal notranslate"><span class="pre">False</span></code>.  A high-level overview of the approach is given here (for more detail, see the documentation for each of the private intermediate functions in this library):</p></td>
+<td><p>Impute missing values for a given variable using the Rogers &amp; Berriman Editing and Imputation System (RBEIS).  This function modifies the existing DataFrame in place, rather than returning a new DataFrame.  A high-level overview of the approach is given here (for more detail, see the documentation for each of the private intermediate functions in this library):</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py function">
 <dt id="rbeis.pandas.impute">
-<code class="sig-prename descclassname"><span class="pre">rbeis.pandas.</span></code><code class="sig-name descname"><span class="pre">impute</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imp_var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">possible_vals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aux_vars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_place</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_intermediates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/rbeis/pandas/#impute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rbeis.pandas.impute" title="Permalink to this definition">¶</a></dt>
-<dd><p>Impute missing values for a given variable using the Rogers &amp; Berriman Editing and Imputation System (RBEIS).  By default, this function modifies the existing DataFrame in place, rather than returning a new DataFrame, unless <code class="docutils literal notranslate"><span class="pre">in_place</span></code> is set to <code class="docutils literal notranslate"><span class="pre">False</span></code>.  A high-level overview of the approach is given here (for more detail, see the documentation for each of the private intermediate functions in this library):</p>
+<code class="sig-prename descclassname"><span class="pre">rbeis.pandas.</span></code><code class="sig-name descname"><span class="pre">impute</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imp_var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">possible_vals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aux_vars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_intermediates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/rbeis/pandas/#impute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rbeis.pandas.impute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Impute missing values for a given variable using the Rogers &amp; Berriman Editing and Imputation System (RBEIS).  This function modifies the existing DataFrame in place, rather than returning a new DataFrame.  A high-level overview of the approach is given here (for more detail, see the documentation for each of the private intermediate functions in this library):</p>
 <ol class="arabic simple">
 <li><p>Identify values to be imputed</p></li>
 <li><p>Assign imputation groups (“IGroups”) based on a given set of auxiliary variables</p></li>
@@ -71,7 +71,6 @@
 <li><p><strong>possible_vals</strong> (‘a list): A list of all possible values that imp_var can take</p></li>
 <li><p><strong>aux_vars</strong> (str * <a class="reference external" href="..#RBEISDistanceFunction">RBEISDistanceFunction</a> dict): A dictionary whose keys are strings corresponding to the names of auxiliary variables and whose values are the <a class="reference external" href="..#RBEISDistanceFunction">RBEISDistanceFunctions</a> to be used to compare instances of each auxiliary variable.</p></li>
 <li><p><strong>ratio</strong> (numeric): [Optional] Instead of choosing the minimum distance, choose records less than or equal to <code class="docutils literal notranslate"><span class="pre">ratio</span></code> × the minimum distance.</p></li>
-<li><p><strong>in_place</strong> (bool): [Optional, default <code class="docutils literal notranslate"><span class="pre">True</span></code>] If <code class="docutils literal notranslate"><span class="pre">True</span></code>, modify the original DataFrame in place.  If <code class="docutils literal notranslate"><span class="pre">False</span></code>, return a new (deep) copy of the DataFrame having undergone imputation.</p></li>
 <li><p><strong>keep_intermediates</strong> (bool): [Optional, default <code class="docutils literal notranslate"><span class="pre">False</span></code>] If <code class="docutils literal notranslate"><span class="pre">True</span></code>, retain the intermediate columns created by this implementation of RBEIS in the process of imputation.  If <code class="docutils literal notranslate"><span class="pre">False</span></code>, remove them from the output.</p></li>
 </ul>
 <p><em>Example usage:</em></p>
@@ -82,9 +81,12 @@
            <span class="s2">&quot;bpm&quot;</span><span class="p">:</span> <span class="n">RBEISDistanceFunction</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">custom_map</span> <span class="o">=</span> <span class="p">{(</span><span class="mi">170</span><span class="p">,</span> <span class="mi">180</span><span class="p">):</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="mi">140</span><span class="p">,</span> <span class="mi">160</span><span class="p">):</span> <span class="mi">100</span><span class="p">},</span> <span class="n">threshold</span> <span class="o">=</span> <span class="mi">5</span><span class="p">),</span>
         <span class="s2">&quot;length&quot;</span><span class="p">:</span> <span class="n">RBEISDistanceFunction</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">threshold</span> <span class="o">=</span> <span class="mf">1.25</span><span class="p">)},</span>
        <span class="n">ratio</span> <span class="o">=</span> <span class="mf">1.5</span><span class="p">,</span>
-       <span class="n">in_place</span> <span class="o">=</span> <span class="bp">False</span><span class="p">,</span>
        <span class="n">keep_intermediates</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
 </pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><strong>PLEASE NOTE</strong> that <code class="docutils literal notranslate"><span class="pre">impute</span></code> is destructive, and will modify the input DataFrame in place.  If you need to retain the unimputed version, make a <a class="reference external" href="https://docs.python.org/3/library/copy.html#copy.deepcopy">deep copy</a> first.</p>
 </div>
 </dd></dl>
 
@@ -143,7 +145,7 @@
         <li class="right" >
           <a href="../../../py-modindex/" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../">rbeis 0.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../">rbeis 0.2.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href=""><code class="xref py py-mod docutils literal notranslate"><span class="pre">rbeis.pandas</span></code></a></li> 
       </ul>
     </div>

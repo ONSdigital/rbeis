@@ -2,6 +2,7 @@ from unittest import TestCase
 
 import numpy as np
 import pandas as pd
+from fractions import Fraction
 
 from rbeis.pandas import (
     RBEISDistanceFunction,
@@ -95,7 +96,6 @@ class TestInputTypeValidation(RBEISTestCase):
                                           weight=3),
                 },
                 ratio=None,
-                in_place=True,
                 keep_intermediates=True,
             )
 
@@ -119,7 +119,6 @@ class TestInputTypeValidation(RBEISTestCase):
                                           weight=3),
                 },
                 ratio=None,
-                in_place=True,
                 keep_intermediates=True,
             )
 
@@ -143,7 +142,6 @@ class TestInputTypeValidation(RBEISTestCase):
                                           weight=3),
                 },
                 ratio=None,
-                in_place=True,
                 keep_intermediates=True,
             )
 
@@ -156,7 +154,6 @@ class TestInputTypeValidation(RBEISTestCase):
                 possible_vals=list(range(1, 101)),
                 aux_vars="Not_a_Dictionary",
                 ratio=None,
-                in_place=True,
                 keep_intermediates=True,
             )
 
@@ -180,7 +177,6 @@ class TestInputTypeValidation(RBEISTestCase):
                                           weight=3),
                 },
                 ratio=None,
-                in_place=True,
                 keep_intermediates=True,
             )
 
@@ -201,7 +197,6 @@ class TestInputTypeValidation(RBEISTestCase):
                                           weight=3),
                 },
                 ratio=None,
-                in_place=True,
                 keep_intermediates=True,
             )
 
@@ -225,7 +220,6 @@ class TestInputTypeValidation(RBEISTestCase):
                                           weight=3),
                 },
                 ratio=None,
-                in_place=True,
                 keep_intermediates=True,
             )
 
@@ -249,7 +243,6 @@ class TestInputTypeValidation(RBEISTestCase):
                                           weight=3),
                 },
                 ratio=None,
-                in_place=True,
                 keep_intermediates=True,
             )
 
@@ -273,7 +266,6 @@ class TestInputTypeValidation(RBEISTestCase):
                                           weight=3),
                 },
                 ratio=None,
-                in_place=True,
                 keep_intermediates=True,
             )
 
@@ -297,7 +289,6 @@ class TestInputTypeValidation(RBEISTestCase):
                                           weight=3),
                 },
                 ratio=None,
-                in_place=True,
                 keep_intermediates=True,
             )
 
@@ -321,31 +312,6 @@ class TestInputTypeValidation(RBEISTestCase):
                                           weight=3),
                 },
                 ratio="Not_a_number",
-                in_place=True,
-                keep_intermediates=True,
-            )
-
-    # --- Test type validation on in_place  ---
-    def test_type_validation_in_place(self):
-        with self.assertRaises(TypeError):
-            impute(
-                data=self.dummy_dataframe,
-                imp_var="dummy_impute_var",
-                possible_vals=list(range(1, 101)),
-                aux_vars={
-                    "dummy_aux_var1":
-                    RBEISDistanceFunction(1,
-                                          custom_map=None,
-                                          threshold=None,
-                                          weight=2),
-                    "dummy_aux_var2":
-                    RBEISDistanceFunction(1,
-                                          custom_map=None,
-                                          threshold=None,
-                                          weight=3),
-                },
-                ratio=None,
-                in_place="Not_a_Boolean",
                 keep_intermediates=True,
             )
 
@@ -369,7 +335,6 @@ class TestInputTypeValidation(RBEISTestCase):
                                           weight=3),
                 },
                 ratio=None,
-                in_place=True,
                 keep_intermediates="Not_a_Boolean",
             )
 
@@ -398,7 +363,6 @@ class TestInputValues(RBEISTestCase):
                                           weight=3),
                 },
                 ratio=None,
-                in_place=True,
                 keep_intermediates=True,
             )
 
@@ -424,7 +388,6 @@ class TestInputValues(RBEISTestCase):
     #                        weight=3)
     #                    },
     #          ratio=None,
-    #          in_place=True,
     #          keep_intermediates=True)
 
     # --- Test exception when auxiliary variable is not a variable in the dataframe
@@ -447,7 +410,6 @@ class TestInputValues(RBEISTestCase):
                                           weight=3),
                 },
                 ratio=None,
-                in_place=True,
                 keep_intermediates=True,
             )
 
@@ -471,7 +433,6 @@ class TestInputValues(RBEISTestCase):
                                           weight=3),
                 },
                 ratio=None,
-                in_place=True,
                 keep_intermediates=True,
             )
 
@@ -495,7 +456,6 @@ class TestInputValues(RBEISTestCase):
                                           weight=3),
                 },
                 ratio=None,
-                in_place=True,
                 keep_intermediates=True,
             )
 
@@ -519,7 +479,6 @@ class TestInputValues(RBEISTestCase):
                                           weight=3),
                 },
                 ratio=None,
-                in_place=True,
                 keep_intermediates=True,
             )
 
@@ -544,7 +503,6 @@ class TestInputValues(RBEISTestCase):
                                               weight=3)
                 },
                 ratio=None,
-                in_place=True,
                 keep_intermediates=True,
             )     
 
@@ -567,7 +525,6 @@ class TestInputValues(RBEISTestCase):
                                           weight=3),
                 },
                 ratio=None,
-                in_place=True,
                 keep_intermediates=True,
             )
 
@@ -591,7 +548,6 @@ class TestInputValues(RBEISTestCase):
                                           weight=3),
                 },
                 ratio=None,
-                in_place=True,
                 keep_intermediates=True,
             )
 
@@ -615,7 +571,6 @@ class TestInputValues(RBEISTestCase):
                                           weight=3),
                 },
                 ratio=None,
-                in_place=True,
                 keep_intermediates=True,
             )
 
@@ -639,7 +594,6 @@ class TestInputValues(RBEISTestCase):
                                           weight=3),
                 },
                 ratio=None,
-                in_place=True,
                 keep_intermediates=True,
             )
 
@@ -663,7 +617,6 @@ class TestInputValues(RBEISTestCase):
                                           weight=3),
                 },
                 ratio=None,
-                in_place=True,
                 keep_intermediates=True,
             )
 
@@ -687,7 +640,6 @@ class TestInputValues(RBEISTestCase):
                                           weight=3),
                 },
                 ratio=None,
-                in_place=True,
                 keep_intermediates=True,
             )
 
@@ -711,7 +663,6 @@ class TestInputValues(RBEISTestCase):
                                           weight=3),
                 },
                 ratio=None,
-                in_place=True,
                 keep_intermediates=True,
             )
 
@@ -735,7 +686,6 @@ class TestInputValues(RBEISTestCase):
                                           weight=3),
                 },
                 ratio=None,
-                in_place=True,
                 keep_intermediates=True,
             )
 
@@ -759,7 +709,6 @@ class TestInputValues(RBEISTestCase):
                                           weight=3),
                 },
                 ratio=None,
-                in_place=True,
                 keep_intermediates=True,
             )
 
@@ -783,7 +732,6 @@ class TestInputValues(RBEISTestCase):
                                           weight=3),
                 },
                 ratio=None,
-                in_place=True,
                 keep_intermediates=True,
             )
 
@@ -807,7 +755,6 @@ class TestInputValues(RBEISTestCase):
                                           weight=3),
                 },
                 ratio=None,
-                in_place=True,
                 keep_intermediates=True,
             )
 
@@ -831,7 +778,6 @@ class TestInputValues(RBEISTestCase):
                                           weight=3),
                 },
                 ratio=None,
-                in_place=True,
                 keep_intermediates=True,
             )
 
@@ -855,7 +801,6 @@ class TestInputValues(RBEISTestCase):
                                           weight=3)
                 },              
                 ratio=0.5,
-                in_place=True,
                 keep_intermediates=True,
             )
 
@@ -1574,51 +1519,6 @@ class TestImputeIGroup(RBEISTestCase):
 #     keep_intermediatesis TRUE
 # -----------------------------------------------------------------------------
 class TestOutputDataframe(RBEISTestCase):
-       
-    # --- Check original dataframe IS changed if in-place is TRUE  
-    def test_in_place_true(self):
-
-        test_data = pd.read_csv(self.test_data_filepath)
-        impute(
-            data=test_data,
-            imp_var=self.test_impute_var,
-            possible_vals=self.test_pos_vals,
-            aux_vars={
-                    self.test_aux_var1: 
-                        RBEISDistanceFunction(1, weight=2), 
-                    self.test_aux_var2: 
-                        RBEISDistanceFunction(1, weight=3)
-                    },
-            ratio=None,
-            in_place=True,
-            keep_intermediates=None
-        )
-        original_data = pd.read_csv(self.test_data_filepath)            
-        self.assertFalse(test_data.equals(original_data)) 
-    
-    # --- Check original dataframe is NOT changed and returned dataframe 
-    #      IS changed if in-place is FALSE  
-    def test_in_place_false(self):
-
-        test_data = pd.read_csv(self.test_data_filepath)
-        imputed_data = impute(
-            data=test_data,
-            imp_var=self.test_impute_var,
-            possible_vals=self.test_pos_vals,
-            aux_vars={
-                    self.test_aux_var1: 
-                        RBEISDistanceFunction(1, weight=2), 
-                    self.test_aux_var2: 
-                        RBEISDistanceFunction(1, weight=3)
-                    },
-            ratio=None,
-            in_place=False,
-            keep_intermediates=None
-        )
-        original_data = pd.read_csv(self.test_data_filepath)            
-        self.assertTrue(test_data.equals(original_data)) 
-        self.assertFalse(imputed_data.equals(original_data))         
-        
         
     # --- Check that 1 column is added when keep_intermediates is FALSE
     def test_keep_intermediates_false(self):
@@ -1636,7 +1536,6 @@ class TestOutputDataframe(RBEISTestCase):
                         RBEISDistanceFunction(1, weight=3)
                     },
             ratio=None,
-            in_place=True,
             keep_intermediates=False
         )
         nrows_new, ncols_new = test_data.shape  
@@ -1658,7 +1557,6 @@ class TestOutputDataframe(RBEISTestCase):
                         RBEISDistanceFunction(1, weight=3)
                     },
             ratio=None,
-            in_place=True,
             keep_intermediates=True
         )
         nrows_new, ncols_new = test_data.shape  
