@@ -2,7 +2,7 @@
 
 RBEIS implementations using Pandas and PySpark for SML
 
-RBEIS is a method originally developed for imputing categorical data in relatively small social surveys with the intention of minimising conditional imputation variance. It is derived from CANCEIS, which is better suited to large datasets such as the Census.  This implementation of RBEIS works with `Pandas <https://pandas.pydata.org>`_ DataFrames.
+RBEIS is a method originally developed for imputing categorical data in relatively small social surveys with the intention of minimising conditional imputation variance. It is derived from CANCEIS, which is better suited to large datasets such as the Census.  This implementation of RBEIS works with [Pandas](https://pandas.pydata.org) DataFrames.
 
 ## Prerequisites
 
