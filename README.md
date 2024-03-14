@@ -1,3 +1,5 @@
+> _This repository is now archived.  Future development will take place in the ONS-owned fork at [ONSdigital/rbeis](https://github.com/ONSdigital/rbeis)._
+
 # Rogers and Berriman Editing and Imputation System (RBEIS)
 
 RBEIS implementations using Pandas and PySpark for SML
