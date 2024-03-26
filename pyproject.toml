@@ -22,7 +22,7 @@ doc = ["sphinx == 3.5.4",
 	"sphinx-autoapi == 2.0.0"]
 
 [project.urls]
-Home = "https://yeel.es/rbeis"
+Home = "https://onsdigital.github.io/rbeis/"
 
 [tool.pytest.ini_options]
 addopts = "--cov"
